@@ -74,8 +74,56 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Return Flash_PT_Internal(True, Vz, P, T, PP, ReuseKI, PrevKi)
+            'Return Flash_PT_Internal(True, Vz, P, T, PP, ReuseKI, PrevKi)
+            Return Flash_PT_S(True, Vz, P, T, PP, ReuseKI, PrevKi)
 
+        End Function
+
+        Public Function Flash_PT_S(ByVal include_vapor As Boolean, ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+            Dim n As Integer = CompoundProperties.Count - 1
+            Dim K() = PP.DW_CalcKvalue_Ideal_VP(T, P)
+            Dim loopMax As Integer = 100
+            Dim beta As Double = 0.5#
+            Dim d_beta As Double
+            Dim ecount As Integer = 0
+            Dim conv As Double = 0.0001
+
+            Do
+                Dim fx(n), dfx(n) As Double
+                For i = 0 To n
+                    fx(i) = (Vz(i) * (K(i) - 1)) / (1 + beta * (K(i) - 1))
+                    dfx(i) = (Vz(i) * Pow(K(i) - 1, 2)) / Pow(1 + beta * (K(i) - 1), 2)
+                Next
+                Dim s_fx, s_dfx As Double
+                s_fx = fx.Sum
+                s_dfx = -dfx.Sum
+                d_beta = -s_fx / s_dfx
+                beta += d_beta
+                ecount += 1
+            Loop Until ecount > loopMax Or Abs(d_beta) < conv Or beta > 1 Or beta < 0
+
+            Dim L, V, S As Double
+            If beta > 0 And beta < 1 Then V = beta Else If beta > 1 Then V = 1
+
+            L = 1 - V
+
+            Dim Vxl(n), Vxv(n) As Double
+
+            For i = 0 To n
+                If V = 0 Then
+                    Vxl(i) = Vz(i)
+                    Vxv(i) = 0
+                ElseIf V = 1 Then
+                    Vxl(i) = 0
+                    Vxv(i) = Vz(i)
+                Else
+                    Vxl(i) = Vz(i) / (1 + beta * (K(i) - 1))
+                    Vxv(i) = Vz(i) * K(i) / (1 + beta * (K(i) - 1))
+                End If
+            Next
+
+
+            Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector, S, PP.RET_NullVector}
         End Function
 
         Public Function Flash_PT_Internal(ByVal include_vapor As Boolean, ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
@@ -212,9 +260,9 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
                 Next
 
                 For i = 0 To n
-                    If Sum(Vnl) <> 0.0# Then Vxl(i) = Vnl(i) / Sum(Vnl) Else Vxl(i) = 0.0000000001
-                    If Sum(Vns) <> 0.0# Then Vxs(i) = Vns(i) / Sum(Vns) Else Vxs(i) = 0.0000000001
-                    If Sum(Vnv) <> 0.0# Then Vxv(i) = Vnv(i) / Sum(Vnv) Else Vxv(i) = 0.0000000001
+                    If Sum(Vnl) <> 0.0# Then Vxl(i) = Vnl(i) / Sum(Vnl) Else Vxl(i) = 0.0
+                    If Sum(Vns) <> 0.0# Then Vxs(i) = Vns(i) / Sum(Vns) Else Vxs(i) = 0.0
+                    If Sum(Vnv) <> 0.0# Then Vxv(i) = Vnv(i) / Sum(Vnv) Else Vxv(i) = 0.0
                 Next
 
                 errfunc = Abs(L - L_ant)
@@ -243,8 +291,124 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
         End Function
 
         Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+            Dim d1, d2 As Date, dt As TimeSpan
 
+            d1 = Date.Now
+
+            Dim n, ecount As Integer
+            Dim maxitINT As Integer = Me.FlashSettings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_Internal_Iterations)
+            n = Vz.Length - 1
+            Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+            Dim L, V, T, S, Pf As Double
+            Dim K(n), Vx(n), Vy(n), Vs(n), Vp(n) As Double
+            Vx = Vz.Clone
+            Vy = {1.0, 0.0}
+            Dim Vn(n) As String
+            Vn = PP.RET_VNAMES()
+
+            Dim mmg, mml, mms As Double
+            Hf = H
+            Pf = P
+            Dim Tloop, fx, fx2, dfdx As Double
+            Tloop = Tref
+            Dim beta_min, beta_max, beta As Double
+            Dim deltaT As Double = 1.0#
+            'Dim deltaTindex As Integer = 0
+
+            ' T loop
+            Do
+                fx = Herror_S(Tloop, {P, Vz, PP})
+                fx2 = Herror_S(Tloop + deltaT, {P, Vz, PP})
+                If Abs(fx) < 0.00001 Then Exit Do
+                dfdx = (fx2 - fx)
+
+                If fx < 0 Then
+                    'Si fx < 0 -> H < H(Tloop)' -> T < Tloop
+                    If Herror_S(Tloop - deltaT, {P, Vz, PP}) < 0 Then
+                        Tloop -= deltaT
+                        ecount = 0
+                    Else
+                        deltaT /= 10
+                        ecount = 0
+                    End If
+                    'ecount = 0
+                Else
+                    If fx2 > 0 Then
+                        If Herror_S(Tloop + deltaT, {P, Vz, PP}) > 0 Then
+                            Tloop += deltaT
+                            ecount = 0
+                        Else
+                            deltaT /= 10
+                            ecount = 0
+                        End If
+                    Else
+                        deltaT /= 10
+                        ecount = 0
+                        'Tloop = Tloop - fx / dfdx
+                        'Exit Do
+                    End If
+                End If
+                Console.WriteLine("Tloop:" & Tloop & " fx : " & fx & " fx2 : " & fx2)
+                ecount += 1
+            Loop Until ecount > 200 Or deltaT < 0.000001 'Or Tloop < 0
+
+            T = Tloop
+
+            Dim Hs, Hl, Hv, xl, xv, xs As Double
+
+            Hs = PP.DW_CalcSolidEnthalpy(T, Vz, CompoundProperties)
+            Hl = PP.DW_CalcEnthalpy(Vz, T, P, State.Liquid)
+            Hv = PP.DW_CalcEnthalpy(Vz, T, P, State.Vapor)
+
+            Dim Tsat As Double = PP.AUX_TSATi(P, wid)
+
+            Dim tmp As Object() = Nothing
+
+            If H > Hl And H <= Hv Then
+                Console.WriteLine("Vaporisation partielle") 'partial vaporization.
+                xv = (H - Hl) / (Hv - Hl)
+                xl = 1 - xv
+                Vz(wid) -= xv
+                Vz = Vz.NormalizeY()
+                'tmp = Flash_PT_S(True, Vz, P, T, PP)
+                L = xl
+                V = xv
+                S = 0
+                Vx = Vz
+                Vy = PP.RET_NullVector()
+                Vy(wid) = 1.0#
+                Vs = PP.RET_NullVector()
+            Else
+                Console.WriteLine("Pas de Vaporisation partielle")
+                xl = 1
+                'tmp = Flash_PT(Vz, P, T, PP)
+                L = xl
+                V = xv
+                S = 0
+                Vx = Vz
+                Vy = PP.RET_NullVector()
+                'Vy(wid) = 1.0#
+                Vs = PP.RET_NullVector()
+            End If
+
+
+            d2 = Date.Now
+
+            dt = d2 - d1
+
+            Console.WriteLine("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+
+            WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+
+            Return New Object() {L, V, Vx, Vy, T, ecount, K, 0.0#, PP.RET_NullVector, S, Vs}
+
+        End Function
+
+        Public Function Flash_PH_old(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+            ' Vz : fraction molaire
             Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1), Vs(1) As Double
+            ' Vn : Nom des composants (water,salt)
+            ' Tref : T° reference
             Dim i, n, ecount As Integer
             Dim d1, d2 As Date, dt As TimeSpan
             Dim L, V, T, S, Pf As Double
@@ -280,13 +444,18 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
             Dim cnt As Integer = 0
 
-            Tref = 300.0#
-            x1 = Tref
+            x1 = 300.0
+            'Tref = 300.0#
+            'Tinf = Tref
+            'Tsup = Tref
+            'x1 = Tref - 10
+            'x1 = 384'
             Do
                 fx = Herror(x1, {P, Vz, PP})
                 fx2 = Herror(x1 + 1, {P, Vz, PP})
                 If Abs(fx) < etol Then Exit Do
                 dfdx = (fx2 - fx)
+                Console.WriteLine("x1:" & x1 & " fx : " & fx & " fx2:" & fx2 & " dfdx :" & dfdx & " res :" & x1 - fx / dfdx)
                 x1 = x1 - fx / dfdx
                 If x1 < 0 Then GoTo alt
                 cnt += 1
@@ -367,6 +536,23 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
                 Vy = tmp(3)
                 Vs = tmp(8)
             End If
+
+            If H > Hl And H <= Hv Then
+                'partial vaporization.
+                xv = (H - Hl) / (Hv - Hl)
+                xl = 1 - xv
+                Vz(wid) -= xv
+                Vz = Vz.NormalizeY()
+                tmp = Flash_PT(Vz, P, T, PP)
+                L = tmp(0) * xl
+                V = xv
+                S = tmp(7) * xl
+                Vx = tmp(2)
+                Vy = PP.RET_NullVector()
+                Vy(wid) = 1.0#
+                Vs = tmp(8)
+            End If
+
 
             ecount = tmp(4)
 
@@ -528,6 +714,13 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
         End Function
 
+        Function OBJ_FUNC_PH_FLASH2(ByVal T As Double, ByVal H As Double, ByVal P As Double, ByVal Vz As Object, ByVal pp As PropertyPackage) As Object
+            'utiliser DW_CalcEnthalpy pour calculer l'Hl, Hv
+            '
+            Dim _Hv, _Hl As Double
+            _Hv = pp.DW_CalcEnthalpy({1, 0}, T, P, State.Vapor)
+        End Function
+
         Function OBJ_FUNC_PH_FLASH(ByVal T As Double, ByVal H As Double, ByVal P As Double, ByVal Vz As Object, ByVal pp As PropertyPackage) As Object
 
             Dim tmp As Object
@@ -557,6 +750,42 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
             OBJ_FUNC_PH_FLASH = herr
+
+            WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
+
+        End Function
+
+        Function OBJ_FUNC_PH_FLASH_S(ByVal T As Double, ByVal H As Double, ByVal P As Double, ByVal Vz As Object, ByVal pp As PropertyPackage) As Object
+
+            Dim tmp As Object
+            tmp = Me.Flash_PT_S(True, Vz, P, T, pp)
+            Dim L, V, S, Vx(), Vy(), Vs(), _Hv, _Hl, _Hs As Double
+
+            Dim n = Vz.Length - 1
+
+            L = tmp(0)
+            V = tmp(1)
+            S = tmp(7)
+            Vx = tmp(2)
+            Vy = tmp(3)
+            Vs = tmp(8)
+
+            _Hv = 0
+            _Hl = 0
+            _Hs = 0
+
+            Dim mmg, mml, mms As Double
+            If V > 0 Then _Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+            If L > 0 Then _Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
+            If S > 0 Then _Hs = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties)
+            mmg = pp.AUX_MMM(Vy)
+            mml = pp.AUX_MMM(Vx)
+            mms = pp.AUX_MMM(Vs)
+
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
+            OBJ_FUNC_PH_FLASH_S = herr
+
+            'Console.WriteLine("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
 
             WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
 
@@ -594,6 +823,12 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             WriteDebugInfo("PS Flash [Seawater]: Current T = " & T & ", Current S Error = " & serr)
 
+        End Function
+
+
+
+        Function Herror_S(ByVal Tt As Double, ByVal otherargs As Object) As Double
+            Return OBJ_FUNC_PH_FLASH_S(Tt, Hf, otherargs(0), otherargs(1), otherargs(2))
         End Function
 
         Function Herror(ByVal Tt As Double, ByVal otherargs As Object) As Double
