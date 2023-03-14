@@ -112,15 +112,19 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             For i = 0 To n
                 If V = 0 Then
                     Vxl(i) = Vz(i)
-                    Vxv(i) = 0
+                    Vxv(i) = 0.0#
                 ElseIf V = 1 Then
-                    Vxl(i) = 0
+                    Vxl(i) = 0.0#
                     Vxv(i) = Vz(i)
                 Else
                     Vxl(i) = Vz(i) / (1 + beta * (K(i) - 1))
                     Vxv(i) = Vz(i) * K(i) / (1 + beta * (K(i) - 1))
                 End If
             Next
+
+            Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+
+            If V = 0 Then Vxv(wid) = 1.0#
 
 
             Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector, S, PP.RET_NullVector}
@@ -260,9 +264,9 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
                 Next
 
                 For i = 0 To n
-                    If Sum(Vnl) <> 0.0# Then Vxl(i) = Vnl(i) / Sum(Vnl) Else Vxl(i) = 0.0
-                    If Sum(Vns) <> 0.0# Then Vxs(i) = Vns(i) / Sum(Vns) Else Vxs(i) = 0.0
-                    If Sum(Vnv) <> 0.0# Then Vxv(i) = Vnv(i) / Sum(Vnv) Else Vxv(i) = 0.0
+                    If Sum(Vnl) <> 0.0# Then Vxl(i) = Vnl(i) / Sum(Vnl) Else Vxl(i) = 0.0000000001
+                    If Sum(Vns) <> 0.0# Then Vxs(i) = Vns(i) / Sum(Vns) Else Vxs(i) = 0.0000000001
+                    If Sum(Vnv) <> 0.0# Then Vxv(i) = Vnv(i) / Sum(Vnv) Else Vxv(i) = 0.0000000001
                 Next
 
                 errfunc = Abs(L - L_ant)
@@ -348,9 +352,11 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
                         'Exit Do
                     End If
                 End If
-                Console.WriteLine("Tloop:" & Tloop & " fx : " & fx & " fx2 : " & fx2)
+                'Console.WriteLine("Tloop:" & Tloop & " fx : " & fx & " fx2 : " & fx2 & " dfdx : " & dfdx)
                 ecount += 1
-            Loop Until ecount > 200 Or deltaT < 0.000001 'Or Tloop < 0
+            Loop Until ecount > 50 Or deltaT < 0.000001 'Or Tloop < 0
+
+            Console.WriteLine("Tref " & Tref & " Tloop " & Tloop & " dfdx " & dfdx & " deltaT " & deltaT)
 
             T = Tloop
 
