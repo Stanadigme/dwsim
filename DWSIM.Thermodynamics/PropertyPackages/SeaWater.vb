@@ -29,7 +29,7 @@ Namespace PropertyPackages
 
         Inherits PropertyPackages.PropertyPackage
 
-        Protected m_iapws97 As New IAPWS_IF97
+        Friend m_iapws97 As New IAPWS_IF97
 
         Protected SIA As New Seawater
 
@@ -96,9 +96,9 @@ Namespace PropertyPackages
             End Get
         End Property
 
-        Public Overrides Function AUX_IS_SINGLECOMP(Phase As Phase) As Boolean
-            Return False
-        End Function
+        'Public Overrides Function AUX_IS_SINGLECOMP(Phase As Phase) As Boolean
+        'Return False
+        'End Function
 
         Public Overrides Function AUX_VAPDENS(ByVal T As Double, ByVal P As Double) As Double
 
