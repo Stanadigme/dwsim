@@ -38,6 +38,9 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
         Dim Hv0, Hvid, Hlid, Hf, Hv, Hl, Hs As Double
         Dim Sv0, Svid, Slid, Sf, Sv, Sl, Ss As Double
 
+        Dim stFA As SteamTables = New SteamTables
+        Dim stpp As SteamTablesPropertyPackage = New SteamTablesPropertyPackage
+
         Public Property CompoundProperties As List(Of Interfaces.ICompoundConstantProperties)
 
         Sub New()
@@ -75,8 +78,13 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             'Return Flash_PT_Internal(True, Vz, P, T, PP, ReuseKI, PrevKi)
-            Return Flash_PT_S(True, Vz, P, T, PP, ReuseKI, PrevKi)
-
+            Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+            If Vz(wid) = 1 Then
+                stpp.CurrentMaterialStream = PP.CurrentMaterialStream
+                Return stFA.Flash_PT(Vz, P, T, stpp, ReuseKI, PrevKi)
+            Else
+                Return Flash_PT_S(True, Vz, P, T, PP, ReuseKI, PrevKi)
+            End If
         End Function
 
         Public Function Flash_PT_S(ByVal include_vapor As Boolean, ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
@@ -86,7 +94,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             Dim beta As Double = 0.5#
             Dim d_beta As Double
             Dim ecount As Integer = 0
-            Dim conv As Double = 0.0001
+            Dim conv As Double = 0.00001
 
             Do
                 Dim fx(n), dfx(n) As Double
@@ -104,6 +112,8 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim L, V, S As Double
             If beta > 0 And beta < 1 Then V = beta Else If beta > 1 Then V = 1
+
+            If V < 0.0000001 Then V = 0
 
             L = 1 - V
 
@@ -303,6 +313,10 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             Dim maxitINT As Integer = Me.FlashSettings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_Internal_Iterations)
             n = Vz.Length - 1
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+            If Vz(wid) = 1 Then
+                stpp.CurrentMaterialStream = PP.CurrentMaterialStream
+                Return stFA.Flash_PH(Vz, P, H, Tref, stpp, ReuseKI, PrevKi)
+            End If
             Dim L, V, T, S, Pf As Double
             Dim K(n), Vx(n), Vy(n), Vs(n), Vp(n) As Double
             Vx = Vz.Clone
@@ -373,6 +387,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             If H > Hl And H <= Hv Then
                 Console.WriteLine("Vaporisation partielle") 'partial vaporization.
                 xv = (H - Hl) / (Hv - Hl)
+                If xv <= 0.0000001 Then xv = 0
                 xl = 1 - xv
                 Vz(wid) -= xv
                 Vz = Vz.NormalizeY()
