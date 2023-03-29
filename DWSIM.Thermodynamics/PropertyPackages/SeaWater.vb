@@ -100,6 +100,10 @@ Namespace PropertyPackages
         'Return False
         'End Function
 
+        'Public Overrides Sub DW_CalcEquilibrium(ByVal spec1 As FlashSpec, ByVal spec2 As FlashSpec)
+
+        'End Sub
+
         Public Overrides Function AUX_VAPDENS(ByVal T As Double, ByVal P As Double) As Double
 
             Return Me.SIA.vap_density_si(T, P)
