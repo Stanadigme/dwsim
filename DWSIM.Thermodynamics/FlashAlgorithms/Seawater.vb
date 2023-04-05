@@ -94,7 +94,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             Dim beta As Double = 0.5#
             Dim d_beta As Double
             Dim ecount As Integer = 0
-            Dim conv As Double = 0.00001
+            Dim conv As Double = 0.0000001
 
             Do
                 Dim fx(n), dfx(n) As Double
@@ -334,41 +334,43 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             'Dim deltaTindex As Integer = 0
 
             ' T loop
+            Dim precision As Double = 0.0000001
+
             Do
                 fx = Herror_S(Tloop, {P, Vz, PP})
                 fx2 = Herror_S(Tloop + deltaT, {P, Vz, PP})
-                If Abs(fx) < 0.00001 Then Exit Do
-                dfdx = (fx2 - fx)
+                If Abs(fx) < precision Then Exit Do
+                'dfdx = (fx2 - fx)
 
                 If fx < 0 Then
                     'Si fx < 0 -> H < H(Tloop)' -> T < Tloop
                     If Herror_S(Tloop - deltaT, {P, Vz, PP}) < 0 Then
                         Tloop -= deltaT
-                        ecount = 0
+                        'ecount = 0
                     Else
                         deltaT /= 10
-                        ecount = 0
+                        'ecount = 0
                     End If
                     'ecount = 0
                 Else
                     If fx2 > 0 Then
                         If Herror_S(Tloop + deltaT, {P, Vz, PP}) > 0 Then
                             Tloop += deltaT
-                            ecount = 0
+                            'ecount = 0
                         Else
                             deltaT /= 10
-                            ecount = 0
+                            'ecount = 0
                         End If
                     Else
                         deltaT /= 10
-                        ecount = 0
+                        'ecount = 0
                         'Tloop = Tloop - fx / dfdx
                         'Exit Do
                     End If
                 End If
                 'Console.WriteLine("Tloop:" & Tloop & " fx : " & fx & " fx2 : " & fx2 & " dfdx : " & dfdx)
                 ecount += 1
-            Loop Until ecount > 50 Or deltaT < 0.000001 'Or Tloop < 0
+            Loop Until ecount > 50 Or deltaT < precision 'Or Tloop < 0
 
             Console.WriteLine("Tref " & Tref & " Tloop " & Tloop & " dfdx " & dfdx & " deltaT " & deltaT)
 
@@ -387,6 +389,8 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             If H > Hl And H <= Hv Then
                 Console.WriteLine("Vaporisation partielle") 'partial vaporization.
                 xv = (H - Hl) / (Hv - Hl)
+                ' TODO : Correction fraction massique --> fraction molaire
+
                 If xv <= 0.0000001 Then xv = 0
                 xl = 1 - xv
                 Vz(wid) -= xv
