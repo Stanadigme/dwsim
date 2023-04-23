@@ -878,6 +878,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
         Dim obj As ISimulationObject
 
         Dim lists As New Dictionary(Of Integer, List(Of String))
+        Dim hashlists As New Dictionary(Of Integer, HashSet(Of String))
         Dim filteredlist As New Dictionary(Of Integer, List(Of String))
         Dim objstack As New List(Of String)
 
@@ -921,7 +922,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                     Else
                         Exit Do
                     End If
-                    If lists.Count > 10000 Then
+                    If lists.Count > 1000000 Then
                         lists.Clear()
                         GlobalSettings.Settings.CalculatorBusy = False
                         Throw New Exception("Infinite loop detected while obtaining flowsheet object calculation order. Please insert recycle blocks where needed.")
@@ -954,36 +955,38 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
 
             'add endpoint material streams and recycle ops to the list, they will be the last objects to be calculated.
 
-            lists.Add(0, New List(Of String))
+            'lists.Add(0, New List(Of String))
+            hashlists.Add(0, New HashSet(Of String))
 
             For Each baseobj In fbag.SimulationObjects.Values
                 If baseobj.GraphicObject.ObjectType = ObjectType.MaterialStream Then
                     If baseobj.GraphicObject.OutputConnectors(0).IsAttached = False Then
-                        lists(0).Add(baseobj.Name)
+                        hashlists(0).Add(baseobj.Name)
                     End If
                 ElseIf baseobj.GraphicObject.ObjectType = ObjectType.EnergyStream Then
                     If baseobj.GraphicObject.OutputConnectors(0).IsAttached = False Then
-                        lists(0).Add(baseobj.Name)
+                        hashlists(0).Add(baseobj.Name)
                     End If
                 ElseIf baseobj.GraphicObject.ObjectType = ObjectType.OT_Recycle Then
-                    lists(0).Add(baseobj.Name)
+                    hashlists(0).Add(baseobj.Name)
                 ElseIf baseobj.GraphicObject.ObjectType = ObjectType.OT_EnergyRecycle Then
-                    lists(0).Add(baseobj.Name)
+                    hashlists(0).Add(baseobj.Name)
                 ElseIf baseobj.IsSource Then
-                    lists(0).Add(baseobj.Name)
+                    hashlists(0).Add(baseobj.Name)
                 End If
             Next
 
             'now start processing the list at each level, until it reaches the beginning of the flowsheet.
 
             Dim totalobjs As Integer = 0
+            Dim processedObjs As New HashSet(Of String)()
 
             Do
                 listidx += 1
-                If lists(listidx - 1).Count > 0 Then
-                    lists.Add(listidx, New List(Of String))
+                If hashlists(listidx - 1).Count > 0 Then
+                    hashlists.Add(listidx, New HashSet(Of String))
                     maxidx = listidx
-                    For Each o As String In lists(listidx - 1)
+                    For Each o As String In hashlists(listidx - 1)
                         If fbag.SimulationObjects.ContainsKey(o) Then
                             obj = fbag.SimulationObjects(o)
                             If Not onqueue Is Nothing Then
@@ -993,10 +996,11 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                 If c.IsAttached Then
                                     If c.AttachedConnector.AttachedFrom.ObjectType <> ObjectType.OT_Recycle And
                                         c.AttachedConnector.AttachedFrom.ObjectType <> ObjectType.OT_EnergyRecycle Then
-                                        lists(listidx).Add(c.AttachedConnector.AttachedFrom.Name)
-                                        totalobjs += 1
-                                        If totalobjs > 10000 Then
-                                            Throw New Exception("Infinite loop detected while obtaining flowsheet object calculation order. Please insert recycle blocks where needed.")
+                                        Dim attachedFromName As String = c.AttachedConnector.AttachedFrom.Name
+                                        hashlists(listidx).Add(attachedFromName)
+                                        If Not processedObjs.Contains(attachedFromName) Then
+                                            totalobjs += 1
+                                            processedObjs.Add(attachedFromName) ' Add to processed objects
                                         End If
                                     End If
                                 End If
@@ -1008,6 +1012,9 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 End If
             Loop
 
+            For Each kvp As KeyValuePair(Of Integer, HashSet(Of String)) In hashlists
+                lists.Add(kvp.Key, kvp.Value.ToList())
+            Next
             'process the lists backwards, adding objects to the stack, discarding duplicate entries.
 
             listidx = maxidx

@@ -372,7 +372,6 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
                 ecount += 1
             Loop Until ecount > 50 Or deltaT < precision 'Or Tloop < 0
 
-            Console.WriteLine("Tref " & Tref & " Tloop " & Tloop & " dfdx " & dfdx & " deltaT " & deltaT)
 
             T = Tloop
 
@@ -387,9 +386,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             Dim tmp As Object() = Nothing
 
             If H > Hl And H <= Hv Then
-                Console.WriteLine("Vaporisation partielle") 'partial vaporization.
                 xv = (H - Hl) / (Hv - Hl)
-                ' TODO : Correction fraction massique --> fraction molaire
 
                 If xv <= 0.0000001 Then xv = 0
                 xl = 1 - xv
@@ -404,7 +401,6 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
                 Vy(wid) = 1.0#
                 Vs = PP.RET_NullVector()
             Else
-                Console.WriteLine("Pas de Vaporisation partielle")
                 xl = 1
                 'tmp = Flash_PT(Vz, P, T, PP)
                 L = xl
@@ -421,7 +417,6 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
@@ -480,7 +475,6 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
                 fx2 = Herror(x1 + 1, {P, Vz, PP})
                 If Abs(fx) < etol Then Exit Do
                 dfdx = (fx2 - fx)
-                Console.WriteLine("x1:" & x1 & " fx : " & fx & " fx2:" & fx2 & " dfdx :" & dfdx & " res :" & x1 - fx / dfdx)
                 x1 = x1 - fx / dfdx
                 If x1 < 0 Then GoTo alt
                 cnt += 1

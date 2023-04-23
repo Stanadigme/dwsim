@@ -275,7 +275,72 @@ Namespace UnitOperations
             End With
         End Function
 
+        Public Overrides Sub CreateDynamicProperties()
+            AddDynamicProperty("Volume", "Pipe Volume", 1, UnitOfMeasure.volume, 1.0.GetType())
+            AddDynamicProperty("Initialize using Inlet Stream", "Initializes the volume content with information from the inlet stream, if the content is null.", True, UnitOfMeasure.none, True.GetType())
+            AddDynamicProperty("Reset Content", "Empties the volume content on the next run.", False, UnitOfMeasure.none, True.GetType())
 
+        End Sub
+
+        Public Overrides Sub RunDynamicModel()
+            Dim integratorID = FlowSheet.DynamicsManager.ScheduleList(FlowSheet.DynamicsManager.CurrentSchedule).CurrentIntegrator
+            Dim integrator = FlowSheet.DynamicsManager.IntegratorList(integratorID)
+
+            Dim timestep = integrator.IntegrationStep.TotalSeconds
+
+            If integrator.RealTime Then timestep = Convert.ToDouble(integrator.RealTimeStepMs) / 1000.0
+
+            Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
+            Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
+            Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
+            Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
+
+            s1 = ims.DynamicsSpec
+            s2 = oms.DynamicsSpec
+            Dim volume As Double
+
+            For Each segmento In Me.Profile.Sections.Values
+                volume += segmento.Quantidade * segmento.Comprimento * ((segmento.DI * 0.0254) ^ 2) / 4 * Math.PI
+            Next
+
+            SetDynamicProperty("Volume", volume)
+
+            If AccumulationStream Is Nothing Then
+
+                If InitializeFromInlet Then
+
+                    AccumulationStream = ims.CloneXML
+
+                Else
+
+                    AccumulationStream = ims.Subtract(oms, timestep)
+
+                End If
+
+            Else
+                AccumulationStream.SetFlowsheet(FlowSheet)
+                If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
+                AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                AccumulationStream.Calculate()
+                If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
+                If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
+
+            End If
+
+            AccumulationStream.SetFlowsheet(FlowSheet)
+            AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+
+            If integrator.ShouldCalculateEquilibrium Then
+
+                AccumulationStream.Calculate(True, True)
+
+            End If
+
+            Calculate()
+
+            oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+
+        End Sub
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)
 
             Dim IObj As Inspector.InspectorItem = Inspector.Host.GetNewInspectorItem()
