@@ -8389,8 +8389,8 @@ Namespace Streams
                 Return newstream
             End If
 
-            Dim W1 = stream.GetMassFlow()
-            Dim M1 = stream.GetMolarFlow()
+            Dim W1 = stream.GetMassFlow() * Factor
+            Dim M1 = stream.GetMolarFlow() * Factor
 
             Dim T1 = stream.GetTemperature()
             Dim H1 = stream.GetMassEnthalpy()
@@ -8474,8 +8474,8 @@ Namespace Streams
                 Return newstream
             End If
 
-            Dim W1 = stream.GetMassFlow()
-            Dim M1 = stream.GetMolarFlow()
+            Dim W1 = stream.GetMassFlow() * Factor
+            Dim M1 = stream.GetMolarFlow() * Factor
 
             Dim T1 = stream.GetTemperature()
             Dim H1 = stream.GetMassEnthalpy()
