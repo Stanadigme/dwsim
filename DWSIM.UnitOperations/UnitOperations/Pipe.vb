@@ -54,6 +54,10 @@ Namespace UnitOperations
         Inherits UnitOperations.UnitOpBaseClass
         Public Overrides Property ObjectClass As SimulationObjectClass = SimulationObjectClass.PressureChangers
 
+        Public Overrides ReadOnly Property SupportsDynamicMode As Boolean = True
+
+        Public Overrides ReadOnly Property HasPropertiesForDynamicMode As Boolean = True
+
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_Pipe
 
         Protected m_profile As New PipeProfile
@@ -276,7 +280,7 @@ Namespace UnitOperations
         End Function
 
         Public Overrides Sub CreateDynamicProperties()
-            AddDynamicProperty("Volume", "Pipe Volume", 1, UnitOfMeasure.volume, 1.0.GetType())
+            AddDynamicProperty("Volume", "Pipe Volume", 0.0, UnitOfMeasure.volume, 1.0.GetType())
             AddDynamicProperty("Initialize using Inlet Stream", "Initializes the volume content with information from the inlet stream, if the content is null.", True, UnitOfMeasure.none, True.GetType())
             AddDynamicProperty("Reset Content", "Empties the volume content on the next run.", False, UnitOfMeasure.none, True.GetType())
 
@@ -292,18 +296,33 @@ Namespace UnitOperations
 
             Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
             Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
+            oms.SetMassFlow(ims.GetMassFlow)
             Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
             s1 = ims.DynamicsSpec
             s2 = oms.DynamicsSpec
-            Dim volume As Double
+            Dim Reset As Boolean = GetDynamicProperty("Reset Content")
+            Dim volume As Double = GetDynamicVolume()
 
-            For Each segmento In Me.Profile.Sections.Values
-                volume += segmento.Quantidade * segmento.Comprimento * ((segmento.DI * 0.0254) ^ 2) / 4 * Math.PI
-            Next
+            If Reset Then
+                AccumulationStream = Nothing
+                volume = 0
+                For Each segmento In Me.Profile.Sections.Values
+                    volume += segmento.Quantidade * segmento.Comprimento * ((segmento.DI * 0.0254) ^ 2) / 4 * Math.PI
+                Next
+                If volume = 0.0 Then Throw New Exception("Erreur de calcul sur le volume : " & volume)
+                SetDynamicProperty("Volume", volume)
+                SetDynamicProperty("Reset Content", 0)
+            End If
 
-            SetDynamicProperty("Volume", volume)
+            'If volume = 0.0 Or volume = Double.NaN Then
+            '    For Each segmento In Me.Profile.Sections.Values
+            '        volume += segmento.Quantidade * segmento.Comprimento * ((segmento.DI * 0.0254) ^ 2) / 4 * Math.PI
+            '    Next
+            '    If volume = 0.0 Then Throw New Exception("Erreur de calcul sur le volume : " & volume)
+            '    SetDynamicProperty("Volume", volume)
+            'End If
 
             If AccumulationStream Is Nothing Then
 
@@ -316,13 +335,23 @@ Namespace UnitOperations
                     AccumulationStream = ims.Subtract(oms, timestep)
 
                 End If
-
-            Else
-                AccumulationStream.SetFlowsheet(FlowSheet)
-                If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
+                Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
+                AccumulationStream.SetMassFlow(density * volume)
+                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
-                If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
+            Else
+                AccumulationStream.SetFlowsheet(FlowSheet)
+                AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                If ims.GetMassFlow() > 0 Then
+                    AccumulationStream = AccumulationStream.Add(ims, timestep)
+                    AccumulationStream.Calculate()
+                End If
+                If oms.GetMassFlow() > 0 Then
+                    AccumulationStream = AccumulationStream.Subtract(oms, timestep)
+                    AccumulationStream.Calculate()
+                End If
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
 
             End If
@@ -336,9 +365,15 @@ Namespace UnitOperations
 
             End If
 
-            Calculate()
+            'oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+            Dim _ims As MaterialStream = ims.CloneXML
+            _ims.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+            _ims.SetPressure(ims.GetPressure)
+            _ims.Calculate(True, True)
 
-            oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+            Calculate({_ims, oms, GetEnergyStream})
+            'Calculate({AccumulationStream, oms, GetEnergyStream})
+
 
         End Sub
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)

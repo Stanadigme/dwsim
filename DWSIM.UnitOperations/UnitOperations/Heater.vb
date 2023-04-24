@@ -175,7 +175,7 @@ Namespace UnitOperations
 
             Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
             Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
-
+            oms.SetMassFlow(ims.GetMassFlow)
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
             s1 = ims.DynamicsSpec
