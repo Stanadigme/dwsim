@@ -877,7 +877,8 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
 
         Dim obj As ISimulationObject
 
-        Dim lists As New Dictionary(Of Integer, List(Of String))
+        'Dim lists As New Dictionary(Of Integer, List(Of String))
+        Dim lists As New Dictionary(Of Integer, HashSet(Of String))
         Dim hashlists As New Dictionary(Of Integer, HashSet(Of String))
         Dim filteredlist As New Dictionary(Of Integer, List(Of String))
         Dim objstack As New List(Of String)
@@ -894,7 +895,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 onqueue = fqueue.CalculationQueue.Dequeue()
                 fqueue.CalculationQueue.Clear()
 
-                lists.Add(0, New List(Of String))
+                lists.Add(0, New HashSet(Of String))
 
                 lists(0).Add(onqueue.Name)
 
@@ -903,7 +904,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 Do
                     listidx += 1
                     If lists(listidx - 1).Count > 0 Then
-                        lists.Add(listidx, New List(Of String))
+                        lists.Add(listidx, New HashSet(Of String))
                         maxidx = listidx
                         For Each o As String In lists(listidx - 1)
                             obj = fbag.SimulationObjects(o)
@@ -1012,9 +1013,11 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 End If
             Loop
 
-            For Each kvp As KeyValuePair(Of Integer, HashSet(Of String)) In hashlists
-                lists.Add(kvp.Key, kvp.Value.ToList())
-            Next
+
+            'For Each kvp As KeyValuePair(Of Integer, HashSet(Of String)) In hashlists
+            ' lists.Add(kvp.Key, kvp.Value.ToList())
+            'Next
+            lists = hashlists
             'process the lists backwards, adding objects to the stack, discarding duplicate entries.
 
             listidx = maxidx
@@ -1065,7 +1068,14 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
         '    Return New Object() {newstack, lists, newfilteredlist}
         'End If
 
-        Return New Object() {objstack, lists, filteredlist}
+        Dim trueLists As New Dictionary(Of Integer, List(Of String))
+
+        For Each kvp As KeyValuePair(Of Integer, HashSet(Of String)) In lists
+            trueLists.Add(kvp.Key, kvp.Value.ToList())
+        Next
+
+
+        Return New Object() {objstack, trueLists, filteredlist}
 
     End Function
 
