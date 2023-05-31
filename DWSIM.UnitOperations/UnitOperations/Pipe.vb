@@ -286,7 +286,16 @@ Namespace UnitOperations
 
         End Sub
 
+
+        Private prevM, currentM As Double
+
+
         Public Overrides Sub RunDynamicModel()
+            'En mode dyn on init le AccuStream
+            'Chaque pas de temps le AS est recalculé (+in -out)
+            'On s'assure de l'équilibre du flux de matière ims.MassFlow = oms.MassFlow
+            'Conditions d'entrées : T° => MS.Flux / P => MS.Pressure
+            'La Pression du Flux d'entrée évolue en f°(AccS.T°) 
             Dim integratorID = FlowSheet.DynamicsManager.ScheduleList(FlowSheet.DynamicsManager.CurrentSchedule).CurrentIntegrator
             Dim integrator = FlowSheet.DynamicsManager.IntegratorList(integratorID)
 
@@ -296,7 +305,7 @@ Namespace UnitOperations
 
             Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
             Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
-            oms.SetMassFlow(ims.GetMassFlow)
+            'oms.SetMassFlow(ims.GetMassFlow)
             Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
@@ -304,6 +313,8 @@ Namespace UnitOperations
             s2 = oms.DynamicsSpec
             Dim Reset As Boolean = GetDynamicProperty("Reset Content")
             Dim volume As Double = GetDynamicVolume()
+
+            Dim _AcccumulationStream As MaterialStream
 
             If Reset Then
                 AccumulationStream = Nothing
@@ -315,6 +326,11 @@ Namespace UnitOperations
                 SetDynamicProperty("Volume", volume)
                 SetDynamicProperty("Reset Content", 0)
             End If
+
+            'oms.SetMassFlow(ims.GetMassFlow)
+            'If s2 = Dynamics.DynamicsSpecType.Flow Then
+            'oms.SetMassFlow(ims.GetMassFlow)
+            'End If
 
             'If volume = 0.0 Or volume = Double.NaN Then
             '    For Each segmento In Me.Profile.Sections.Values
@@ -332,32 +348,42 @@ Namespace UnitOperations
 
                 Else
 
-                    AccumulationStream = ims.Subtract(oms, timestep)
+                    'AccumulationStream = ims.Subtract(oms, timestep)
+                    AccumulationStream = oms.CloneXML
 
                 End If
+                'FlowSheet.ShowMessage(String.Format("{0} AccumulationStream {1}", GraphicObject.Tag, AccumulationStream.ToString), Interfaces.IFlowsheet.MessageType.Warning)
                 Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
                 AccumulationStream.SetMassFlow(density * volume)
-                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
+                'FlowSheet.ShowMessage(String.Format("{0} AccumulationStream (Calc) {1}", GraphicObject.Tag, AccumulationStream.ToString), Interfaces.IFlowsheet.MessageType.Warning)
+                _AcccumulationStream = AccumulationStream.CloneXML
             Else
                 AccumulationStream.SetFlowsheet(FlowSheet)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                _AcccumulationStream = AccumulationStream.CloneXML
+                _AcccumulationStream.SetTemperature(AccumulationStream.GetTemperature)
+
                 If ims.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(ims, timestep)
-                    AccumulationStream.Calculate()
+                    AccumulationStream.Calculate(True, True)
+                    Dim _oms As MaterialStream = oms.Clone
+                    _oms.SetMassFlow(ims.GetMassFlow)
+                    _oms.Calculate(False, True)
+                    AccumulationStream = AccumulationStream.Subtract(_oms, timestep)
+                    AccumulationStream.Calculate(True, True)
                 End If
-                If oms.GetMassFlow() > 0 Then
-                    AccumulationStream = AccumulationStream.Subtract(oms, timestep)
-                    AccumulationStream.Calculate()
-                End If
+
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
 
             End If
 
             AccumulationStream.SetFlowsheet(FlowSheet)
-            AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+            'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
 
             If integrator.ShouldCalculateEquilibrium Then
 
@@ -365,14 +391,94 @@ Namespace UnitOperations
 
             End If
 
-            'oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
-            Dim _ims As MaterialStream = ims.CloneXML
-            _ims.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
-            _ims.SetPressure(ims.GetPressure)
-            _ims.Calculate(True, True)
+            'calculate pressure
 
-            Calculate({_ims, oms, GetEnergyStream})
-            'Calculate({AccumulationStream, oms, GetEnergyStream})
+            Dim M = AccumulationStream.GetMolarFlow()
+
+            Dim Temperature = AccumulationStream.GetTemperature
+
+            Dim Pressure = AccumulationStream.GetPressure
+
+            'm3/mol
+
+            If M > 0 Then
+
+                prevM = currentM
+
+                currentM = volume / M
+
+                PropertyPackage.CurrentMaterialStream = AccumulationStream
+
+                If AccumulationStream.GetPressure > 0 Then
+
+                    If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
+
+                        Dim result As IFlashCalculationResult
+
+                        result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
+
+                        Pressure = result.CalculatedPressure
+
+                    Else
+
+                        Pressure = currentM / prevM * Pressure
+
+                    End If
+
+                Else
+
+                    Pressure = 700
+
+                End If
+
+            Else
+
+                Pressure = 700
+
+            End If
+
+            Dim newVol As Double
+            newVol = volume + timestep * (ims.GetMassFlow / ims.Phases(0).Properties.density - ims.GetMassFlow / oms.Phases(0).Properties.density)
+
+
+            If newVol < 0 Then Throw New Exception(String.Format("
+                Pressure < 0 pour {0} 
+                - ims : {1}
+                - oms : {2}
+                - AccumulationStream : {3}
+                - rho_in / rho_out : {4}/{5}
+                ", {Me, ims.ToResume, oms.ToResume,
+                   AccumulationStream.ToResume, ims.Phases(0).Properties.density, oms.Phases(0).Properties.density}))
+            'Pressure = Pressure * newVol / volume
+            AccumulationStream.SetPressure(Pressure)
+            AccumulationStream.Calculate(True, True)
+            'Console.WriteLine(String.Format("Acc St dT = {0:n2}°K dP={1:n2}Pa Mass={2:n2}kg", {Temperature - _AcccumulationStream.GetTemperature, Pressure - _AcccumulationStream.GetPressure, AccumulationStream.GetMassFlow - _AcccumulationStream.GetMassFlow}))
+            'Console.WriteLine(AccumulationStream.ToString)
+
+            ims.SetPressure(Pressure)
+
+
+            If ims.GetMassFlow > 0 Then
+                Dim _ims As MaterialStream = AccumulationStream.CloneXML
+                'Dim _ims As MaterialStream = ims.CloneXML
+                _ims.SetTemperature(AccumulationStream.GetTemperature)
+                _ims.SetPressure(Pressure)
+                _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
+                _ims.SetMassFlow(ims.GetMassFlow)
+                _ims.Calculate(True, True)
+                Calculate({_ims, oms, GetEnergyStream})
+            Else
+                Dim _ims As MaterialStream = AccumulationStream.CloneXML
+                'Dim _ims As MaterialStream = ims.CloneXML
+                _ims.SetTemperature(AccumulationStream.GetTemperature)
+                _ims.SetPressure(Pressure)
+                _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
+                _ims.SetMassFlow(ims.GetMassFlow)
+                _ims.Calculate(True, True)
+                Calculate({_ims, oms, GetEnergyStream})
+            End If
+            'oms.SetMassFlow(ims.GetMassFlow)
+
 
 
         End Sub
@@ -707,6 +813,7 @@ Namespace UnitOperations
                                         IObj6?.SetCurrent()
                                         If segmento.TipoSegmento = "Tubulaosimples" Or segmento.TipoSegmento = "" Or segmento.TipoSegmento = "Straight Tube Section" Or segmento.TipoSegmento = "Straight Tube" Or segmento.TipoSegmento = "Tubulação Simples" Then
                                             resv = fpp.CalculateDeltaP(.DI * 0.0254, .Comprimento / .Incrementos, .Elevacao / .Incrementos, Me.GetRugosity(.Material, segmento), Qvin * 24 * 3600, Qlin * 24 * 3600, eta_v * 1000, eta_l * 1000, rho_v, rho_l, tens)
+                                            'Console.WriteLine(resv.ToString)
                                         Else
                                             segmento.Comprimento = 0.1 '10 cm default
                                             segmento.Incrementos = 1 'only one increment
@@ -736,7 +843,7 @@ Namespace UnitOperations
 
 
                                         IObj6?.SetCurrent()
-
+                                        'Console.WriteLine(String.Format("Qvin={0} Qlin={1} dpf={2} dph={3} dpt={4}", {Qvin, Qlin, resv(2), resv(3), resv(4)}))
                                         tipofluxo = resv(0)
                                         holdup = resv(1)
                                         dpf = resv(2)
@@ -759,7 +866,7 @@ Namespace UnitOperations
                                     If Qvin + Qlin = 0.0 Then
                                         dpt = 0.0
                                         dpf = 0.0
-                                        Pout = Pin
+                                        Pout = Pin - dph
                                         fP = 0.0
                                     Else
                                         If cntP > 3 Then

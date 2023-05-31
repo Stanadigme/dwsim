@@ -115,6 +115,7 @@ Namespace UnitOperations
             Dim i As Integer = 1
             Dim ms As MaterialStream
             Dim cp As IConnectionPoint
+            Dim refMs As MaterialStream
             For Each cp In Me.GraphicObject.InputConnectors
                 If cp.IsAttached Then
                     IObj?.Paragraphs.Add(String.Format("<h3>Inlet Stream #{0}</h3>", i))
@@ -124,18 +125,23 @@ Namespace UnitOperations
                     If Me.PressureCalculation = PressureBehavior.Minimum Then
                         If ms.Phases(0).Properties.pressure.GetValueOrDefault < P Then
                             P = ms.Phases(0).Properties.pressure
+                            refMs = ms
                         ElseIf P = 0 Then
                             P = ms.Phases(0).Properties.pressure
+                            refMs = ms
                         End If
                     ElseIf Me.PressureCalculation = PressureBehavior.Maximum Then
                         If ms.Phases(0).Properties.pressure.GetValueOrDefault > P Then
                             P = ms.Phases(0).Properties.pressure
+                            refMs = ms
                         ElseIf P = 0 Then
                             P = ms.Phases(0).Properties.pressure
+                            refMs = ms
                         End If
                     Else
                         P = P + ms.Phases(0).Properties.pressure.GetValueOrDefault
                         i += 1
+                        refMs = ms
                     End If
                     IObj?.Paragraphs.Add(String.Format("Mass Flow: {0} kg/s", ms.Phases(0).Properties.massflow.GetValueOrDefault))
                     IObj?.Paragraphs.Add(String.Format("Pressure: {0} Pa", ms.Phases(0).Properties.pressure.GetValueOrDefault))
@@ -177,10 +183,12 @@ Namespace UnitOperations
             IObj?.Paragraphs.Add(String.Format("Enthalpy: {0} kJ/kg", Hs))
 
             Dim omstr As MaterialStream = Me.FlowSheet.SimulationObjects(Me.GraphicObject.OutputConnectors(0).AttachedConnector.AttachedTo.Name)
+
             With omstr
                 .Clear()
                 .ClearAllProps()
-                If W <> 0.0# Then .Phases(0).Properties.enthalpy = Hs
+                'If W <> 0.0# Then .Phases(0).Properties.enthalpy = Hs
+                .Phases(0).Properties.enthalpy = Hs
                 .Phases(0).Properties.pressure = P
                 .Phases(0).Properties.massflow = W
                 .DefinedFlow = FlowSpec.Mass
@@ -205,6 +213,10 @@ Namespace UnitOperations
                 .Phases(0).Properties.temperature = T
                 .SpecType = Interfaces.Enums.StreamSpec.Pressure_and_Enthalpy
             End With
+
+            If W = 0.0 Then
+                omstr.CopyFromMaterial(refMs)
+            End If
 
             IObj?.Close()
 

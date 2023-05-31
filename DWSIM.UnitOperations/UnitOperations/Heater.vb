@@ -175,7 +175,7 @@ Namespace UnitOperations
 
             Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
             Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
-            oms.SetMassFlow(ims.GetMassFlow)
+            'oms.SetMassFlow(ims.GetMassFlow)
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
             s1 = ims.DynamicsSpec
@@ -220,10 +220,10 @@ Namespace UnitOperations
                 AccumulationStream.SetFlowsheet(FlowSheet)
                 If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-                AccumulationStream.Calculate()
+                AccumulationStream.Calculate(True, True)
                 If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
-
+                AccumulationStream.Calculate(True, True)
             End If
 
             AccumulationStream.SetFlowsheet(FlowSheet)
@@ -293,6 +293,7 @@ Namespace UnitOperations
                         Dim result As IFlashCalculationResult
 
                         result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
+                        'Console.WriteLine(String.Format("M={0} , currentM={1}", M, currentM))
 
                         Pressure = result.CalculatedPressure
 
@@ -314,6 +315,8 @@ Namespace UnitOperations
 
             End If
 
+            'Pressure = ims.GetPressure
+
             AccumulationStream.SetPressure(Pressure)
 
             Dim Wi, DeltaP As Double
@@ -328,7 +331,7 @@ Namespace UnitOperations
 
                     Wi = ims.GetMassFlow()
 
-                    DeltaP = (Wi / Kr) ^ 2
+                    'DeltaP = (Wi / Kr) ^ 2
 
                     ims.SetPressure(Pressure)
 
@@ -336,6 +339,7 @@ Namespace UnitOperations
                     oms.SetTemperature(AccumulationStream.GetTemperature)
                     oms.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
                     oms.SetPressure(Pressure - DeltaP)
+                    oms.SetMassFlow(ims.GetMassFlow)
 
             End Select
 

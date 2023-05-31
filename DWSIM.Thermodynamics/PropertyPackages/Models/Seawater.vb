@@ -5772,9 +5772,9 @@ ExitFunction:
 
             InitIAPWS08()
 
-            If check_limits = 1 Then
+            If check_limits = 1 And False Then
                 'SAL_LIMITS
-                If t_si < sal_tmin Or t_si > sal_tmax Or _
+                If t_si < sal_tmin Or t_si > sal_tmax Or
                     p_si < sal_pmin Or p_si > sal_pmax Then Exit Function
             End If
 

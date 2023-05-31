@@ -134,7 +134,8 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
 
-            If V = 0 Then Vxv(wid) = 1.0#
+            'If V = 0 Then Vxv(wid) = 1.0#
+            Vxv(wid) = 1.0#
 
 
             Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector, S, PP.RET_NullVector}
@@ -334,41 +335,32 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             'Dim deltaTindex As Integer = 0
 
             ' T loop
-            Dim precision As Double = 0.0000001
+            Dim precision As Double = 0.000000001
 
             Do
                 fx = Herror_S(Tloop, {P, Vz, PP})
                 fx2 = Herror_S(Tloop + deltaT, {P, Vz, PP})
                 If Abs(fx) < precision Then Exit Do
-                'dfdx = (fx2 - fx)
 
                 If fx < 0 Then
                     'Si fx < 0 -> H < H(Tloop)' -> T < Tloop
                     If Herror_S(Tloop - deltaT, {P, Vz, PP}) < 0 Then
                         Tloop -= deltaT
-                        'ecount = 0
                     Else
                         deltaT /= 10
-                        'ecount = 0
                     End If
-                    'ecount = 0
                 Else
                     If fx2 > 0 Then
                         If Herror_S(Tloop + deltaT, {P, Vz, PP}) > 0 Then
                             Tloop += deltaT
-                            'ecount = 0
                         Else
                             deltaT /= 10
-                            'ecount = 0
                         End If
                     Else
                         deltaT /= 10
-                        'ecount = 0
-                        'Tloop = Tloop - fx / dfdx
-                        'Exit Do
                     End If
                 End If
-                'Console.WriteLine("Tloop:" & Tloop & " fx : " & fx & " fx2 : " & fx2 & " dfdx : " & dfdx)
+
                 ecount += 1
             Loop Until ecount > 50 Or deltaT < precision 'Or Tloop < 0
 
@@ -411,6 +403,10 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
                 'Vy(wid) = 1.0#
                 Vs = PP.RET_NullVector()
             End If
+
+
+            'If V = 0 Then Vxv(wid) = 1.0#
+            Vy(wid) = 1.0#
 
 
             d2 = Date.Now

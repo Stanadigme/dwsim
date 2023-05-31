@@ -235,8 +235,8 @@ Namespace UnitOperations
             For i = 0 To 5
                 If Me.GraphicObject.InputConnectors(i).IsAttached Then
                     Dim imsx = GetInletMaterialStream(i)
-                    If imsmix Is Nothing Then imsmix = imsx.CloneXML
-                    imsmix = imsmix.Add(imsx)
+                    If imsmix Is Nothing Then imsmix = imsx.CloneXML Else If imsx.GetMassFlow > 0 Then imsmix = imsmix.Add(imsx)
+                    'imsmix = imsmix.Add(imsx)
                 End If
             Next
 
@@ -275,16 +275,32 @@ Namespace UnitOperations
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
 
+                Dim wfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+                oms1.Calculate()
+                oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
+                oms2.Calculate()
             Else
 
                 AccumulationStream.SetFlowsheet(FlowSheet)
+                AccumulationStream.Calculate(True, True)
+                Dim wfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+                oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
+
                 If imsmix.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(imsmix, timestep)
                 End If
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-                AccumulationStream.Calculate()
-                If oms1.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms1, timestep)
-                If oms2.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms2, timestep)
+                AccumulationStream.Calculate(True, True)
+
+                If oms1.GetMassFlow() > 0 Then
+                    AccumulationStream = AccumulationStream.Subtract(oms1, timestep)
+                End If
+                If oms2.GetMassFlow() > 0 Then
+                    AccumulationStream = AccumulationStream.Subtract(oms2, timestep)
+                End If
+                AccumulationStream.Calculate(True, True)
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
             End If
 
@@ -374,35 +390,51 @@ Namespace UnitOperations
 
             End If
 
-            AccumulationStream.SetPressure(Pressure)
-            AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+            'AccumulationStream.SetPressure(Pressure)
+            AccumulationStream.SetPressure(imsmix.GetPressure)
+            'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+            AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
 
             AccumulationStream.PropertyPackage = PropertyPackage
             AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
 
             If integrator.ShouldCalculateEquilibrium And Pressure > 0.0 Then
-
                 AccumulationStream.Calculate(True, True)
 
             End If
 
             SetDynamicProperty("Operating Pressure", Pressure)
 
-            For i = 0 To 5
-                If Me.GraphicObject.InputConnectors(i).IsAttached Then
-                    GetInletMaterialStream(i).SetPressure(Pressure)
-                End If
-            Next
-            oms1.SetPressure(Pressure)
+            'For i = 0 To 5
+            '    If Me.GraphicObject.InputConnectors(i).IsAttached Then
+            '        GetInletMaterialStream(i).SetPressure(Pressure)
+            '    End If
+            'Next
+            'oms1.SetPressure(Pressure)
+            'oms1.SetPressure(imsmix.GetPressure)
 
-            Dim liqdens = AccumulationStream.Phases(3).Properties.density.GetValueOrDefault
+            'Dim liqdens = AccumulationStream.Phases(3).Properties.density.GetValueOrDefault
 
-            oms2.SetPressure(Pressure + liqdens * 9.8 * RelativeLevel * Height)
+            'oms2.SetPressure(Pressure + liqdens * 9.8 * RelativeLevel * Height)
+            'oms2.SetPressure(Pressure)
+            'oms2.SetPressure(imsmix.GetPressure)
 
-            oms1.AssignFromPhase(PhaseLabel.Vapor, AccumulationStream, False)
+            'Dim vfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+            Dim phase As PhaseLabel = PhaseLabel.Vapor
+            'If vfrac = 0 Then phase = PhaseLabel.LiquidMixture
 
-            oms2.AssignFromPhase(PhaseLabel.Liquid1, AccumulationStream, False)
-
+            'oms1.Calculate(True, True)
+            With oms1
+                .AssignFromPhaseSowage(phase, AccumulationStream)
+                .Phases(2).Properties.molarfraction = 1.0
+                'Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+                '.AtEquilibrium = False
+            End With
+            'oms1.AssignFromPhaseSowage(phase, AccumulationStream)
+            'oms2.Calculate(True, True)
+            oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
+            'oms2.Calculate()
+            'Console.WriteLine(oms2.ToResume)
         End Sub
 
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)

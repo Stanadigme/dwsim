@@ -423,7 +423,7 @@ Namespace Streams
 
                 If integrator.ShouldCalculateEquilibrium Then
                     If GetPressure() > 0.0 And GetTemperature() > 0 Then
-                        Calculate()
+                        Calculate(True, True)
                     Else
                         'Clear()
                         'ClearAllProps()
@@ -8389,8 +8389,8 @@ Namespace Streams
                 Return newstream
             End If
 
-            Dim W1 = stream.GetMassFlow() * Factor
-            Dim M1 = stream.GetMolarFlow() * Factor
+            Dim W1 = stream.GetMassFlow() '* Factor
+            Dim M1 = stream.GetMolarFlow() '* Factor
 
             Dim T1 = stream.GetTemperature()
             Dim H1 = stream.GetMassEnthalpy()
@@ -8474,8 +8474,8 @@ Namespace Streams
                 Return newstream
             End If
 
-            Dim W1 = stream.GetMassFlow() * Factor
-            Dim M1 = stream.GetMolarFlow() * Factor
+            Dim W1 = stream.GetMassFlow() '* Factor
+            Dim M1 = stream.GetMolarFlow() '* Factor
 
             Dim T1 = stream.GetTemperature()
             Dim H1 = stream.GetMassEnthalpy()
@@ -8539,12 +8539,62 @@ Namespace Streams
                 Next
                 .Phases(0).Properties.massflow = total
                 .Phases(0).Properties.molarflow = totalm
-                .SpecType = StreamSpec.Temperature_and_Pressure
+                .SetMassEnthalpy((H0 * W0 - (H1 * W1 * Factor)) / W0)
+                .SpecType = StreamSpec.Pressure_and_Enthalpy
+                '.SpecType = StreamSpec.Temperature_and_Pressure
             End With
 
             Return newstream
 
         End Function
+
+        'Copie de la fonction ci dessous sans impact sur le débit
+        Public Sub AssignFromPhaseSowage(phase As Enums.PhaseLabel, stream As MaterialStream)
+            Dim prevW As Double = GetMassFlow()
+            If Double.IsNaN(prevW) Then prevW = 0
+            Dim prevM As Double = GetMolarFlow()
+            If Double.IsNaN(prevM) Then prevM = 0
+
+            Clear()
+            ClearAllProps()
+
+            SetTemperature(stream.GetTemperature)
+            SetPressure(stream.GetPressure)
+            Dim phaseId As Int16
+            Select Case phase
+
+                Case PhaseLabel.Mixture
+                    phaseId = 0
+                Case PhaseLabel.Vapor
+                    phaseId = 2
+                Case PhaseLabel.LiquidMixture
+                    phaseId = 1
+                Case Else
+                    Throw New Exception("Unsupported Phase")
+
+            End Select
+            Dim H As Double = stream.Phases(phaseId).Properties.enthalpy.GetValueOrDefault
+
+            'If H > 0 Then SetMassEnthalpy(H) Else SetMassEnthalpy(stream.Phases(0).Properties.enthalpy.GetValueOrDefault)
+            SetMassFlow(prevW)
+            SetMolarFlow(prevM)
+            SetMassEnthalpy(H)
+
+            For Each sub1 In Me.Phases(0).Compounds.Values
+                sub1.MoleFraction = stream.Phases(phaseId).Compounds(sub1.Name).MoleFraction.GetValueOrDefault
+                If Double.IsNaN(sub1.MoleFraction) Then sub1.MoleFraction = stream.Phases(0).Compounds(sub1.Name).MoleFraction.GetValueOrDefault
+                sub1.MassFraction = stream.Phases(phaseId).Compounds(sub1.Name).MassFraction.GetValueOrDefault
+                If Double.IsNaN(sub1.MassFraction) Then sub1.MassFraction = stream.Phases(0).Compounds(sub1.Name).MassFraction.GetValueOrDefault
+                If sub1.Name = "Water" And phaseId = 2 Then
+                    sub1.MoleFraction = 1
+                    sub1.MassFraction = 1
+                End If
+                sub1.MolarFlow = prevW * sub1.MoleFraction
+                sub1.MassFlow = prevM * sub1.MassFraction
+            Next
+
+        End Sub
+
 
         ''' <summary>
         ''' Assign properties from another phase in another stream.
@@ -8768,6 +8818,10 @@ Namespace Streams
             End If
             Return text
 
+        End Function
+
+        Public Function ToResume() As String
+            Return String.Format(": T = {0:n2} K, P = {1:n2} Pa, W = {2:n2} kg/s H={3:n2} kJ/kg", GetTemperature, GetPressure, GetMassFlow, GetMassEnthalpy)
         End Function
 
         Public Function GetEnergyFlow() As Double Implements IMaterialStream.GetEnergyFlow

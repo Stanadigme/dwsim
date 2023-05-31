@@ -126,6 +126,10 @@ Namespace UnitOperations
         End Sub
 
         Public Overrides Sub RunDynamicModel()
+            Calculate()
+        End Sub
+
+        Public Sub RunDynamicModelOld()
 
             OutCount = 0
             For Each cp In GraphicObject.OutputConnectors
