@@ -21,6 +21,7 @@ Imports DWSIM.Thermodynamics
 Imports DWSIM.Thermodynamics.Streams
 Imports DWSIM.SharedClasses
 Imports DWSIM.Interfaces.Enums
+Imports DWSIM.Thermodynamics.PropertyPackages
 
 Namespace UnitOperations
 
@@ -223,6 +224,8 @@ Namespace UnitOperations
 
             Dim oms1 As MaterialStream = Me.GetOutletMaterialStream(0)
             Dim oms2 As MaterialStream = Me.GetOutletMaterialStream(1)
+            oms1.SpecType = Interfaces.Enums.StreamSpec.Pressure_and_Enthalpy
+            oms2.SpecType = Interfaces.Enums.StreamSpec.Pressure_and_Enthalpy
 
             Dim oms3 As MaterialStream = Me.GetOutletMaterialStream(2)
 
@@ -239,6 +242,7 @@ Namespace UnitOperations
                     'imsmix = imsmix.Add(imsx)
                 End If
             Next
+            imsmix.Calculate()
 
             Dim Vol As Double = GetDynamicProperty("Volume")
             Dim Height As Double = GetDynamicProperty("Height")
@@ -246,9 +250,10 @@ Namespace UnitOperations
             Dim Pmin = GetDynamicProperty("Minimum Pressure")
             Dim Orientation As Integer = GetDynamicProperty("Vessel Orientation")
             Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
-
+            Dim wfrac As Double
             Dim Reset As Boolean = GetDynamicProperty("Reset Content")
-
+            'Console.WriteLine("----------")
+            Dim tempH As Double
             If Reset Then
                 AccumulationStream = Nothing
                 SetDynamicProperty("Reset Content", 0)
@@ -274,8 +279,15 @@ Namespace UnitOperations
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
+                tempH = AccumulationStream.GetMassEnthalpy
 
-                Dim wfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                wfrac = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                With oms1
+                    .AssignFromPhaseSowage(PhaseLabel.Vapor, AccumulationStream)
+                    .Phases(2).Properties.molarfraction = 1.0
+                End With
+
+                oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
                 oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
                 oms1.Calculate()
                 oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
@@ -283,28 +295,87 @@ Namespace UnitOperations
             Else
 
                 AccumulationStream.SetFlowsheet(FlowSheet)
-                AccumulationStream.Calculate(True, True)
-                Dim wfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
-                oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
-                oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
-
+                'AccumulationStream.Calculate(True, False)
+                'Dim wfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                'oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+                'oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
+                'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+                tempH = AccumulationStream.GetMassEnthalpy
                 If imsmix.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(imsmix, timestep)
+                    'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+                    'Console.WriteLine("imsmix" + imsmix.ToResume)
+                    ' Le fluide d'accumulation accumule l'énergie jusqu'à atteindre le niveau de saturation pour les conditions PHT
                 End If
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-                AccumulationStream.Calculate(True, True)
+                'AccumulationStream.SetPressure(imsmix.GetPressure)
+                'AccumulationStream.Calculate(True, True)
+                AccumulationStream.Calculate()
+                'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+                'Si il y a une phase vapeur présente, elle est extraite
+
+                'Dim phase As PhaseLabel = PhaseLabel.Vapor
+
+                'Console.WriteLine("----------")
+                'Console.WriteLine("imsmix" + imsmix.ToResume)
+
+                'With oms1
+                '    .AssignFromPhaseSowage(PhaseLabel.Vapor, AccumulationStream)
+                '    .Phases(2).Properties.molarfraction = 1.0
+                'End With
+
+                'oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
+
+                'wfrac = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+                'If wfrac > 0 Then
+                '    Console.WriteLine(wfrac)
+                'End If
+                'oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+                'oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
+
+                'Console.WriteLine(oms1.ToResume)
+                'Console.WriteLine(oms2.ToResume)
+
+                'oms1.Calculate(True, True)
+                'oms2.Calculate(True, True)
+
+                'oms1.Calculate()
+                'oms2.Calculate()
 
                 If oms1.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Subtract(oms1, timestep)
+                    'AccumulationStream.Calculate(True, True)
+                    'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+                    'Console.WriteLine(oms1.ToResume)
                 End If
                 If oms2.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Subtract(oms2, timestep)
+                    'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+                    'Console.WriteLine(oms2.ToResume)
                 End If
-                AccumulationStream.Calculate(True, True)
+
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
             End If
 
-            AccumulationStream.SetFlowsheet(FlowSheet)
+            'AccumulationStream.SetFlowsheet(FlowSheet)
+
+            Dim dH_theory As Double = (imsmix.GetMassFlow * imsmix.GetMassEnthalpy - (oms1.GetMassFlow * oms1.GetMassEnthalpy + oms2.GetMassFlow * oms2.GetMassEnthalpy)) * timestep / AccumulationStream.GetMassFlow
+
+            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+            AccumulationStream.SetPressure(imsmix.GetPressure)
+            AccumulationStream.Calculate(True, True)
+            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+            'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
+
+            'Console.WriteLine(String.Format("dH : {0:n3}, true dH : {1:n3}",
+            '                                {dH_theory, tempH - AccumulationStream.GetMassEnthalpy}
+            '                                )
+            '                                )
+
+            'If AccumulationStream.GetMassEnthalpy > imsmix.GetMassEnthalpy Then
+            'AccumulationStream.SetMassEnthalpy(imsmix.GetMassEnthalpy)
+            'AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+            'End If
 
             ' Calculate Temperature
 
@@ -317,26 +388,26 @@ Namespace UnitOperations
 
             If es IsNot Nothing Then Qval = es.EnergyFlow.GetValueOrDefault
 
-            If Qval <> 0.0 Then
+            'If Qval <> 0.0 Then
 
-                If Wa > 0 Then
+            '    If Wa > 0 Then
 
-                    AccumulationStream.SetMassEnthalpy(Ha + Qval * timestep / Wa)
+            '        AccumulationStream.SetMassEnthalpy(Ha + Qval * timestep / Wa)
 
-                    AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+            '        AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
 
-                    AccumulationStream.PropertyPackage = PropertyPackage
-                    AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+            '        AccumulationStream.PropertyPackage = PropertyPackage
+            '        AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
 
-                    If integrator.ShouldCalculateEquilibrium Then
+            '        '        If integrator.ShouldCalculateEquilibrium Then
 
-                        AccumulationStream.Calculate(True, True)
+            '        AccumulationStream.Calculate(True, True)
 
-                    End If
+            '        '        End If
 
-                End If
+            '    End If
 
-            End If
+            'End If
 
             'calculate pressure
 
@@ -356,85 +427,76 @@ Namespace UnitOperations
 
             Dim LiquidVolume, RelativeLevel As Double
 
-            If AccumulationStream.GetPressure > Pmin Then
+            'If AccumulationStream.GetPressure > Pmin Then
 
-                If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
+            '    If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
 
-                    Dim result As IFlashCalculationResult
+            '        Dim result As IFlashCalculationResult
 
-                    result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
+            '        result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
 
-                    Pressure = result.CalculatedPressure
+            '        Pressure = result.CalculatedPressure
 
-                    LiquidVolume = AccumulationStream.Phases(3).Properties.volumetric_flow.GetValueOrDefault
+            '        LiquidVolume = AccumulationStream.Phases(3).Properties.volumetric_flow.GetValueOrDefault
 
-                    RelativeLevel = LiquidVolume / Vol
+            '        RelativeLevel = LiquidVolume / Vol
 
-                    SetDynamicProperty("Liquid Level", RelativeLevel * Height)
+            '        SetDynamicProperty("Liquid Level", RelativeLevel * Height)
 
-                Else
+            '    Else
 
-                    Pressure = currentM / prevM * Pressure
+            '        Pressure = currentM / prevM * Pressure
 
-                End If
+            '    End If
 
-            Else
+            'Else
 
-                Pressure = Pmin
+            '    Pressure = Pmin
 
-                LiquidVolume = 0.0
+            '    LiquidVolume = 0.0
 
-                RelativeLevel = LiquidVolume / Vol
+            '    RelativeLevel = LiquidVolume / Vol
 
-                SetDynamicProperty("Liquid Level", RelativeLevel * Height)
+            '    SetDynamicProperty("Liquid Level", RelativeLevel * Height)
 
-            End If
+            'End If
 
             'AccumulationStream.SetPressure(Pressure)
-            AccumulationStream.SetPressure(imsmix.GetPressure)
+            'AccumulationStream.SetPressure(imsmix.GetPressure)
             'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
-            AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+            'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
 
-            AccumulationStream.PropertyPackage = PropertyPackage
-            AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+            'AccumulationStream.PropertyPackage = PropertyPackage
+            'AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
 
-            If integrator.ShouldCalculateEquilibrium And Pressure > 0.0 Then
-                AccumulationStream.Calculate(True, True)
-
-            End If
+            'If integrator.ShouldCalculateEquilibrium And Pressure > 0.0 Then
+            '    AccumulationStream.Calculate(True, True)
+            'End If
 
             SetDynamicProperty("Operating Pressure", Pressure)
 
-            'For i = 0 To 5
-            '    If Me.GraphicObject.InputConnectors(i).IsAttached Then
-            '        GetInletMaterialStream(i).SetPressure(Pressure)
-            '    End If
-            'Next
-            'oms1.SetPressure(Pressure)
-            'oms1.SetPressure(imsmix.GetPressure)
 
-            'Dim liqdens = AccumulationStream.Phases(3).Properties.density.GetValueOrDefault
+            'Dim phase As PhaseLabel = PhaseLabel.Vapor
 
-            'oms2.SetPressure(Pressure + liqdens * 9.8 * RelativeLevel * Height)
-            'oms2.SetPressure(Pressure)
-            'oms2.SetPressure(imsmix.GetPressure)
+            'Console.WriteLine("----------")
+            ''Console.WriteLine("imsmix" + imsmix.ToResume)
 
-            'Dim vfrac As Double = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
-            Dim phase As PhaseLabel = PhaseLabel.Vapor
-            'If vfrac = 0 Then phase = PhaseLabel.LiquidMixture
+            With oms1
+                .AssignFromPhaseSowage(PhaseLabel.Vapor, AccumulationStream)
+                .Phases(2).Properties.molarfraction = 1.0
+            End With
+
+            oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
+
+            wfrac = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
+            oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+            oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
 
             'oms1.Calculate(True, True)
-            With oms1
-                .AssignFromPhaseSowage(phase, AccumulationStream)
-                .Phases(2).Properties.molarfraction = 1.0
-                'Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
-                '.AtEquilibrium = False
-            End With
-            'oms1.AssignFromPhaseSowage(phase, AccumulationStream)
             'oms2.Calculate(True, True)
-            oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
-            'oms2.Calculate()
+            'Console.WriteLine(oms1.ToResume)
             'Console.WriteLine(oms2.ToResume)
+
         End Sub
 
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)
@@ -707,7 +769,12 @@ Namespace UnitOperations
                     .SpecType = Interfaces.Enums.StreamSpec.Pressure_and_Enthalpy
                     .SetTemperature(T)
                     .SetPressure(P)
-                    .SetMassEnthalpy(MixedStream.Phases(2).Properties.enthalpy.GetValueOrDefault)
+                    'SOWAGE EDIT
+                    ' Quand on attribue H = 0 à un Stream configuré en PH, DWSIM l'assigne aux Limits de PP
+                    ' Ex : démarrage, Q_vap = 0 ==> H = inf
+                    Dim H_vap As Double = MixedStream.Phases(2).Properties.enthalpy.GetValueOrDefault
+                    If H_vap = 0 Then .SetMassEnthalpy(MixedStream.Phases(0).Properties.enthalpy.GetValueOrDefault) Else .SetMassEnthalpy(H_vap)
+                    '.SetMassEnthalpy(MixedStream.Phases(2).Properties.enthalpy.GetValueOrDefault)
                     .SetMassFlow(MixedStream.Phases(2).Properties.massflow.GetValueOrDefault)
                     Dim comp As BaseClasses.Compound
                     For Each comp In .Phases(0).Compounds.Values
@@ -748,7 +815,12 @@ Namespace UnitOperations
                         Else
                             .SetMassFlow(0.0)
                         End If
-                        .SetMassEnthalpy(HL1)
+                        'SOWAGE EDIT
+                        ' Quand on attribue H = 0 à un Stream configuré en PH, DWSIM l'assigne aux Limits de PP
+                        ' Ex : démarrage, Q_vap = 0 ==> H = inf
+                        Dim H_liq As Double = MixedStream.Phases(2).Properties.enthalpy.GetValueOrDefault
+                        If H_liq = 0 Then .SetMassEnthalpy(MixedStream.Phases(0).Properties.enthalpy.GetValueOrDefault) Else .SetMassEnthalpy(H_liq)
+                        '.SetMassEnthalpy(HL1)
                         Dim comp As BaseClasses.Compound
                         i = 0
                         For Each comp In .Phases(0).Compounds.Values

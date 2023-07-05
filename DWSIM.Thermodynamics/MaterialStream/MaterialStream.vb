@@ -8539,7 +8539,7 @@ Namespace Streams
                 Next
                 .Phases(0).Properties.massflow = total
                 .Phases(0).Properties.molarflow = totalm
-                .SetMassEnthalpy((H0 * W0 - (H1 * W1 * Factor)) / W0)
+                .SetMassEnthalpy((H0 * W0 - H1 * W1) / total)
                 .SpecType = StreamSpec.Pressure_and_Enthalpy
                 '.SpecType = StreamSpec.Temperature_and_Pressure
             End With
@@ -8575,10 +8575,10 @@ Namespace Streams
             End Select
             Dim H As Double = stream.Phases(phaseId).Properties.enthalpy.GetValueOrDefault
 
-            'If H > 0 Then SetMassEnthalpy(H) Else SetMassEnthalpy(stream.Phases(0).Properties.enthalpy.GetValueOrDefault)
+            If H > 0 Then SetMassEnthalpy(H) Else SetMassEnthalpy(stream.Phases(0).Properties.enthalpy.GetValueOrDefault)
             SetMassFlow(prevW)
             SetMolarFlow(prevM)
-            SetMassEnthalpy(H)
+            'SetMassEnthalpy(H)
 
             For Each sub1 In Me.Phases(0).Compounds.Values
                 sub1.MoleFraction = stream.Phases(phaseId).Compounds(sub1.Name).MoleFraction.GetValueOrDefault
@@ -8821,7 +8821,9 @@ Namespace Streams
         End Function
 
         Public Function ToResume() As String
-            Return String.Format(": T = {0:n2} K, P = {1:n2} Pa, W = {2:n2} kg/s H={3:n2} kJ/kg", GetTemperature, GetPressure, GetMassFlow, GetMassEnthalpy)
+            Dim name As String
+            If GraphicObject Is Nothing Then name = "" Else name = GraphicObject.Tag
+            Return name + String.Format(" : T = {0:n2} K, P = {1:n2} Pa, W = {2:n2} kg/s H={3:n2} kJ/kg {4:n2}%", GetTemperature, GetPressure, GetMassFlow, GetMassEnthalpy, Phases(2).Properties.massfraction.GetValueOrDefault * 100)
         End Function
 
         Public Function GetEnergyFlow() As Double Implements IMaterialStream.GetEnergyFlow

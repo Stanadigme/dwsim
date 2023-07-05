@@ -31,6 +31,8 @@ Imports OxyPlot.Axes
 
 Imports cv = DWSIM.SharedClasses.SystemsOfUnits.Converter
 Imports System.IO
+Imports DWSIM.Drawing.SkiaSharp.GraphicObjects.Shapes
+Imports NetOffice.OfficeApi.Enums
 
 Namespace UnitOperations
 
@@ -305,7 +307,8 @@ Namespace UnitOperations
 
             Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
             Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
-            'oms.SetMassFlow(ims.GetMassFlow)
+            oms.SetMassFlow(ims.GetMassFlow)
+            Dim _oms As MaterialStream
             Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
@@ -315,7 +318,7 @@ Namespace UnitOperations
             Dim volume As Double = GetDynamicVolume()
 
             Dim _AcccumulationStream As MaterialStream
-
+            Dim tempH As Double
             If Reset Then
                 AccumulationStream = Nothing
                 volume = 0
@@ -327,161 +330,157 @@ Namespace UnitOperations
                 SetDynamicProperty("Reset Content", 0)
             End If
 
-            'oms.SetMassFlow(ims.GetMassFlow)
-            'If s2 = Dynamics.DynamicsSpecType.Flow Then
-            'oms.SetMassFlow(ims.GetMassFlow)
-            'End If
-
-            'If volume = 0.0 Or volume = Double.NaN Then
-            '    For Each segmento In Me.Profile.Sections.Values
-            '        volume += segmento.Quantidade * segmento.Comprimento * ((segmento.DI * 0.0254) ^ 2) / 4 * Math.PI
-            '    Next
-            '    If volume = 0.0 Then Throw New Exception("Erreur de calcul sur le volume : " & volume)
-            '    SetDynamicProperty("Volume", volume)
-            'End If
 
             If AccumulationStream Is Nothing Then
 
                 If InitializeFromInlet Then
-
+                    ims.Calculate()
                     AccumulationStream = ims.CloneXML
 
                 Else
 
-                    'AccumulationStream = ims.Subtract(oms, timestep)
-                    AccumulationStream = oms.CloneXML
+                    AccumulationStream = ims.Subtract(oms, timestep)
 
                 End If
-                'FlowSheet.ShowMessage(String.Format("{0} AccumulationStream {1}", GraphicObject.Tag, AccumulationStream.ToString), Interfaces.IFlowsheet.MessageType.Warning)
                 Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
                 AccumulationStream.SetMassFlow(density * volume)
-                'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
                 AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+                oms.SpecType = StreamSpec.Pressure_and_Enthalpy
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
-                'FlowSheet.ShowMessage(String.Format("{0} AccumulationStream (Calc) {1}", GraphicObject.Tag, AccumulationStream.ToString), Interfaces.IFlowsheet.MessageType.Warning)
-                _AcccumulationStream = AccumulationStream.CloneXML
+                tempH = AccumulationStream.GetMassEnthalpy
             Else
                 AccumulationStream.SetFlowsheet(FlowSheet)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-                _AcccumulationStream = AccumulationStream.CloneXML
-                _AcccumulationStream.SetTemperature(AccumulationStream.GetTemperature)
-
+                tempH = AccumulationStream.GetMassEnthalpy
                 If ims.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(ims, timestep)
-                    AccumulationStream.Calculate(True, True)
-                    Dim _oms As MaterialStream = oms.Clone
-                    _oms.SetMassFlow(ims.GetMassFlow)
-                    _oms.Calculate(False, True)
-                    AccumulationStream = AccumulationStream.Subtract(_oms, timestep)
-                    AccumulationStream.Calculate(True, True)
+                    'AccumulationStream.Calculate()
+                    If Not oms.Calculated Then oms.Calculate()
+                    AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 End If
-
+                AccumulationStream.PropertyPackage = PropertyPackage
+                AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                'AccumulationStream.Calculate()
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
 
             End If
 
+
+            Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
+
             AccumulationStream.SetFlowsheet(FlowSheet)
-            'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
 
-            If integrator.ShouldCalculateEquilibrium Then
+            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+            AccumulationStream.SetPressure(ims.GetPressure)
+            AccumulationStream.Calculate()
+            'AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
 
-                AccumulationStream.Calculate(True, True)
-
-            End If
+            'Console.WriteLine(String.Format("dH : {0:n3}, true dH : {1:n3}",
+            '                                {dH_theory, tempH - AccumulationStream.GetMassEnthalpy}
+            '                                )
+            '                                )
 
             'calculate pressure
 
-            Dim M = AccumulationStream.GetMolarFlow()
+            'Dim M = AccumulationStream.GetMolarFlow
 
-            Dim Temperature = AccumulationStream.GetTemperature
+            'Dim Temperature = AccumulationStream.GetTemperature
 
-            Dim Pressure = AccumulationStream.GetPressure
+            'Dim Pressure = AccumulationStream.GetPressure
 
             'm3/mol
 
-            If M > 0 Then
+            'If M > 0 Then
 
-                prevM = currentM
+            '    prevM = currentM
 
-                currentM = volume / M
+            '    currentM = volume / M
 
-                PropertyPackage.CurrentMaterialStream = AccumulationStream
+            '    PropertyPackage.CurrentMaterialStream = AccumulationStream
 
-                If AccumulationStream.GetPressure > 0 Then
+            '    If Pressure > 0 Then
 
-                    If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
+            '        If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
 
-                        Dim result As IFlashCalculationResult
+            '            Dim result As IFlashCalculationResult
 
-                        result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
+            '            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
 
-                        Pressure = result.CalculatedPressure
+            '            Pressure = result.CalculatedPressure
 
-                    Else
+            '        Else
 
-                        Pressure = currentM / prevM * Pressure
+            '            Pressure = currentM / prevM * Pressure
 
-                    End If
+            '        End If
 
-                Else
+            '    Else
 
-                    Pressure = 700
+            '        Pressure = 700
 
-                End If
+            '    End If
 
-            Else
+            'Else
 
-                Pressure = 700
+            '    Pressure = 700
 
-            End If
+            'End If
 
-            Dim newVol As Double
-            newVol = volume + timestep * (ims.GetMassFlow / ims.Phases(0).Properties.density - ims.GetMassFlow / oms.Phases(0).Properties.density)
+            'Dim newVol As Double
+            'If ims.GetMassFlow > 0 Then
+            '    newVol = volume + timestep * (ims.GetMassFlow / ims.Phases(0).Properties.density - ims.GetMassFlow / oms.Phases(0).Properties.density
+            '    )
+            'Else
+            '    newVol = volume
+            'End If
 
-
-            If newVol < 0 Then Throw New Exception(String.Format("
-                Pressure < 0 pour {0} 
-                - ims : {1}
-                - oms : {2}
-                - AccumulationStream : {3}
-                - rho_in / rho_out : {4}/{5}
-                ", {Me, ims.ToResume, oms.ToResume,
-                   AccumulationStream.ToResume, ims.Phases(0).Properties.density, oms.Phases(0).Properties.density}))
-            'Pressure = Pressure * newVol / volume
-            AccumulationStream.SetPressure(Pressure)
-            AccumulationStream.Calculate(True, True)
+            'If newVol < 0 Then Throw New Exception(String.Format("
+            '    Pressure < 0 pour {0} 
+            '    - ims : {1}
+            '    - oms : {2}
+            '    - AccumulationStream : {3}
+            '    - rho_in / rho_out : {4}/{5}
+            '    ", {Me, ims.ToResume, oms.ToResume,
+            '       AccumulationStream.ToResume, ims.Phases(0).Properties.density, oms.Phases(0).Properties.density}))
+            ''Pressure = Pressure * newVol / volume
+            'AccumulationStream.SetPressure(Pressure)
+            'AccumulationStream.Calculate(True, True)
             'Console.WriteLine(String.Format("Acc St dT = {0:n2}°K dP={1:n2}Pa Mass={2:n2}kg", {Temperature - _AcccumulationStream.GetTemperature, Pressure - _AcccumulationStream.GetPressure, AccumulationStream.GetMassFlow - _AcccumulationStream.GetMassFlow}))
             'Console.WriteLine(AccumulationStream.ToString)
 
-            ims.SetPressure(Pressure)
+            'ims.SetPressure(Pressure)
+            'ims.Calculate()
+            'AccumulationStream.SetPressure(Pressure)
+            'AccumulationStream.Calculate()
 
-
-            If ims.GetMassFlow > 0 Then
-                Dim _ims As MaterialStream = AccumulationStream.CloneXML
-                'Dim _ims As MaterialStream = ims.CloneXML
-                _ims.SetTemperature(AccumulationStream.GetTemperature)
-                _ims.SetPressure(Pressure)
-                _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
-                _ims.SetMassFlow(ims.GetMassFlow)
-                _ims.Calculate(True, True)
-                Calculate({_ims, oms, GetEnergyStream})
-            Else
-                Dim _ims As MaterialStream = AccumulationStream.CloneXML
-                'Dim _ims As MaterialStream = ims.CloneXML
-                _ims.SetTemperature(AccumulationStream.GetTemperature)
-                _ims.SetPressure(Pressure)
-                _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
-                _ims.SetMassFlow(ims.GetMassFlow)
-                _ims.Calculate(True, True)
-                Calculate({_ims, oms, GetEnergyStream})
-            End If
-            'oms.SetMassFlow(ims.GetMassFlow)
-
-
+            'If ims.GetMassFlow > 0 Then
+            '    Dim _ims As MaterialStream = AccumulationStream.CloneXML
+            '    _ims.SetTemperature(AccumulationStream.GetTemperature)
+            '    _ims.SetPressure(Pressure)
+            '    _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
+            '    _ims.SetMassFlow(ims.GetMassFlow)
+            '    _ims.Calculate()
+            '    _oms = oms.CloneXML
+            '    Calculate({_ims, oms, GetEnergyStream})
+            'End If
+            Dim _ims As MaterialStream = AccumulationStream.CloneXML
+            _ims.SetTemperature(AccumulationStream.GetTemperature)
+            _ims.SetPressure(AccumulationStream.GetPressure)
+            _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
+            _ims.SetMassFlow(ims.GetMassFlow)
+            _ims.Calculate()
+            '_oms = oms.CloneXML
+            Calculate({_ims, oms, GetEnergyStream})
+            'oms.AtEquilibrium = False
+            'oms.Calculate(True, True)
+            'If oms.Phases(2).Properties.massflow.GetValueOrDefault > 0 And Me.GraphicObject.Tag = "1_flash_pipe" Then
+            '    Console.WriteLine("MsoAlertButtonType")
+            'End If
 
         End Sub
+
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)
 
             Dim IObj As Inspector.InspectorItem = Inspector.Host.GetNewInspectorItem()
@@ -490,7 +489,7 @@ Namespace UnitOperations
 
             IObj?.SetCurrent()
 
-            IObj?.Paragraphs.Add("The Pipe Segment unit operation  can be used to 
+            IObj?.Paragraphs.Add("The Pipe Segment unit operation  can be used To 
                                 simulate fluid flow process in a pipe. Two of the most used 
                                 correlations for the calculation of pressure drop are available 
                                 in DWSIM. Temperature can be rigorously calculated considering 
@@ -813,7 +812,11 @@ Namespace UnitOperations
                                         IObj6?.SetCurrent()
                                         If segmento.TipoSegmento = "Tubulaosimples" Or segmento.TipoSegmento = "" Or segmento.TipoSegmento = "Straight Tube Section" Or segmento.TipoSegmento = "Straight Tube" Or segmento.TipoSegmento = "Tubulação Simples" Then
                                             resv = fpp.CalculateDeltaP(.DI * 0.0254, .Comprimento / .Incrementos, .Elevacao / .Incrementos, Me.GetRugosity(.Material, segmento), Qvin * 24 * 3600, Qlin * 24 * 3600, eta_v * 1000, eta_l * 1000, rho_v, rho_l, tens)
-                                            'Console.WriteLine(resv.ToString)
+                                            Dim temp As Double = Pin - resv(2)
+                                            'Console.WriteLine(Me.GraphicObject.Tag + String.Format(" {2} dpf {0:n2} dph {1:n2}", {resv(2), resv(3), resv(0)}))
+                                            'If Me.GraphicObject.Tag = "desc_pipe" And ims.GetMassFlow > 0 Then
+                                            '    Console.WriteLine(Me.GraphicObject.Tag + String.Format(" {2} dpf {0:n2} dph {1:n2} Pin {3:n2} T={4}", {resv(2), resv(3), resv(0), Pin, Tin}))
+                                            'End If
                                         Else
                                             segmento.Comprimento = 0.1 '10 cm default
                                             segmento.Incrementos = 1 'only one increment
@@ -843,7 +846,6 @@ Namespace UnitOperations
 
 
                                         IObj6?.SetCurrent()
-                                        'Console.WriteLine(String.Format("Qvin={0} Qlin={1} dpf={2} dph={3} dpt={4}", {Qvin, Qlin, resv(2), resv(3), resv(4)}))
                                         tipofluxo = resv(0)
                                         holdup = resv(1)
                                         dpf = resv(2)
@@ -877,6 +879,8 @@ Namespace UnitOperations
                                     IObj6?.Paragraphs.Add(String.Format("Updated outlet pressure: {0} Pa", Pout))
 
                                     cntP += 1
+
+                                    'Console.WriteLine(Me.GraphicObject.Tag + String.Format(" Pin {0:n2} dpt {1:n2} Pout {2:n2}", {Pin, dpt, Pout}))
 
                                     If Pout <= 0 Then Throw New Exception(FlowSheet.GetTranslatedString("Pressonegativadentro"))
 
@@ -2676,6 +2680,58 @@ Final3:     T = bbb
             Next
 
             str.AppendLine()
+            str.AppendLine("DpFriction Profile")
+            str.AppendLine()
+            str.AppendLine("Length (" & su.distance & ")" & vbTab & "DpFriction (" & su.deltaP & ")")
+            comp_ant = 0
+            For Each ps In Profile.Sections.Values
+                For Each res In ps.Results
+                    str.AppendLine(SystemsOfUnits.Converter.ConvertFromSI(su.distance, comp_ant).ToString(numberformat, ci) &
+                                   vbTab & SystemsOfUnits.Converter.ConvertFromSI(su.deltaP, res.DpFriction.GetValueOrDefault).ToString(numberformat, ci))
+                    comp_ant += ps.Comprimento / ps.Incrementos
+                Next
+            Next
+
+            str.AppendLine()
+            str.AppendLine("DpStatic Profile")
+            str.AppendLine()
+            str.AppendLine("Length (" & su.distance & ")" & vbTab & "DpStatic (" & su.deltaP & ")")
+            comp_ant = 0
+            For Each ps In Profile.Sections.Values
+                For Each res In ps.Results
+                    str.AppendLine(SystemsOfUnits.Converter.ConvertFromSI(su.distance, comp_ant).ToString(numberformat, ci) &
+                                   vbTab & SystemsOfUnits.Converter.ConvertFromSI(su.deltaP, res.DpStatic.GetValueOrDefault).ToString(numberformat, ci))
+                    comp_ant += ps.Comprimento / ps.Incrementos
+                Next
+            Next
+
+            str.AppendLine()
+            str.AppendLine("RHOl Profile")
+            str.AppendLine()
+            str.AppendLine("Length (" & su.distance & ")" & vbTab & "RHOl (" & su.density & ")")
+            comp_ant = 0
+            For Each ps In Profile.Sections.Values
+                For Each res In ps.Results
+                    str.AppendLine(SystemsOfUnits.Converter.ConvertFromSI(su.distance, comp_ant).ToString(numberformat, ci) &
+                                   vbTab & SystemsOfUnits.Converter.ConvertFromSI(su.density, res.RHOl.GetValueOrDefault).ToString(numberformat, ci))
+                    comp_ant += ps.Comprimento / ps.Incrementos
+                Next
+            Next
+
+            str.AppendLine()
+            str.AppendLine("RHOv Profile")
+            str.AppendLine()
+            str.AppendLine("Length (" & su.distance & ")" & vbTab & "RHOl (" & su.density & ")")
+            comp_ant = 0
+            For Each ps In Profile.Sections.Values
+                For Each res In ps.Results
+                    str.AppendLine(SystemsOfUnits.Converter.ConvertFromSI(su.distance, comp_ant).ToString(numberformat, ci) &
+                                   vbTab & SystemsOfUnits.Converter.ConvertFromSI(su.density, res.RHOv.GetValueOrDefault).ToString(numberformat, ci))
+                    comp_ant += ps.Comprimento / ps.Incrementos
+                Next
+            Next
+
+            str.AppendLine()
             str.AppendLine("Vapor Velocity Profile")
             str.AppendLine()
             str.AppendLine("Length (" & su.distance & ")" & vbTab & "Vapor Velocity (" & su.velocity & ")")
@@ -2854,7 +2910,7 @@ Final3:     T = bbb
         End Function
 
         Public Overrides Function GetChartModelNames() As List(Of String)
-            Return New List(Of String)({"Temperature Profile", "Pressure Profile", "Heat Flow Profile", "Liquid Velocity Profile", "Vapor Velocity Profile", "Liquid Holdup Profile", "Inclination Profile", "Overall HTC Profile", "Internal HTC Profile", "Wall k/L Profile", "Insulation k/L Profile", "External HTC Profile", "External Temperature Profile"})
+            Return New List(Of String)({"DpStatic Profile", "DpFriction Profile", "Temperature Profile", "Pressure Profile", "Heat Flow Profile", "Liquid Velocity Profile", "Vapor Velocity Profile", "Liquid Holdup Profile", "Inclination Profile", "Overall HTC Profile", "Internal HTC Profile", "Wall k/L Profile", "Insulation k/L Profile", "External HTC Profile", "External Temperature Profile"})
         End Function
 
         Public Overrides Function GetChartModel(name As String) As Object
@@ -2926,9 +2982,15 @@ Final3:     T = bbb
                 Case "External HTC Profile"
                     model.AddLineSeries(px, PopulateData(12))
                     model.Axes(1).Title = "Heat Transfer Coefficient (" + su.heat_transf_coeff + ")"
-                Case "External Temperature Profile"
-                    model.AddLineSeries(px, PopulateData(13))
-                    model.Axes(1).Title = "External Temperature (" + su.temperature + ")"
+                'Case "External Temperature Profile"
+                '    model.AddLineSeries(px, PopulateData(13))
+                '    model.Axes(1).Title = "External Temperature (" + su.temperature + ")"
+                Case "DpFriction Profile"
+                    model.AddLineSeries(px, PopulateData(14))
+                    model.Axes(1).Title = "DpFriction (" + su.deltaP + ")"
+                Case "DpStatic Profile"
+                    model.AddLineSeries(px, PopulateData(15))
+                    model.Axes(1).Title = "DpStatic (" + su.deltaP + ")"
             End Select
 
             Return model
@@ -3050,6 +3112,22 @@ Final3:     T = bbb
                     For Each sec In Profile.Sections.Values
                         For Each res In sec.Results
                             vec.Add(SystemsOfUnits.Converter.ConvertFromSI(su.temperature, res.External_Temperature))
+                        Next
+                    Next
+                    Exit Select
+                Case 14
+                    'DpFriction
+                    For Each sec In Profile.Sections.Values
+                        For Each res In sec.Results
+                            vec.Add(SystemsOfUnits.Converter.ConvertFromSI(su.deltaP, res.DpFriction.GetValueOrDefault))
+                        Next
+                    Next
+                    Exit Select
+                Case 15
+                    'DpStatic
+                    For Each sec In Profile.Sections.Values
+                        For Each res In sec.Results
+                            vec.Add(SystemsOfUnits.Converter.ConvertFromSI(su.deltaP, res.DpStatic.GetValueOrDefault))
                         Next
                     Next
                     Exit Select

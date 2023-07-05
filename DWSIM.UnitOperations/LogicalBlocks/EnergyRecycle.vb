@@ -194,7 +194,7 @@ Namespace SpecialOps
         End Sub
 
         Public Overrides Sub RunDynamicModel()
-
+            Calculate()
         End Sub
 
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)
@@ -266,16 +266,16 @@ SS:             Enew = Me.ConvergenceHistory.Energy
                 .GraphicObject.Calculated = True
             End With
 
-            If Me.IterationCount >= Me.MaximumIterations Then
-                Dim msgres As MsgBoxResult = MessageBox.Show(FlowSheet.GetTranslatedString("Onmeromximodeiteraes"), _
-                                Me.GraphicObject.Tag & " - " & FlowSheet.GetTranslatedString("Nmeromximodeiteraesa3"), _
-                                MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-                If msgres = MsgBoxResult.No Then
-                    GoTo final
-                Else
-                    Me.IterationCount = 0
-                End If
-            End If
+            'If Me.IterationCount >= Me.MaximumIterations Then
+            '    Dim msgres As MsgBoxResult = MessageBox.Show(FlowSheet.GetTranslatedString("Onmeromximodeiteraes"), _
+            '                    Me.GraphicObject.Tag & " - " & FlowSheet.GetTranslatedString("Nmeromximodeiteraesa3"), _
+            '                    MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+            '    If msgres = MsgBoxResult.No Then
+            '        GoTo final
+            '    Else
+            '        Me.IterationCount = 0
+            '    End If
+            'End If
 
             Me.IterationCount += 1
 

@@ -7,7 +7,10 @@ Module Module1
 
     Sub Main()
 
-        System.IO.Directory.SetCurrentDirectory("C:/Program Files/DWSIM8") ' replace with DWSIM's installation directory on your computer
+        'Dim path As String = "D:/git/dwsim/DWSIM/bin/x64/Debug/"
+        Dim path As String = "D:/git/sowage/"
+
+        System.IO.Directory.SetCurrentDirectory(path) ' replace with DWSIM's installation directory on your computer
 
         'create automation manager
         Dim interf As New DWSIM.Automation.Automation3
@@ -15,7 +18,7 @@ Module Module1
         Dim sim As Interfaces.IFlowsheet
 
         'load Cavett's Problem simulation file
-        sim = interf.LoadFlowsheet("samples" & IO.Path.DirectorySeparatorChar & "Cavett's Problem.dwxml")
+        sim = interf.LoadFlowsheet("D:/git/sowage/test.dwxmz")
 
         '(optional) set a listener to catch solver messages
         'sim.SetMessageListener(Sub(msg As String) CONSOLE.WriteLine(msg)End Sub)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,8 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <COMReference Include="{d37e2a3e-8545-3a39-9f4f-31827c9124ab}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>2</VersionMajor>
+      <Guid>d37e2a3e-8545-3a39-9f4f-31827c9124ab</Guid>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DWSIM.Automation\DWSIM.Automation.csproj" />
     <ProjectReference Include="..\DWSIM.Interfaces\DWSIM.Interfaces.vbproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CapeOpen">
+      <HintPath>..\DWSIM\bin\x64\Debug\CapeOpen.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
