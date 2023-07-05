@@ -378,9 +378,9 @@ Public Class FormDynamicsIntegratorControl
 
                                         exceptions = FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Flowsheet, GlobalSettings.Settings.SolverMode)
 
-                                        While GlobalSettings.Settings.CalculatorBusy
-                                            Task.Delay(200).Wait()
-                                        End While
+                                        'While GlobalSettings.Settings.CalculatorBusy
+                                        '    Task.Delay(200).Wait()
+                                        'End While
 
                                         If exceptions.Count > 0 Then Exit While
 
