@@ -45,6 +45,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
         Sub New()
             MyBase.New()
+            'FlashSettings(Interfaces.Enums.FlashSetting.CalculateBubbleAndDewPoints) = True
         End Sub
 
         Public Overrides ReadOnly Property InternalUseOnly As Boolean
@@ -299,7 +300,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             dt = d2 - d1
 
-            WriteDebugInfo("PT Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & errfunc)
+            'WriteDebugInfo("PT Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & errfunc)
 
 out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector, S, Vxs}
 
@@ -414,7 +415,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             dt = d2 - d1
 
 
-            WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            'WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, K, 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -454,7 +455,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Herror)
-            WriteDebugInfo("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            'WriteDebugInfo("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -579,7 +580,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            'WriteDebugInfo("PH Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -624,7 +625,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
             If Tinf < 100 Then Tinf = 100
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Serror)
-            WriteDebugInfo("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            'WriteDebugInfo("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -723,7 +724,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            WriteDebugInfo("PS Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            'WriteDebugInfo("PS Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, Ss, Vs}
 
@@ -766,7 +767,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
             OBJ_FUNC_PH_FLASH = herr
 
-            WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
+            'WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
@@ -802,7 +803,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             'Console.WriteLine("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
 
-            WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
+            'WriteDebugInfo("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
@@ -836,7 +837,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L + mms * Ssf)) * _Sv - (mml * L / (mmg * V + mml * L + mms * Ssf)) * _Sl - (mms * Ssf / (mmg * V + mml * L + mms * Ssf)) * _Ss
             OBJ_FUNC_PS_FLASH = serr
 
-            WriteDebugInfo("PS Flash [Seawater]: Current T = " & T & ", Current S Error = " & serr)
+            'WriteDebugInfo("PS Flash [Seawater]: Current T = " & T & ", Current S Error = " & serr)
 
         End Function
 
@@ -870,7 +871,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim Vx(n), Vy(n), Vs(n), xv, xl, L, S, P As Double
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
-
+            If V > Vz(wid) Then V = Vz(wid)
             xv = V
             xl = 1 - V
 
@@ -878,7 +879,9 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim tmp As Object() = Nothing
 
-            If xv < Vz(wid) Then
+
+
+            If xv <= Vz(wid) Then
                 Vz(wid) -= xv
                 Vz = Vz.NormalizeY()
                 tmp = Flash_PT_Internal(False, Vz, P, T, PP)
@@ -906,7 +909,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             If ecount > maxit_e Then Throw New Exception(Calculator.GetLocalString("PropPack_FlashMaxIt2"))
 
-            WriteDebugInfo("TV Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            'WriteDebugInfo("TV Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, P, ecount, Vy.DivideY(Vx), 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -928,7 +931,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim Vx(n), Vy(n), Vs(n), xv, xl, L, S, T As Double
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
-
+            If V > Vz(wid) Then V = Vz(wid)
             xv = V
             xl = 1 - V
 
@@ -936,7 +939,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim tmp As Object() = Nothing
 
-            If xv < Vz(wid) Then
+            If xv <= Vz(wid) Then
                 Vz(wid) -= xv
                 Vz = Vz.NormalizeY()
                 tmp = Flash_PT_Internal(False, Vz, P, T, PP)
@@ -964,7 +967,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             If ecount > maxit_e Then Throw New Exception(Calculator.GetLocalString("PropPack_FlashMaxIt2"))
 
-            WriteDebugInfo("PV Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            'WriteDebugInfo("PV Flash [Seawater]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Vy.DivideY(Vx), 0.0#, PP.RET_NullVector, S, Vs}
 
