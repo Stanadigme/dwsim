@@ -3026,19 +3026,19 @@ Label_00CC:
 
         Dim t1 = TaskHelper.Run(Sub()
 
-                                    Dim CPPP As CoolPropPropertyPackage = New CoolPropPropertyPackage()
-                                    CPPP.ComponentName = "CoolProp"
-                                    plist.Add(CPPP)
+                                    'Dim CPPP As CoolPropPropertyPackage = New CoolPropPropertyPackage()
+                                    'CPPP.ComponentName = "CoolProp"
+                                    'plist.Add(CPPP)
 
-                                    Dim CPIPP As New CoolPropIncompressiblePurePropertyPackage()
-                                    CPIPP.ComponentName = "CoolProp (Incompressible Fluids)"
-                                    CPIPP.ComponentDescription = "CoolProp (Incompressible Fluids)"
-                                    plist.Add(CPIPP)
+                                    'Dim CPIPP As New CoolPropIncompressiblePurePropertyPackage()
+                                    'CPIPP.ComponentName = "CoolProp (Incompressible Fluids)"
+                                    'CPIPP.ComponentDescription = "CoolProp (Incompressible Fluids)"
+                                    'plist.Add(CPIPP)
 
-                                    Dim CPIMPP As New CoolPropIncompressibleMixturePropertyPackage()
-                                    CPIMPP.ComponentName = "CoolProp (Incompressible Mixtures)"
-                                    CPIMPP.ComponentDescription = "CoolProp (Incompressible Mixtures)"
-                                    plist.Add(CPIMPP)
+                                    'Dim CPIMPP As New CoolPropIncompressibleMixturePropertyPackage()
+                                    'CPIMPP.ComponentName = "CoolProp (Incompressible Mixtures)"
+                                    'CPIMPP.ComponentDescription = "CoolProp (Incompressible Mixtures)"
+                                    'plist.Add(CPIMPP)
 
                                     Dim STPP As SteamTablesPropertyPackage = New SteamTablesPropertyPackage()
                                     STPP.ComponentName = "Steam Tables (IAPWS-IF97)"
@@ -3161,15 +3161,15 @@ Label_00CC:
                                      'DHPP.ComponentName = "Debye-Hückel (Aqueous Electrolytes)"
                                      'plist.Add(DHPP)
 
-                                     Dim BOPP As BlackOilPropertyPackage = New BlackOilPropertyPackage()
-                                     BOPP.ComponentName = "Black Oil"
-                                     plist.Add(BOPP)
+                                     'Dim BOPP As BlackOilPropertyPackage = New BlackOilPropertyPackage()
+                                     'BOPP.ComponentName = "Black Oil"
+                                     'plist.Add(BOPP)
 
-                                     Dim GERGPP As GERG2008PropertyPackage = New GERG2008PropertyPackage()
-                                     plist.Add(GERGPP)
+                                     'Dim GERGPP As GERG2008PropertyPackage = New GERG2008PropertyPackage()
+                                     'plist.Add(GERGPP)
 
-                                     Dim PCSAFTPP As PCSAFT2PropertyPackage = New PCSAFT2PropertyPackage()
-                                     plist.Add(PCSAFTPP)
+                                     'Dim PCSAFTPP As PCSAFT2PropertyPackage = New PCSAFT2PropertyPackage()
+                                     'plist.Add(PCSAFTPP)
 
                                  End Sub)
 
@@ -3183,15 +3183,15 @@ Label_00CC:
 
         Dim t13 = TaskHelper.Run(Sub()
 
-                                     Dim PR78Adv As PengRobinson1978AdvancedPropertyPackage = New PengRobinson1978AdvancedPropertyPackage()
-                                     plist.Add(PR78Adv)
+                                     'Dim PR78Adv As PengRobinson1978AdvancedPropertyPackage = New PengRobinson1978AdvancedPropertyPackage()
+                                     'plist.Add(PR78Adv)
 
                                  End Sub)
 
         Dim t14 = TaskHelper.Run(Sub()
 
-                                     Dim SRKAdv As SoaveRedlichKwongAdvancedPropertyPackage = New SoaveRedlichKwongAdvancedPropertyPackage()
-                                     plist.Add(SRKAdv)
+                                     'Dim SRKAdv As SoaveRedlichKwongAdvancedPropertyPackage = New SoaveRedlichKwongAdvancedPropertyPackage()
+                                     'plist.Add(SRKAdv)
 
                                  End Sub)
 
