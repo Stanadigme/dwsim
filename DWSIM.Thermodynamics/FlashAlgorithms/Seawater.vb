@@ -338,6 +338,8 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             ' T loop
             Dim precision As Double = 0.000000001
 
+            'TODO : FIXME : Degeu
+
             Do
                 fx = Herror_S(Tloop, {P, Vz, PP})
                 fx2 = Herror_S(Tloop + deltaT, {P, Vz, PP})
@@ -366,7 +368,8 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             Loop Until ecount > 50 Or deltaT < precision 'Or Tloop < 0
 
 
-            T = Tloop
+            T = Tloop - deltaT
+            ' - deltaT : pour s'assurer de H < sum(Hv,Hl)
 
             Dim Hs, Hl, Hv, xl, xv, xs As Double
 
@@ -793,12 +796,13 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Dim mmg, mml, mms As Double
             If V > 0 Then _Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
             If L > 0 Then _Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
-            If S > 0 Then _Hs = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties)
+            'If S > 0 Then _Hs = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties)
             mmg = pp.AUX_MMM(Vy)
             mml = pp.AUX_MMM(Vx)
-            mms = pp.AUX_MMM(Vs)
+            'mms = pp.AUX_MMM(Vs)
 
-            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
+            'Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L)) * _Hv - (mml * L / (mmg * V + mml * L)) * _Hl
             OBJ_FUNC_PH_FLASH_S = herr
 
             'Console.WriteLine("PH Flash [Seawater]: Current T = " & T & ", Current H Error = " & herr)
