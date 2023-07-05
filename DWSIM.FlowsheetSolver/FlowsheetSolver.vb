@@ -25,6 +25,7 @@ Imports DWSIM.GlobalSettings
 Imports DWSIM.ExtensionMethods
 Imports cv = DWSIM.SharedClasses.SystemsOfUnits.Converter
 Imports DWSIM.SharedClasses
+Imports DWSIM.SharedClasses.UnitOperations
 
 'custom event handler declaration
 Public Delegate Sub CustomEvent(ByVal sender As Object, ByVal e As System.EventArgs, ByVal extrainfo As Object)
@@ -1439,8 +1440,8 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                                       converged = True
                                                       For Each r As String In recycles
                                                           obj = fbag.SimulationObjects(r)
-                                                          converged = DirectCast(obj, IRecycle).Converged
-                                                          If Not converged Then Exit For
+                                                          'converged = DirectCast(obj, IRecycle).Converged
+                                                          'If Not converged Then Exit For
                                                       Next
 
                                                       'in dynamic mode, recycles are redundant
@@ -1734,6 +1735,43 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
         End If
 
     End Function
+
+    Public Shared Function InitFlowsheet(ByVal fobj As Object)
+        Dim fs As IFlowsheet = TryCast(fobj, IFlowsheet)
+
+        Dim Controllers = fs.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_PID).ToList
+
+        Dim Controllers2 = fs.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_Python).ToList
+
+        For Each controller In Controllers
+            controller.Reset()
+        Next
+        For Each controller In Controllers2
+            controller.ResetRequested = True
+        Next
+
+        For Each obj In fs.SimulationObjects.Values
+            If obj.HasPropertiesForDynamicMode Then
+                If TypeOf obj Is BaseClass Then
+                    Dim bobj = DirectCast(obj, BaseClass)
+                    If bobj.GetDynamicProperty("Reset Content") IsNot Nothing Then
+                        bobj.SetDynamicProperty("Reset Content", 1)
+                    End If
+                    If bobj.GetDynamicProperty("Reset Contents") IsNot Nothing Then
+                        bobj.SetDynamicProperty("Reset Contents", 1)
+                    End If
+                    If bobj.GetDynamicProperty("Initialize using Inlet Stream") IsNot Nothing Then
+                        bobj.SetDynamicProperty("Initialize using Inlet Stream", 1)
+                    End If
+                    If bobj.GetDynamicProperty("Initialize using Inlet Streams") IsNot Nothing Then
+                        bobj.SetDynamicProperty("Initialize using Inlet Streams", 1)
+                    End If
+                End If
+            End If
+        Next
+
+    End Function
+
 
     ''' <summary>
     ''' Calculates a single object in the Flowsheet.
