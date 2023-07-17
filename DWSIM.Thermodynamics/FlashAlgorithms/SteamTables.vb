@@ -99,7 +99,9 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
         End Function
 
         Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+            Dim d1, d2 As Date, dt As TimeSpan
 
+            d1 = Date.Now
             Dim vf, lf, T As Double
 
             spp = PP
@@ -133,6 +135,12 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             End With
 
             lf = 1 - vf
+
+            d2 = Date.Now
+
+            dt = d2 - d1
+
+            Console.WriteLine("PH Flash [SteamTable]: Converged in Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {lf, vf, Vz.Clone, Vz.Clone, T, 0.0#, Vz.Clone, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 

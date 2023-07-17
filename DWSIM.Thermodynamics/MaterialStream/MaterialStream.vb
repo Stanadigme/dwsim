@@ -595,7 +595,7 @@ Namespace Streams
                         End If
 
                     Else
-
+                        'Console.WriteLine(String.Format("H from Calc before eq {0:n2}", {Me.Phases(0).Properties.enthalpy}))
                         Select Case Me.SpecType
                             Case StreamSpec.Temperature_and_Pressure
                                 .DW_CalcEquilibrium(PropertyPackages.FlashSpec.T, PropertyPackages.FlashSpec.P)
@@ -608,7 +608,7 @@ Namespace Streams
                             Case StreamSpec.Temperature_and_VaporFraction
                                 .DW_CalcEquilibrium(PropertyPackages.FlashSpec.T, PropertyPackages.FlashSpec.VAP)
                         End Select
-
+                        'Console.WriteLine(String.Format("H from Calc {0:n2}", {Me.Phases(0).Properties.enthalpy}))
                     End If
 
                     If DebugMode Then AppendDebugLine(String.Format("Phase equilibria calculated succesfully."))
@@ -656,7 +656,7 @@ Namespace Streams
                     IObj?.Paragraphs.Add("Phase Properties will be calculated using the currently selected Property Package.")
 
                     IObj?.Paragraphs.Add("To calculate the phase properties, DWSIM will call the 'DW_CalcPhaseProps' routine from the Property Package for each present phase.")
-
+                    'Console.WriteLine(String.Format("H from Calc before Calc {0:n2}", {Me.Phases(3).Properties.enthalpy}))
                     If doparallel Then
 
                         Dim task1 = TaskHelper.Run(Sub()
@@ -759,6 +759,8 @@ Namespace Streams
                             .DW_ZerarPhaseProps(PropertyPackages.Phase.Vapor)
                         End If
                     End If
+                    'Console.WriteLine(String.Format("H after calc {0:n2}", {Me.Phases(3).Properties.enthalpy}))
+                    'Console.WriteLine(Me.Phases(0).Properties.enthalpy - Me.Phases(3).Properties.enthalpy * Me.Phases(3).Properties.molarfraction - Me.Phases(2).Properties.enthalpy * Me.Phases(2).Properties.molarfraction)
 
                     IObj?.Paragraphs.Add("Additional (new) properties like Bulk Modulus and Speed of Sound are calculated in a separate step.")
 
@@ -794,6 +796,7 @@ Namespace Streams
 
                     Select Case foption
                         Case 0, 1
+
                             IObj?.SetCurrent()
                             .DW_CalcCompMolarFlow(-1)
                             IObj?.SetCurrent()
@@ -801,13 +804,17 @@ Namespace Streams
                             IObj?.SetCurrent()
                             .DW_CalcCompVolFlow(-1)
                             IObj?.SetCurrent()
+                            Dim _H = Me.Phases(0).Properties.enthalpy
+                            'Console.WriteLine(String.Format("H original {0:n2}", {}))
                             .DW_CalcOverallProps()
+                            'If _H <> Me.Phases(0).Properties.enthalpy Then Console.WriteLine(String.Format("H from {1:n2} to {0:n2}", {Me.Phases(0).Properties.enthalpy, _H})) Else Console.WriteLine("RAS")
                             IObj?.SetCurrent()
                             .DW_CalcTwoPhaseProps(PropertyPackages.Phase.Liquid, PropertyPackages.Phase.Vapor)
                             IObj?.SetCurrent()
                             .DW_CalcVazaoVolumetrica()
                             IObj?.SetCurrent()
                             .DW_CalcKvalue()
+
                         Case 2
                             'Me.Phases(0).Properties.massflow = QV * Me.Phases(0).Properties.density.GetValueOrDefault
                             '.DW_CalcVazaoMolar()
