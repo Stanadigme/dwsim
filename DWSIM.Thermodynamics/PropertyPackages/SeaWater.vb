@@ -443,42 +443,71 @@ Namespace PropertyPackages
                 'Dim salinity As Double = CalcSalinity()
                 Dim salinity As Double = CalcSalinity(Me.CurrentMaterialStream.GetPhaseComposition(phaseID))
 
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight = Me.AUX_MMM(PropertyPackages.Phase.Liquid1)
-                result = 1 / (Me.SIA.sea_density_si(salinity, T, P) * 1000 / 18) / 8.314 / T * P
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.compressibilityFactor = result
-                result = Me.SIA.sea_cp_si(salinity, T, P) / 1000
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = result
-                result = Me.SIA.sea_cp_si(salinity, T, P) / 1000
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = result
-                result = Me.SIA.sea_enthalpy_si(salinity, T, P) / 1000
-                'Console.WriteLine(String.Format("From DW_CalcPhaseProps Liquid Hl {1:n5}", {T, result}))
-                'Console.WriteLine(String.Format("T from Calc {0:n2}", {T}))
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy = result
-                result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_enthalpy = result
-                result = Me.SIA.sea_entropy_si(salinity, T, P) / 1000
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy = result
-                result = Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_entropy = result
-                Dim entF As Double = Me.AUX_HFm25(PropertyPackages.Phase.Liquid1)
-                result = Me.m_iapws97.enthalpyW(T, P / 100000)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpyF = result + entF
-                result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpyF.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_enthalpyF = result
-                entF = Me.AUX_SFm25(PropertyPackages.Phase.Liquid1)
-                result = Me.m_iapws97.entropyW(T, P / 100000)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.entropyF = result + entF
-                result = Me.CurrentMaterialStream.Phases(phaseID).Properties.entropyF.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_entropyF = result
-                result = Me.SIA.sea_viscosity(salinity, T)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity = result
-                result = Me.SIA.sea_thermalcond(salinity, T)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.thermalConductivity = result
-                Me.DW_CalcCompFugCoeff(PropertyPackages.Phase.Liquid1)
-                result = Me.SIA.sea_density_si(salinity, T, P)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.kinematic_viscosity = Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity.GetValueOrDefault / result
-                Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
+                If salinity > 0 Then
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight = Me.AUX_MMM(PropertyPackages.Phase.Liquid1)
+                    result = 1 / (Me.SIA.sea_density_si(salinity, T, P) * 1000 / 18) / 8.314 / T * P
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.compressibilityFactor = result
+                    result = Me.SIA.sea_cp_si(salinity, T, P) / 1000
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = result
+                    result = Me.SIA.sea_cp_si(salinity, T, P) / 1000
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = result
+                    result = Me.SIA.sea_enthalpy_si(salinity, T, P) / 1000
+                    'Console.WriteLine(String.Format("From DW_CalcPhaseProps Liquid Hl {1:n5}", {T, result}))
+                    'Console.WriteLine(String.Format("T from Calc {0:n2}", {T}))
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy = result
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_enthalpy = result
+                    result = Me.SIA.sea_entropy_si(salinity, T, P) / 1000
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy = result
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_entropy = result
+                    Dim entF As Double = Me.AUX_HFm25(PropertyPackages.Phase.Liquid1)
+                    result = Me.m_iapws97.enthalpyW(T, P / 100000)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpyF = result + entF
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpyF.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_enthalpyF = result
+                    entF = Me.AUX_SFm25(PropertyPackages.Phase.Liquid1)
+                    result = Me.m_iapws97.entropyW(T, P / 100000)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.entropyF = result + entF
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.entropyF.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_entropyF = result
+                    result = Me.SIA.sea_viscosity(salinity, T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity = result
+                    result = Me.SIA.sea_thermalcond(salinity, T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.thermalConductivity = result
+                    Me.DW_CalcCompFugCoeff(PropertyPackages.Phase.Liquid1)
+                    result = Me.SIA.sea_density_si(salinity, T, P)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.kinematic_viscosity = Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity.GetValueOrDefault / result
+                    Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
+                Else
+                    result = Me.m_iapws97.densSatLiqTW(T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
+                    result = DW_CalcEnthalpy(RET_VMOL(Phase), T, P, State.Liquid)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy = result
+                    result = DW_CalcEntropy(RET_VMOL(Phase), T, P, State.Liquid)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy = result
+                    result = 1 / (Me.m_iapws97.densSatLiqTW(T) * 1000 / Me.AUX_MMM(PropertyPackages.Phase.Mixture)) / 8.314 / T * P
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.compressibilityFactor = result
+                    result = Me.m_iapws97.cpSatLiqTW(T) '* 18
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = result
+                    result = Me.m_iapws97.cvSatLiqTW(T) '* 18
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = result
+                    result = Me.AUX_MMM(PropertyPackages.Phase.Mixture)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight = result
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_enthalpy = result
+                    result = Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.molar_entropy = result
+                    result = Me.m_iapws97.thconSatLiqTW(T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.thermalConductivity = result
+                    result = Me.m_iapws97.viscSatLiqTW(T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity = result
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.kinematic_viscosity = result / Me.CurrentMaterialStream.Phases(phaseID).Properties.density.Value
+
+                End If
+
+
 
             ElseIf phaseID = 1 Then
 
