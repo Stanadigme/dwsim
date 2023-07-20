@@ -382,6 +382,18 @@ Namespace UnitOperations
             '                                )
             '                                )
 
+            Dim CalcPressure As Boolean = True
+            If CalcPressure Then
+                Dim P As Double
+                If ims.GetMassFlow > 0 Then
+                    P = CalculatePressure(AccumulationStream, volume / AccumulationStream.GetMolarFlow)
+                Else
+                    P = CalculatePressure(ims, volume / AccumulationStream.GetMolarFlow)
+                End If
+                'If P < Pmin Then P = Pmin
+                AccumulationStream.SetPressure(P)
+            End If
+
             'calculate pressure
 
             'Dim M = AccumulationStream.GetMolarFlow
@@ -390,7 +402,7 @@ Namespace UnitOperations
 
             'Dim Pressure = AccumulationStream.GetPressure
 
-            'm3/mol
+            ''m3/mol
 
             'If M > 0 Then
 
@@ -419,7 +431,6 @@ Namespace UnitOperations
             '    Else
 
             '        Pressure = 700
-
             '    End If
 
             'Else

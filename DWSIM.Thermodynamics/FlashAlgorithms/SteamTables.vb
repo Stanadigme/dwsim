@@ -140,7 +140,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [SteamTable]: Converged in Time taken: " & dt.TotalMilliseconds & " ms.")
+            'Console.WriteLine("PH Flash [SteamTable]: Converged in Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {lf, vf, Vz.Clone, Vz.Clone, T, 0.0#, Vz.Clone, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 

@@ -159,7 +159,7 @@ Namespace UnitOperations
             AddDynamicProperty("Minimum Pressure", "Minimum Dynamic Pressure for this Unit Operation.", 101325, UnitOfMeasure.pressure, 1.0.GetType())
             AddDynamicProperty("Initialize using Inlet Stream", "Initializes the volume content with information from the inlet stream, if the content is null.", True, UnitOfMeasure.none, True.GetType())
             AddDynamicProperty("Reset Content", "Empties the volume content on the next run.", False, UnitOfMeasure.none, True.GetType())
-
+            AddDynamicProperty("Maximum Pressure", "Maximum Dynamic Pressure for this Unit Operation.", 6 * 101325, UnitOfMeasure.pressure, 1.0.GetType())
         End Sub
 
         Private prevM, currentM As Double
@@ -188,6 +188,7 @@ Namespace UnitOperations
             Dim InitializeFromInlet As Boolean = GetDynamicProperty("Initialize using Inlet Stream")
 
             Dim Pmin = GetDynamicProperty("Minimum Pressure")
+            Dim Pmax = GetDynamicProperty("Maximum Pressure")
 
             Dim Reset As Boolean = GetDynamicProperty("Reset Content")
 
@@ -197,13 +198,15 @@ Namespace UnitOperations
             End If
 
             Dim tempH As Double
+            Dim _ims As MaterialStream
 
             If AccumulationStream Is Nothing Then
-
+                ims.Calculate()
+                _ims = ims.CloneXML
+                _ims.SetPressure(Pmin)
+                _ims.Calculate()
                 If InitializeFromInlet Then
-                    ims.Calculate()
                     AccumulationStream = ims.CloneXML
-
                 Else
 
                     AccumulationStream = ims.Subtract(oms, timestep)
@@ -211,10 +214,11 @@ Namespace UnitOperations
 
                 End If
 
-                Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
+                'Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
+                Dim density = _ims.Phases(0).Properties.density.GetValueOrDefault
                 AccumulationStream.SetMassFlow(density * Vol)
                 'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
-                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
@@ -223,24 +227,23 @@ Namespace UnitOperations
             Else
 
                 AccumulationStream.SetFlowsheet(FlowSheet)
-                AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 tempH = AccumulationStream.GetMassEnthalpy
-                ims.Calculate()
+
                 'oms.SetMassFlow(ims.GetMassFlow)
-                oms.Calculate()
-                If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
-                'AccumulationStream.Calculate()
-                If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
+
+                If ims.GetMassFlow() > 0 Then
+                    ims.Calculate()
+                    oms.Calculate()
+                    AccumulationStream = AccumulationStream.Add(ims, timestep)
+                    AccumulationStream = AccumulationStream.Subtract(oms, timestep)
+                End If
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
-                'AccumulationStream.Calculate(True, True)
             End If
 
             Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
 
             AccumulationStream.SetFlowsheet(FlowSheet)
-
-            'AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
-            AccumulationStream.SetPressure(ims.GetPressure)
+            'AccumulationStream.SetPressure(ims.GetPressure)
             'AccumulationStream.Calculate()
             AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
             AccumulationStream.Calculate()
@@ -283,66 +286,32 @@ Namespace UnitOperations
 
             AccumulationStream.SetMassEnthalpy(newH)
 
-            AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
-
             AccumulationStream.PropertyPackage = PropertyPackage
             AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-
-            AccumulationStream.Calculate(True, True)
+            AccumulationStream.Calculate()
 
             'calculate pressure
+            Dim CalcPressure As Boolean = True
 
-            'Dim M = AccumulationStream.GetMolarFlow()
+            If CalcPressure Then
+                Dim P As Double
+                'If AccumulationStream.GetPressure < Pmax Then
+                '    P = CalculatePressure(AccumulationStream, Vol / AccumulationStream.GetMolarFlow)
+                'Else
+                '    P = Pmax
+                'End If
+                P = CalculatePressure(AccumulationStream, Vol / AccumulationStream.GetMolarFlow)
+                AccumulationStream.SetPressure(P)
 
-            'Dim Temperature = AccumulationStream.GetTemperature
+            End If
 
-            'Dim Pressure = AccumulationStream.GetPressure
 
-            'm3/mol
 
-            'If M > 0 Then
+                'AccumulationStream.SetMassEnthalpy(newH)
+                'AccumulationStream.SetPressure(Pressure)
+                'AccumulationStream.Calculate(True, True)
 
-            '    prevM = currentM
-
-            '    currentM = Vol / M
-
-            '    PropertyPackage.CurrentMaterialStream = AccumulationStream
-
-            '    If AccumulationStream.GetPressure > 0 Then
-
-            '        If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
-
-            '            Dim result As IFlashCalculationResult
-
-            '            'result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeEnthalpy, currentM, newH, Pressure)
-            '            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
-
-            '            Pressure = result.CalculatedPressure
-
-            '        Else
-
-            '            Pressure = currentM / prevM * Pressure
-
-            '        End If
-
-            '    Else
-
-            '        Pressure = Pmin
-
-            '    End If
-
-            'Else
-
-            '    Pressure = Pmin
-
-            'End If
-
-            'Pressure = ims.GetPressure
-            'AccumulationStream.SetMassEnthalpy(newH)
-            'AccumulationStream.SetPressure(Pressure)
-            'AccumulationStream.Calculate(True, True)
-
-            Dim Wi, DeltaP As Double
+                Dim Wi, DeltaP As Double
 
             Select Case CalcMode
 
@@ -352,19 +321,24 @@ Namespace UnitOperations
 
                 Case Else
 
-                        'Wi = ims.GetMassFlow()
+                    'Wi = ims.GetMassFlow()
 
-                        'DeltaP = (Wi / Kr) ^ 2
+                    'DeltaP = (Wi / Kr) ^ 2
 
-                        'ims.SetPressure(Pressure)
-
-                        oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+                    'ims.SetPressure(Pressure)
+                    'AccumulationStream.Calculate()
+                    Console.WriteLine(AccumulationStream.ToResume)
+                    oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
                     oms.SetTemperature(AccumulationStream.GetTemperature)
                     oms.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
-                        oms.SetPressure(AccumulationStream.GetPressure - DeltaP)
+                    Dim pressure As Double
+                    If AccumulationStream.GetPressure > Pmax Then pressure = Pmax Else pressure = AccumulationStream.GetPressure
+                    oms.SetPressure(pressure)
+                    Console.WriteLine(oms.ToResume)
+                    oms.Calculate()
+                    Console.WriteLine(oms.ToResume)
 
-
-                End Select
+            End Select
 
         End Sub
 

@@ -25,6 +25,8 @@ Imports DWSIM.Thermodynamics
 Imports Org.XmlUnit
 Imports Org.XmlUnit.Builder
 Imports System.Buffers
+Imports DWSIM.Thermodynamics.Streams
+Imports DWSIM.SharedClasses
 
 Namespace UnitOperations
 
@@ -337,6 +339,17 @@ Namespace UnitOperations
             Calculated = False
 
         End Sub
+
+        Public Overridable Function CalculatePressure(stream As MaterialStream, M As Double) As Double
+            Dim T As Double = stream.GetTemperature
+            Dim P As Double = stream.GetPressure
+            Dim H As Double = stream.GetMassEnthalpy
+
+            Dim result As IFlashCalculationResult
+            PropertyPackage.CurrentMaterialStream = stream
+            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, M, T, P)
+            Return result.CalculatedPressure
+        End Function
 
 #End Region
 

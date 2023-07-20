@@ -358,6 +358,7 @@ Namespace PropertyPackages
             Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
 
             If phaseID = 2 Then
+                T += 0.01
 
                 result = Me.m_iapws97.densW(T, P / 100000)
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result

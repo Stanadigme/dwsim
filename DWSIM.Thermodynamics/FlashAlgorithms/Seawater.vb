@@ -1088,6 +1088,12 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim Vx(n), Vy(n), Vs(n), xv, xl, L, S, T As Double
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
+
+            If Vz(wid) = 1 Then
+                stpp.CurrentMaterialStream = PP.CurrentMaterialStream
+                Return stFA.Flash_PV(Vz, P, V, Tref, stpp)
+            End If
+
             If V > Vz(wid) Then V = Vz(wid)
             xv = V
             xl = 1 - V
