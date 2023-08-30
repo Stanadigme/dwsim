@@ -35,7 +35,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
         Inherits FlashAlgorithm
 
-        Dim etol As Double = 0.000001
+        Dim etol As Double = 0.00001
         Dim itol As Double = 0.000001
         Dim maxit_i As Integer = 100
         Dim maxit_e As Integer = 100
@@ -103,10 +103,10 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             Dim d_beta As Double
             Dim ecount As Integer = 0
             Dim errfunc As Double = 0.0#
-            Dim conv As Double = 0.000000001
+            Dim conv As Double = 0.00001
             Dim L, V, S As Double
             Dim Vxl(n), Vxv(n), Vnf(n), Vnv(n), Vnl(n), L_ant As Double
-            etol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance).ToDoubleFromInvariant
+            'etol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance).ToDoubleFromInvariant
             maxit_e = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_External_Iterations)
             itol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Internal_Loop_Tolerance).ToDoubleFromInvariant
             maxit_i = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_Internal_Iterations)
@@ -128,7 +128,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
                     d_beta = -s_fx / s_dfx
                     beta += d_beta
                     ecount += 1
-                Loop Until ecount > loopMax Or Abs(d_beta) < conv Or beta > 1 Or beta < 0
+                Loop Until ecount > loopMax Or Abs(d_beta) < etol Or beta > 1 Or beta < 0
 
                 If beta > 0 And beta < 1 Then V = beta Else If beta > 1 Then V = 1
 
@@ -375,7 +375,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             Dim d1, d2 As Date, dt As TimeSpan
 
             d1 = Date.Now
-
+            'etol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PHFlash_External_Loop_Tolerance).ToDoubleFromInvariant
             Dim n, ecount As Integer
             Dim maxitINT As Integer = Me.FlashSettings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_Internal_Iterations)
             n = Vz.Length - 1
@@ -401,7 +401,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             'Dim deltaTindex As Integer = 0
 
             ' T loop
-            Dim precision As Double = 0.000000001
+            Dim precision As Double = etol
             If True Then
                 'TODO : FIXME : Degeu
 
@@ -1019,7 +1019,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             d1 = Date.Now
 
-            etol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance).ToDoubleFromInvariant
+            'etol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance).ToDoubleFromInvariant
             maxit_e = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_External_Iterations)
             itol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Internal_Loop_Tolerance).ToDoubleFromInvariant
             maxit_i = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_Internal_Iterations)

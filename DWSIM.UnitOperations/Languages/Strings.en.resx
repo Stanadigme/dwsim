@@ -255,6 +255,12 @@
   <data name="HEAT_Name" xml:space="preserve">
     <value>Heater</value>
   </data>
+	<data name="RECOMPLETOR_Desc" xml:space="preserve">
+    <value>Recompletor model</value>
+  </data>
+	<data name="RECOMPLETOR_Name" xml:space="preserve">
+    <value>Recompletor</value>
+  </data>
   <data name="HEXCH_Desc" xml:space="preserve">
     <value>Rigorous Heat Exchanger model</value>
   </data>

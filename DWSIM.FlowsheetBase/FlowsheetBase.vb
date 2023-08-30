@@ -2479,6 +2479,19 @@ Imports System.Text.RegularExpressions
 
     End Function
 
+    'Public Function GetSowageProcessData() As List(Of XElement) Implements IFlowsheet.GetSowageProcessData
+
+    '    Dim dlist As New List(Of XElement)
+
+    '    For Each so As SharedClasses.UnitOperations.BaseClass In SimulationObjects.Values
+    '        so.SetFlowsheet(Me)
+    '        dlist.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
+    '    Next
+
+    '    Return dlist
+
+    'End Function
+
     Public Sub LoadProcessData(data As List(Of XElement)) Implements IFlowsheet.LoadProcessData
 
         For Each xel In data

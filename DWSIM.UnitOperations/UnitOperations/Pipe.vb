@@ -230,6 +230,20 @@ Namespace UnitOperations
             Return obj
         End Function
 
+        Public Overrides Function SaveData() As System.Collections.Generic.List(Of System.Xml.Linq.XElement)
+
+            Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = MyBase.SaveData()
+
+            elements.Add(New XElement("Segments"))
+
+            For Each kvp As KeyValuePair(Of Integer, PipeSection) In Me.Profile.Sections
+                elements.Item(elements.Count - 1).Add(New XElement("Segment", {New XElement("ID", kvp.Key), kvp.Value.SaveData()}))
+            Next
+
+            Return elements
+
+        End Function
+
         Public Overrides Function CloneJSON() As Object
             Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of Pipe)(Newtonsoft.Json.JsonConvert.SerializeObject(Me))
         End Function
@@ -334,7 +348,7 @@ Namespace UnitOperations
             If AccumulationStream Is Nothing Then
 
                 If InitializeFromInlet Then
-                    ims.Calculate()
+                    If Not ims.Calculated Then ims.Calculate()
                     AccumulationStream = ims.CloneXML
 
                 Else
@@ -371,7 +385,7 @@ Namespace UnitOperations
             Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
 
             AccumulationStream.SetFlowsheet(FlowSheet)
-
+            PropertyPackage.CurrentMaterialStream = AccumulationStream
             AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
             AccumulationStream.SetPressure(ims.GetPressure)
             AccumulationStream.Calculate()
@@ -382,7 +396,7 @@ Namespace UnitOperations
             '                                )
             '                                )
 
-            Dim CalcPressure As Boolean = True
+            Dim CalcPressure As Boolean = False
             If CalcPressure Then
                 Dim P As Double
                 If ims.GetMassFlow > 0 Then
@@ -477,10 +491,12 @@ Namespace UnitOperations
             '    Calculate({_ims, oms, GetEnergyStream})
             'End If
             Dim _ims As MaterialStream = AccumulationStream.CloneXML
+            _ims.PropertyPackage = PropertyPackage
             _ims.SetTemperature(AccumulationStream.GetTemperature)
             _ims.SetPressure(AccumulationStream.GetPressure)
             _ims.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
             _ims.SetMassFlow(ims.GetMassFlow)
+            PropertyPackage.CurrentMaterialStream = _ims
             _ims.Calculate()
             '_oms = oms.CloneXML
             Calculate({_ims, oms, GetEnergyStream})
@@ -687,7 +703,8 @@ Namespace UnitOperations
 
                     segmento.Results.Clear()
 
-                    For iq = 1 To segmento.Quantidade
+
+                    For iq = 1 To 1 'segmento.Quantidade
 
                         IObj2?.SetCurrent
 
@@ -734,6 +751,11 @@ Namespace UnitOperations
                             z = .Phases(2).Properties.compressibilityFactor.GetValueOrDefault
 
                         End With
+
+                        Qlin /= segmento.Quantidade
+                        w_l /= segmento.Quantidade
+                        Qvin /= segmento.Quantidade
+                        w_v /= segmento.Quantidade
 
                         Do
 
@@ -1065,6 +1087,10 @@ Namespace UnitOperations
                                 w_v = .Phases(2).Properties.massflow.GetValueOrDefault
                                 z = .Phases(2).Properties.compressibilityFactor.GetValueOrDefault
 
+                                Qlin /= segmento.Quantidade
+                                w_l /= segmento.Quantidade
+                                Qvin /= segmento.Quantidade
+                                w_v /= segmento.Quantidade
                             End With
 
                             With results

@@ -551,45 +551,45 @@ Namespace UnitOperations
 
             'm3/mol
 
-            If MHot > 0 Then
+            'If MHot > 0 Then
 
-                prevMHot = currentMHot
+            '    prevMHot = currentMHot
 
-                currentMHot = VolumeHot / MHot
+            '    currentMHot = VolumeHot / MHot
 
-                If Math.Abs(currentMHot - prevMHot) < 0.0001 And AccumulationStreamHot.Phases(1).Properties.molarfraction.GetValueOrDefault > 0.99999 Then
-                    liquidcase = True
-                End If
+            '    If Math.Abs(currentMHot - prevMHot) < 0.0001 And AccumulationStreamHot.Phases(1).Properties.molarfraction.GetValueOrDefault > 0.99999 Then
+            '        liquidcase = True
+            '    End If
 
-                PropertyPackage.CurrentMaterialStream = AccumulationStreamHot
+            '    PropertyPackage.CurrentMaterialStream = AccumulationStreamHot
 
-                If AccumulationStreamHot.GetPressure > 0 Then
+            '    If AccumulationStreamHot.GetPressure > 0 Then
 
-                    If (prevMHot = 0.0 Or integrator.ShouldCalculateEquilibrium) And Not liquidcase Then
+            '        If (prevMHot = 0.0 Or integrator.ShouldCalculateEquilibrium) And Not liquidcase Then
 
-                        Dim result As IFlashCalculationResult
+            '            Dim result As IFlashCalculationResult
 
-                        result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentMHot, TemperatureHot, PressureHot)
+            '            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentMHot, TemperatureHot, PressureHot)
 
-                        PressureHot = result.CalculatedPressure
+            '            PressureHot = result.CalculatedPressure
 
-                    Else
+            '        Else
 
-                        If prevMHot > 0.0 Then PressureHot = currentMHot / prevMHot * PressureHot
+            '            If prevMHot > 0.0 Then PressureHot = currentMHot / prevMHot * PressureHot
 
-                    End If
+            '        End If
 
-                Else
+            '    Else
 
-                    PressureHot = Pmin
+            '        PressureHot = Pmin
 
-                End If
+            '    End If
 
-            Else
+            'Else
 
-                PressureHot = Pmin
+            '    PressureHot = Pmin
 
-            End If
+            'End If
 
             PressureHot = StInHot.GetPressure
             AccumulationStreamHot.SetPressure(PressureHot)
@@ -606,45 +606,45 @@ Namespace UnitOperations
 
             'm3/mol
 
-            If MCold > 0 Then
+            'If MCold > 0 Then
 
-                prevMCold = currentMCold
+            '    prevMCold = currentMCold
 
-                currentMCold = VolumeCold / MCold
+            '    currentMCold = VolumeCold / MCold
 
-                If Math.Abs(currentMCold - prevMCold) < 0.0001 And AccumulationStreamCold.Phases(1).Properties.molarfraction.GetValueOrDefault > 0.99999 Then
-                    liquidcase = True
-                End If
+            '    If Math.Abs(currentMCold - prevMCold) < 0.0001 And AccumulationStreamCold.Phases(1).Properties.molarfraction.GetValueOrDefault > 0.99999 Then
+            '        liquidcase = True
+            '    End If
 
-                AccumulationStreamCold.PropertyPackage.CurrentMaterialStream = AccumulationStreamCold
+            '    AccumulationStreamCold.PropertyPackage.CurrentMaterialStream = AccumulationStreamCold
 
-                If AccumulationStreamCold.GetPressure > 0 Then
+            '    If AccumulationStreamCold.GetPressure > 0 Then
 
-                    If (prevMCold = 0.0 Or integrator.ShouldCalculateEquilibrium) And Not liquidcase Then
+            '        If (prevMCold = 0.0 Or integrator.ShouldCalculateEquilibrium) And Not liquidcase Then
 
-                        Dim result As IFlashCalculationResult
+            '            Dim result As IFlashCalculationResult
 
-                        result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentMCold, TemperatureCold, PressureCold)
+            '            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentMCold, TemperatureCold, PressureCold)
 
-                        PressureCold = result.CalculatedPressure
+            '            PressureCold = result.CalculatedPressure
 
-                    Else
+            '        Else
 
-                        If prevMCold > 0.0 Then PressureCold = currentMCold / prevMCold * PressureCold
+            '            If prevMCold > 0.0 Then PressureCold = currentMCold / prevMCold * PressureCold
 
-                    End If
+            '        End If
 
-                Else
+            '    Else
 
-                    PressureCold = Pmin
+            '        PressureCold = Pmin
 
-                End If
+            '    End If
 
-            Else
+            'Else
 
-                PressureCold = Pmin
+            '    PressureCold = Pmin
 
-            End If
+            'End If
 
             AccumulationStreamCold.SetPressure(PressureCold)
             'AccumulationStreamCold.SetPressure(StInCold.GetPressure)

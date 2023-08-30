@@ -2113,6 +2113,27 @@ Public Class FlowsheetSurface_SkiaSharp
                 myCOCL.GraphicObject = myHeat
                 Flowsheet.Collections.FlowsheetObjectCollection.Add(myHeat.Name, myCOCL)
 
+            Case ObjectType.Recompletor
+                Dim myHeatExchanger As New RecompletorGraphic(mpx, mpy, 30, 30)
+                If Flowsheet.FlowsheetOptions.FlowsheetColorTheme = 2 Then
+                    myHeatExchanger.SetSize(New SKSize(60, 60))
+                End If
+                myHeatExchanger.LineWidth = 2
+                myHeatExchanger.Fill = True
+                myHeatExchanger.FillColor = fillclr
+                myHeatExchanger.LineColor = lineclr
+                myHeatExchanger.Tag = "REC-" + objindex
+                If tag <> "" Then myHeatExchanger.Tag = tag
+                gObj = myHeatExchanger
+                CheckTag(gObj)
+                gObj.Name = "HE-" & Guid.NewGuid.ToString
+                If id <> "" Then gObj.Name = id
+                Flowsheet.Collections.GraphicObjectCollection.Add(gObj.Name, myHeatExchanger)
+                'OBJETO DWSIM
+                Dim myCOHE As Recompletor = New Recompletor(myHeatExchanger.Name, "Recompletor")
+                myCOHE.GraphicObject = myHeatExchanger
+                Flowsheet.Collections.FlowsheetObjectCollection.Add(myHeatExchanger.Name, myCOHE)
+
             Case ObjectType.Pipe
 
                 Dim myPipe As New PipeSegmentGraphic(mpx, mpy, 50, 10)
@@ -3139,6 +3160,8 @@ Public Class FlowsheetSurface_SkiaSharp
                 tobj = ObjectType.Input
             Case "Switch"
                 tobj = ObjectType.Switch
+            Case "Recompletor"
+                tobj = ObjectType.Recompletor
         End Select
 
         AddObjectToSurface(tobj, x, y, chemsep,,,, CreateConnected)

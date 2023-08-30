@@ -242,6 +242,7 @@ Namespace UnitOperations
                     'imsmix = imsmix.Add(imsx)
                 End If
             Next
+            imsmix.PropertyPackage.CurrentMaterialStream = imsmix
             imsmix.Calculate()
 
             Dim Vol As Double = GetDynamicProperty("Volume")
@@ -363,7 +364,9 @@ Namespace UnitOperations
 
             AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
             AccumulationStream.SetPressure(imsmix.GetPressure)
-            AccumulationStream.Calculate(True, True)
+            AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+            PropertyPackage.CurrentMaterialStream = AccumulationStream
+            AccumulationStream.Calculate()
             AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
             'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
 

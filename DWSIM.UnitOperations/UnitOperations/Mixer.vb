@@ -116,6 +116,7 @@ Namespace UnitOperations
             Dim ms As MaterialStream
             Dim cp As IConnectionPoint
             Dim refMs As MaterialStream
+
             For Each cp In Me.GraphicObject.InputConnectors
                 If cp.IsAttached Then
                     IObj?.Paragraphs.Add(String.Format("<h3>Inlet Stream #{0}</h3>", i))

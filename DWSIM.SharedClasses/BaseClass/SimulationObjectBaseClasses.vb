@@ -946,6 +946,13 @@ Namespace UnitOperations
             Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = XMLSerializer.XMLSerializer.Serialize(Me)
 
             With elements
+                Dim name As String
+                If GraphicObject IsNot Nothing Then
+                    name = GraphicObject.Tag
+                Else
+                    name = ToString()
+                End If
+                .Add(New XElement("String", name))
                 .Add(New XElement("DynamicProperties"))
                 Dim extraprops = DirectCast(ExtraProperties, IDictionary(Of String, Object))
                 For Each item In extraprops

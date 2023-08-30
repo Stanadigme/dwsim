@@ -201,7 +201,7 @@ Namespace UnitOperations
             Dim _ims As MaterialStream
 
             If AccumulationStream Is Nothing Then
-                ims.Calculate()
+                If Not ims.Calculated Then ims.Calculate()
                 _ims = ims.CloneXML
                 _ims.SetPressure(Pmin)
                 _ims.Calculate()
@@ -232,7 +232,7 @@ Namespace UnitOperations
                 'oms.SetMassFlow(ims.GetMassFlow)
 
                 If ims.GetMassFlow() > 0 Then
-                    ims.Calculate()
+                    If Not ims.Calculated Then ims.Calculate()
                     oms.Calculate()
                     AccumulationStream = AccumulationStream.Add(ims, timestep)
                     AccumulationStream = AccumulationStream.Subtract(oms, timestep)
@@ -307,11 +307,11 @@ Namespace UnitOperations
 
 
 
-                'AccumulationStream.SetMassEnthalpy(newH)
-                'AccumulationStream.SetPressure(Pressure)
-                'AccumulationStream.Calculate(True, True)
+            'AccumulationStream.SetMassEnthalpy(newH)
+            'AccumulationStream.SetPressure(Pressure)
+            'AccumulationStream.Calculate(True, True)
 
-                Dim Wi, DeltaP As Double
+            Dim Wi, DeltaP As Double
 
             Select Case CalcMode
 
@@ -327,16 +327,14 @@ Namespace UnitOperations
 
                     'ims.SetPressure(Pressure)
                     'AccumulationStream.Calculate()
-                    Console.WriteLine(AccumulationStream.ToResume)
+                    'Console.WriteLine(AccumulationStream.ToResume)
                     oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
                     oms.SetTemperature(AccumulationStream.GetTemperature)
                     oms.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
                     Dim pressure As Double
                     If AccumulationStream.GetPressure > Pmax Then pressure = Pmax Else pressure = AccumulationStream.GetPressure
+                    'pressure = AccumulationStream.GetPressure
                     oms.SetPressure(pressure)
-                    Console.WriteLine(oms.ToResume)
-                    oms.Calculate()
-                    Console.WriteLine(oms.ToResume)
 
             End Select
 
@@ -416,7 +414,7 @@ Namespace UnitOperations
                     If DebugMode Then AppendDebugLine(String.Format("Doing a PH flash to calculate outlet temperature... P = {0} Pa, H = {1} kJ/[kg.K]", P2, H2))
 
                     IObj?.SetCurrent()
-                    Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2, 0)
+                    Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2, Ti)
                     T2 = tmp.CalculatedTemperature
                     Me.DeltaT = T2 - Ti
 
