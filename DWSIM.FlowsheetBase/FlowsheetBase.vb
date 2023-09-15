@@ -656,6 +656,25 @@ Imports System.Text.RegularExpressions
 
         Select Case type
 
+            Case ObjectType.Recompletor
+                Dim myHeatExchanger As New RecompletorGraphic(mpx, mpy, 30, 30)
+                If FlowsheetOptions.FlowsheetColorTheme = 2 Then
+                    myHeatExchanger.SetSize(New SKSize(60, 60))
+                End If
+                myHeatExchanger.LineWidth = 2
+                myHeatExchanger.Fill = True
+                myHeatExchanger.Tag = "REC-" + objindex
+                If tag <> "" Then myHeatExchanger.Tag = tag
+                gObj = myHeatExchanger
+                CheckTag(gObj)
+                gObj.Name = "HE-" & Guid.NewGuid.ToString
+                If id <> "" Then gObj.Name = id
+                GraphicObjects.Add(gObj.Name, myHeatExchanger)
+                'OBJETO DWSIM
+                Dim myCOHE As Recompletor = New Recompletor(myHeatExchanger.Name, "Recompletor")
+                myCOHE.GraphicObject = myHeatExchanger
+                SimulationObjects.Add(myHeatExchanger.Name, myCOHE)
+
             Case ObjectType.External
 
                 Dim myNode As New ExternalUnitOperationGraphic(mpx, mpy, 40, 40)

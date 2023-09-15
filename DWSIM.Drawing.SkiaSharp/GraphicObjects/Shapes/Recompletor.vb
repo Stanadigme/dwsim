@@ -13,7 +13,7 @@ Namespace GraphicObjects.Shapes
         Public Sub New()
             Me.ObjectType = DWSIM.Interfaces.Enums.GraphicObjects.ObjectType.Recompletor
             Me.Description = "Recompletor"
-            CreateConnectors(3, 4)
+            CreateConnectors(4, 5)
             EmbeddedResourceIconName = "heat_exchanger.png"
         End Sub
 
@@ -53,7 +53,7 @@ Namespace GraphicObjects.Shapes
 
             If InputConnectors.Count = 0 Then
 
-                For I As Integer = 1 To 3
+                For I As Integer = 1 To InCount
 
                     Dim Con As New ConnectionPoint
                     Con.Type = ConType.ConIn
@@ -65,7 +65,7 @@ Namespace GraphicObjects.Shapes
 
             If OutputConnectors.Count = 0 Then
 
-                For I As Integer = 1 To 4
+                For I As Integer = 1 To OutCount
 
                     Dim Con As New ConnectionPoint
                     Con.Type = ConType.ConOut
@@ -80,14 +80,17 @@ Namespace GraphicObjects.Shapes
                 If DrawMode = 2 Then
                     .Item(1).Position = New Point(X + 0.257 * Width, Y + 0.234 * Height)
                     .Item(2).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
+                    .Item(3).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
                 Else
                     .Item(1).Position = New Point(X + 0.5 * Width, Y)
                     .Item(2).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
+                    .Item(3).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
                 End If
                 .Item(1).Direction = ConDir.Down
                 .Item(0).ConnectorName = "ComboBoxEdMIn"
-                .Item(1).ConnectorName = "ComboBoxXFlashLiq"
+                .Item(1).ConnectorName = "ComboBoxXEdMFlashLiq"
                 .Item(2).ConnectorName = "ComboBoxXFlashVapor"
+                .Item(3).ConnectorName = "ComboBoxXFlashLiq"
             End With
 
             With OutputConnectors
@@ -96,16 +99,19 @@ Namespace GraphicObjects.Shapes
                     .Item(1).Position = New Point(X + 0.765 * Width, Y + 0.7825 * Height)
                     .Item(2).Position = New Point(X + 0.257 * Width, Y + 0.257 * Height)
                     .Item(3).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
+                    .Item(4).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
                 Else
                     .Item(1).Position = New Point(X + 0.5 * Width, Y + Height)
                     .Item(2).Position = New Point(X + 0.257 * Width, Y + 0.257 * Height)
                     .Item(3).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
+                    .Item(4).Position = New Point(X + 0.5 * Width, Y + 0.5 * Height)
                 End If
                 .Item(1).Direction = ConDir.Down
                 .Item(0).ConnectorName = "ComboBoxXCoolerOut"
                 .Item(1).ConnectorName = "ComboBoxXHeaterOut"
                 .Item(2).ConnectorName = "ComboBoxRejet"
                 .Item(3).ConnectorName = "ComboBoxRecirculation"
+                .Item(4).ConnectorName = "ComboBoxDistillatOut"
             End With
 
             Me.EnergyConnector.Active = False

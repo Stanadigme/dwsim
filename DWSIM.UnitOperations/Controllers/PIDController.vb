@@ -620,7 +620,8 @@ Namespace SpecialOps
             ' Calculates PID value for given reference feedback
             ' u(t) = K_p e(t) + K_i \int_{0}^{t} e(t)dt + K_d {de}/{dt}
 
-            Dim integratorID = FlowSheet.DynamicsManager.ScheduleList(FlowSheet.DynamicsManager.CurrentSchedule).CurrentIntegrator
+            'Dim integratorID = FlowSheet.DynamicsManager.ScheduleList(FlowSheet.DynamicsManager.CurrentSchedule).CurrentIntegrator
+            Dim integratorID = FlowSheet.DynamicsManager.ScheduleList.First.Value.CurrentIntegrator
             Dim integrator = FlowSheet.DynamicsManager.IntegratorList(integratorID)
 
             Dim timestep = integrator.IntegrationStep.TotalSeconds

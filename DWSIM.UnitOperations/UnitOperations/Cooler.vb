@@ -149,10 +149,13 @@ Namespace UnitOperations
             AddDynamicProperty("Minimum Pressure", "Minimum Dynamic Pressure for this Unit Operation.", 101325, UnitOfMeasure.pressure, 1.0.GetType())
             AddDynamicProperty("Initialize using Inlet Stream", "Initializes the volume content with information from the inlet stream, if the content is null.", True, UnitOfMeasure.none, True.GetType())
             AddDynamicProperty("Reset Content", "Empties the volume content on the next run.", False, UnitOfMeasure.none, True.GetType())
-
+            AddDynamicProperty("Pressure Control", "Controle la pression en fonct des conditions de chgmt de phase", False, UnitOfMeasure.none, True.GetType())
         End Sub
 
         Private prevM, currentM As Double
+
+        Public metaIms As MaterialStream = Nothing
+        Public metaOms As MaterialStream = Nothing
 
         Public Overrides Sub RunDynamicModel()
 
@@ -163,8 +166,22 @@ Namespace UnitOperations
 
             If integrator.RealTime Then timestep = Convert.ToDouble(integrator.RealTimeStepMs) / 1000.0
 
-            Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
-            Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
+            'Dim ims As MaterialStream = Me.GetInletMaterialStream(0)
+            'Dim oms As MaterialStream = Me.GetOutletMaterialStream(0)
+            Dim ims As MaterialStream
+            If metaIms Is Nothing Then
+                ims = Me.GetInletMaterialStream(0)
+            Else
+                ims = metaIms
+            End If
+
+            Dim oms As MaterialStream
+            If metaOms Is Nothing Then
+                oms = Me.GetOutletMaterialStream(0)
+            Else
+                oms = metaOms
+            End If
+
             oms.SetMassFlow(ims.GetMassFlow)
             Dim s1, s2 As Enums.Dynamics.DynamicsSpecType
 
@@ -184,6 +201,8 @@ Namespace UnitOperations
                 SetDynamicProperty("Reset Content", 0)
             End If
 
+            Dim _ims As MaterialStream
+
             If AccumulationStream Is Nothing Then
 
                 If InitializeFromInlet Then
@@ -197,10 +216,20 @@ Namespace UnitOperations
 
                 End If
 
-                Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
+                _ims = ims.CloneXML
+                _ims.SetPressure(Pmin)
+                _ims.Calculate()
+                Dim density = _ims.Phases(0).Properties.density.GetValueOrDefault
+                'Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
 
                 AccumulationStream.SetMassFlow(density * Vol)
-                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                Select Case CalcMode
+                    Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
+                        AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                    Case Else
+                        AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+                End Select
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
@@ -211,16 +240,22 @@ Namespace UnitOperations
                 If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 'AccumulationStream.Calculate()
-                If Not oms.Calculated Then oms.Calculate()
+                'If Not oms.Calculated Then oms.Calculate()
                 If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
 
             End If
             Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
             AccumulationStream.SetFlowsheet(FlowSheet)
-            AccumulationStream.SetPressure(ims.GetPressure)
+            'AccumulationStream.SetPressure(ims.GetPressure)
             AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
-            AccumulationStream.Calculate(True, True)
+            Select Case CalcMode
+                Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
+                    AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                Case Else
+                    AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+            End Select
+            AccumulationStream.Calculate()
 
 
 
@@ -246,6 +281,12 @@ Namespace UnitOperations
                     Else
                         T11 = T10
                         H11 = H10
+                        'AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                        'tmp = AccumulationStream.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureVaporFraction, AccumulationStream.GetPressure, m_VFout.GetValueOrDefault, T10)
+                        'T11 = tmp.CalculatedTemperature.GetValueOrDefault()
+                        'H11 = tmp.CalculatedEnthalpy()
+                        'OutletVaporFraction = tmp.GetVaporPhaseMoleFraction
+                        'AccumulationStream.SetMassEnthalpy(H11)
                     End If
 
                     Me.DeltaT = T11 - T10
@@ -259,6 +300,15 @@ Namespace UnitOperations
                         End With
                     End If
 
+                    'oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
+                    'With oms
+                    '    '.Clear()
+                    '    .Phases(0).Properties.temperature = T11
+                    '    '.Phases(0).Properties.pressure = AccumulationStream.GetPressure
+                    '    .Phases(0).Properties.enthalpy = AccumulationStream.GetMassEnthalpy
+                    '    .Phases(2).Properties.molarfraction = m_VFout.GetValueOrDefault
+
+                    'End With
 
 
                 Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
@@ -284,19 +334,6 @@ Namespace UnitOperations
 
                             newH = Ha + Qval * timestep / Wa
 
-                            'AccumulationStream.SetMassEnthalpy(Ha + Qval * timestep / Wa)
-
-                            'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
-
-                            'AccumulationStream.PropertyPackage = PropertyPackage
-                            'AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-
-                            'If integrator.ShouldCalculateEquilibrium Then
-
-                            '    AccumulationStream.Calculate(True, True)
-
-                            'End If
-
                         End If
 
                     End If
@@ -311,69 +348,17 @@ Namespace UnitOperations
 
             End Select
 
-            AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+            'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
 
             AccumulationStream.PropertyPackage = PropertyPackage
             AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-
-            AccumulationStream.Calculate(True, True)
-
-            'Dim M = AccumulationStream.GetMolarFlow()
-
-            'Dim Temperature = AccumulationStream.GetTemperature
-
-            'Dim Pressure = AccumulationStream.GetPressure
-
-            ''m3/mol
-
-            'If M > 0 Then
-
-            '    prevM = currentM
-
-            '    currentM = Vol / M
-
-            '    PropertyPackage.CurrentMaterialStream = AccumulationStream
-
-            '    If AccumulationStream.GetPressure > 0 Then
-
-            '        If prevM = 0.0 Or integrator.ShouldCalculateEquilibrium Then
-
-            '            Dim result As IFlashCalculationResult
-
-            '            result = PropertyPackage.CalculateEquilibrium2(FlashCalculationType.VolumeTemperature, currentM, Temperature, Pressure)
-
-            '            Pressure = result.CalculatedPressure
-
-            '        Else
-
-            '            Pressure = currentM / prevM * Pressure
-
-            '        End If
-
-            '    Else
-
-            '        Pressure = Pmin
-
-            '    End If
-
-            'Else
-
-            '    Pressure = Pmin
-
-            'End If
-
-            ' AccumulationStream.SetPressure(Pressure)
-
-            'Wi = ims.GetMassFlow()
-
-            'DeltaP = (Wi / Kr) ^ 2
-
-            'ims.SetPressure(Pressure)
+            AccumulationStream.Calculate()
 
             oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
             oms.SetTemperature(AccumulationStream.GetTemperature)
             oms.SetMassEnthalpy(AccumulationStream.GetMassEnthalpy)
             oms.SetPressure(AccumulationStream.GetPressure - DeltaP)
+            oms.SpecType = AccumulationStream.SpecType
 
         End Sub
 
@@ -390,15 +375,28 @@ Namespace UnitOperations
                                 were the outlet stream enthalpy is calculated by an energy balance 
                                 through the cooler.")
 
-            If Not Me.GraphicObject.OutputConnectors(0).IsAttached Then
-                Throw New Exception(FlowSheet.GetTranslatedString("Verifiqueasconexesdo"))
-            ElseIf Not Me.GraphicObject.InputConnectors(0).IsAttached Then
-                Throw New Exception(FlowSheet.GetTranslatedString("Verifiqueasconexesdo"))
-            End If
+            'If Not Me.GraphicObject.OutputConnectors(0).IsAttached Then
+            '    Throw New Exception(FlowSheet.GetTranslatedString("Verifiqueasconexesdo"))
+            'ElseIf Not Me.GraphicObject.InputConnectors(0).IsAttached Then
+            '    Throw New Exception(FlowSheet.GetTranslatedString("Verifiqueasconexesdo"))
+            'End If
 
             Dim msin As MaterialStream = Nothing, esout As Streams.EnergyStream = Nothing
+            Dim msout As MaterialStream = Nothing
 
-            msin = FlowSheet.SimulationObjects(Me.GraphicObject.InputConnectors(0).AttachedConnector.AttachedFrom.Name)
+            If metaIms Is Nothing Then
+                msin = FlowSheet.SimulationObjects(Me.GraphicObject.InputConnectors(0).AttachedConnector.AttachedFrom.Name)
+            Else
+                msin = metaIms
+            End If
+
+            If metaOms Is Nothing Then
+                msout = FlowSheet.SimulationObjects(Me.GraphicObject.OutputConnectors(0).AttachedConnector.AttachedTo.Name)
+            Else
+                msout = metaOms
+            End If
+
+            'msin = FlowSheet.SimulationObjects(Me.GraphicObject.InputConnectors(0).AttachedConnector.AttachedFrom.Name)
             msin.Validate()
 
             Dim Ti, Pi, Hi, Wi, ei, ein, T2, P2, H2, V2 As Double
@@ -670,7 +668,8 @@ Namespace UnitOperations
             If Not DebugMode Then
 
                 'Atribuir valores a corrente de materia conectada a jusante
-                With DirectCast(FlowSheet.SimulationObjects(Me.GraphicObject.OutputConnectors(0).AttachedConnector.AttachedTo.Name), MaterialStream)
+                'With DirectCast(FlowSheet.SimulationObjects(Me.GraphicObject.OutputConnectors(0).AttachedConnector.AttachedTo.Name), MaterialStream)
+                With msout
                     .Clear()
                     .Phases(0).Properties.temperature = T2
                     .Phases(0).Properties.pressure = P2

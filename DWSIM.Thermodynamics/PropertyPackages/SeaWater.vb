@@ -355,10 +355,10 @@ Namespace PropertyPackages
 
             End If
 
-            Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
+            'Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
 
             If phaseID = 2 Then
-                T += 0.01
+                'T += 0.01
 
                 result = Me.m_iapws97.densW(T, P / 100000)
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
@@ -484,8 +484,10 @@ Namespace PropertyPackages
                 Else
                     result = Me.m_iapws97.densSatLiqTW(T)
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
-                    result = DW_CalcEnthalpy(RET_VMOL(Phase), T, P, State.Liquid)
+                    'result = DW_CalcEnthalpy(RET_VMOL(Phase), T, P, State.Liquid)
+                    result = Me.m_iapws97.enthalpyW(T, P / 100000)
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy = result
+                    'Console.WriteLine(result)
                     result = DW_CalcEntropy(RET_VMOL(Phase), T, P, State.Liquid)
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy = result
                     result = 1 / (Me.m_iapws97.densSatLiqTW(T) * 1000 / Me.AUX_MMM(PropertyPackages.Phase.Mixture)) / 8.314 / T * P

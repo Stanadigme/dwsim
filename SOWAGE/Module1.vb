@@ -9,9 +9,8 @@ Imports MongoDB.Driver
 Imports MongoDB.Bson.Serialization
 
 Imports SOWAGE.SowageProcessData
-
-
-
+Imports System.Xml
+Imports DWSIM
 
 Module Module1
 
@@ -19,7 +18,7 @@ Module Module1
     Function Calculate()
         Console.WriteLine(String.Format("Fichier : "))
 
-        Dim fSName As String = "test_pid_circ"
+        Dim fSName As String = "R10-120-800-10E6r5P1DpMax"
 
         Dim fSName2 = Console.ReadLine()
 
@@ -46,6 +45,8 @@ Module Module1
         For Each kvp As KeyValuePair(Of String, ISimulationObject) In sim.SimulationObjects
             objects.Add(kvp.Value.GraphicObject.Tag, kvp.Value.GetType.ToString)
         Next
+        Dim initialData = ConvertSimulationData(sim.GetProcessData)
+
         Dim q = New BsonDocument()
         With q
             .Add("simulation", fSNameC)
@@ -58,14 +59,33 @@ Module Module1
             .IsUpsert = True,
             .ReturnDocument = ReturnDocument.After
         }
-        confColl.FindOneAndReplace(q, q.Add("objects", New BsonDocument(objects)), options)
+        'Dim confData = New BsonDocument()
+        'With confData
+        '    .Add("objects", New BsonDocument(objects))
+        '    .Add("state", New BsonArray(initialData))
+        'End With
+        confColl.FindOneAndReplace(q, q.Add("objects", New BsonDocument(objects)).Add("state", New BsonArray(initialData)), options)
 
+        col.DeleteMany(New BsonDocument())
+        col.Indexes.DropAll()
+        Dim indexes = New List(Of CreateIndexModel(Of BsonDocument))
+        Dim indexKey = Builders(Of BsonDocument).IndexKeys.Ascending("step")
+        Dim index = New CreateIndexModel(Of BsonDocument)(indexKey)
+        indexes.Add(index)
 
+        indexKey = Builders(Of BsonDocument).IndexKeys.Combine(Builders(Of BsonDocument).IndexKeys.Ascending("step"), Builders(Of BsonDocument).IndexKeys.Ascending("String"))
+        index = New CreateIndexModel(Of BsonDocument)(indexKey)
+        indexes.Add(index)
+
+        col.Indexes.CreateMany(indexes)
 
         Dim Controllers = sim.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_PID).ToList
+        Dim PyControllers = sim.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_Python).ToList
         Dim sch As String = fSName
-        Dim schedule = sim.DynamicsManager.ScheduleList(sch)
-        Dim integrator = sim.DynamicsManager.IntegratorList(sch)
+        Dim schedule = sim.DynamicsManager.ScheduleList.First.Value
+        'Dim schedule = sim.DynamicsManager.ScheduleList(sch)
+        'Dim integrator = schedule.CurrentIntegrator
+        Dim integrator = sim.DynamicsManager.IntegratorList(schedule.CurrentIntegrator)
         sim.DynamicsManager.CurrentSchedule = sch
 
         'Dim ms(3) As MaterialStream
@@ -97,30 +117,40 @@ Module Module1
                     controller.Calculate()
                 End If
             Next
-
-            Dim data = sim.GetProcessData
-            Dim toWriteData As List(Of BsonDocument) = New List(Of BsonDocument)
-            For Each doc As XElement In data
-                Dim jsonText As String = Newtonsoft.Json.JsonConvert.SerializeXNode(doc)
-                Dim bsonDoc As BsonDocument = BsonSerializer.Deserialize(Of BsonDocument)(jsonText)
-                toWriteData.Add(bsonDoc.GetElement(0).Value.ToBsonDocument.Add("step", start))
-            Next
-            col.InsertMany(toWriteData)
-
-            d2 = Date.Now
-            dt = d2 - d1
-            Console.WriteLine(String.Format("Step :{0} {1:n3}s", {start, dt.TotalSeconds}))
-            Dim i As Integer = 0
-            Dim _i As Integer = 0
-            'For Each _ms In ms
-            '    If _ms IsNot Nothing Then Console.WriteLine((_ms.ToResume))
+            'For Each controller As PythonController In PyControllers
+            '    If controller.Active Then
+            '        controller.Calculate()
+            '    End If
             'Next
-            'Console.WriteLine((ms.ToResume + String.Format(" {0:n2}s", dt.TotalSeconds)))
+
+            'Dim data As List(Of XElement) = sim.GetProcessData
+            Dim data As List(Of XElement) = New List(Of XElement)
+            For Each so As SharedClasses.UnitOperations.BaseClass In sim.SimulationObjects.Values
+                Select Case so.GraphicObject.ObjectType
+                    Case ObjectType.MaterialStream, ObjectType.Pipe
+                        data.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
+                End Select
+            Next
+
+            Dim toWriteData As List(Of BsonDocument) = ConvertSimulationData(data, start)
+            '    New List(Of BsonDocument)
+            'For Each doc As XElement In data
+            '    Dim jsonText As String = Newtonsoft.Json.JsonConvert.SerializeXNode(doc)
+            '    Dim bsonDoc As BsonDocument = BsonSerializer.Deserialize(Of BsonDocument)(jsonText)
+            '    toWriteData.Add(bsonDoc.GetElement(0).Value.ToBsonDocument.Add("step", start))
+            'Next
+            toWriteData = StripBsonData(toWriteData)
+
+            col.InsertMany(toWriteData)
             If ex.Count > 0 Then
                 start = final
                 Console.WriteLine(ex.ElementAt(0))
             End If
             start += integrationStep
+            d2 = Date.Now
+            dt = d2 - d1
+            Console.WriteLine(String.Format("Step :{0} {1:n3}s", {start, dt.TotalSeconds}))
+
         End While
 
 

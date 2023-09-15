@@ -1,6 +1,9 @@
-﻿Imports DWSIM.Thermodynamics.Utilities.Hypos.Methods
+﻿Imports System.Runtime.Remoting
+Imports DWSIM.SharedClasses.Charts
+Imports DWSIM.Thermodynamics.Utilities.Hypos.Methods
 Imports DWSIM.UnitOperations.UnitOperations
 Imports MongoDB.Bson
+Imports MongoDB.Bson.Serialization
 Imports MongoDB.Driver
 
 Module SowageProcessData
@@ -54,6 +57,42 @@ Module SowageProcessData
         Console.Read()
 
     End Function
+
+    Function StripBsonData(data As List(Of BsonDocument)) As List(Of BsonDocument)
+        Dim toWriteData As List(Of BsonDocument) = New List(Of BsonDocument)
+
+        For Each element As BsonDocument In data
+            Dim doc As BsonDocument = New BsonDocument
+            With doc
+                .Add(element.GetElement("step"))
+                .Add(element.GetElement("String"))
+                .Add(element.GetElement("Type"))
+            End With
+
+            Dim Type As String = element.GetElement("Type").Value.AsString
+
+            Select Case Type
+                Case "DWSIM.Thermodynamics.Streams.MaterialStream"
+                    doc.Add(element.GetElement("Phases"))
+                    toWriteData.Add(doc)
+                Case "DWSIM.UnitOperations.UnitOperations.Pipe"
+                    Dim towrite = doc
+                    With towrite
+                        .Add(element.GetElement("Profile"))
+                        .Add(element.GetElement("PressureDrop_Static"))
+                        .Add(element.GetElement("PressureDrop_Friction"))
+                        .Add(element.GetElement("DeltaP"))
+                        .Add(element.GetElement("DeltaT"))
+                    End With
+                    toWriteData.Add(doc)
+                Case Else
+                    Console.WriteLine(String.Format("{0} non traité", {element.GetElement("String").Value.AsString, element.GetElement("step").Value.AsDouble}))
+            End Select
+        Next
+
+        Return toWriteData
+    End Function
+
 
     Function ConvertCollection(collName As String)
 
@@ -162,6 +201,16 @@ Module SowageProcessData
         Next
 
         Return dbs
+    End Function
+
+    Function ConvertSimulationData(data As List(Of XElement), Optional ByVal currStep As Double = 0) As List(Of BsonDocument)
+        Dim toWriteData As List(Of BsonDocument) = New List(Of BsonDocument)
+        For Each doc As XElement In data
+            Dim jsonText As String = Newtonsoft.Json.JsonConvert.SerializeXNode(doc)
+            Dim bsonDoc As BsonDocument = BsonSerializer.Deserialize(Of BsonDocument)(jsonText)
+            toWriteData.Add(bsonDoc.GetElement(0).Value.ToBsonDocument.Add("step", currStep))
+        Next
+        Return toWriteData
     End Function
 
 

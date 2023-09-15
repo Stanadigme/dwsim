@@ -96,13 +96,17 @@ Public Class EditingForm_Recompletor
             ComboBoxEdMIn.Items.AddRange(mslist)
             If .GraphicObject.InputConnectors(0).IsAttached Then ComboBoxEdMIn.SelectedItem = .GraphicObject.InputConnectors(0).AttachedConnector.AttachedFrom.Tag
 
-            ComboBoxXFlashLiq.Items.Clear()
-            ComboBoxXFlashLiq.Items.AddRange(mslist)
-            If .GraphicObject.InputConnectors(1).IsAttached Then ComboBoxXFlashLiq.SelectedItem = .GraphicObject.InputConnectors(1).AttachedConnector.AttachedFrom.Tag
+            ComboBoxXEdMFlashLiq.Items.Clear()
+            ComboBoxXEdMFlashLiq.Items.AddRange(mslist)
+            If .GraphicObject.InputConnectors(1).IsAttached Then ComboBoxXEdMFlashLiq.SelectedItem = .GraphicObject.InputConnectors(1).AttachedConnector.AttachedFrom.Tag
 
             ComboBoxXFlashVapor.Items.Clear()
             ComboBoxXFlashVapor.Items.AddRange(mslist)
             If .GraphicObject.InputConnectors(2).IsAttached Then ComboBoxXFlashVapor.SelectedItem = .GraphicObject.InputConnectors(2).AttachedConnector.AttachedFrom.Tag
+
+            ComboBoxXFlashLiq.Items.Clear()
+            ComboBoxXFlashLiq.Items.AddRange(mslist)
+            If .GraphicObject.InputConnectors(3).IsAttached Then ComboBoxXFlashLiq.SelectedItem = .GraphicObject.InputConnectors(3).AttachedConnector.AttachedFrom.Tag
 
             ComboBoxXCoolerOut.Items.Clear()
             ComboBoxXCoolerOut.Items.AddRange(mslist)
@@ -119,6 +123,10 @@ Public Class EditingForm_Recompletor
             ComboBoxRecirculation.Items.Clear()
             ComboBoxRecirculation.Items.AddRange(mslist)
             If .GraphicObject.OutputConnectors(3).IsAttached Then ComboBoxRecirculation.SelectedItem = .GraphicObject.OutputConnectors(3).AttachedConnector.AttachedTo.Tag
+
+            ComboBoxDistillatOut.Items.Clear()
+            ComboBoxDistillatOut.Items.AddRange(mslist)
+            If .GraphicObject.OutputConnectors(4).IsAttached Then ComboBoxDistillatOut.SelectedItem = .GraphicObject.OutputConnectors(4).AttachedConnector.AttachedTo.Tag
 
         End With
 
@@ -156,16 +164,16 @@ Public Class EditingForm_Recompletor
                 End If
                 UpdateInfo()
             Else
-                If gobj.OutputConnectors(Index).IsAttached Then FlowSheet.DisconnectObjects(gobj, gobj.OutputConnectors(Index).AttachedConnector.AttachedTo)
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
             End If
 
         End If
     End Sub
 
-    Private Sub ComboBoxXFlashLiq_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxXFlashLiq.SelectedIndexChanged
+    Private Sub ComboBoxXFlashLiq_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxXEdMFlashLiq.SelectedIndexChanged
         If Loaded Then
 
-            Dim text As String = ComboBoxXFlashLiq.Text
+            Dim text As String = ComboBoxXEdMFlashLiq.Text
             Dim index As Integer = 1
 
             Dim gobj = SimObject.GraphicObject
@@ -184,7 +192,7 @@ Public Class EditingForm_Recompletor
                 End If
                 UpdateInfo()
             Else
-                If gobj.OutputConnectors(Index).IsAttached Then FlowSheet.DisconnectObjects(gobj, gobj.OutputConnectors(Index).AttachedConnector.AttachedTo)
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
             End If
 
         End If
@@ -215,7 +223,37 @@ Public Class EditingForm_Recompletor
                 End If
                 UpdateInfo()
             Else
-                If gobj.OutputConnectors(Index).IsAttached Then FlowSheet.DisconnectObjects(gobj, gobj.OutputConnectors(Index).AttachedConnector.AttachedTo)
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
+            End If
+
+        End If
+    End Sub
+
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxXFlashLiq.SelectedIndexChanged
+        If Loaded Then
+
+            Dim text As String = ComboBoxXFlashLiq.Text
+
+            Dim index As Integer = 3
+
+            Dim gobj = SimObject.GraphicObject
+            Dim flowsheet = SimObject.FlowSheet
+
+            If text <> "" Then
+
+                If flowsheet.GetFlowsheetSimulationObject(text).GraphicObject.OutputConnectors(0).IsAttached Then
+                    MessageBox.Show(flowsheet.GetTranslatedString("Todasasconexespossve"), flowsheet.GetTranslatedString("Erro"), MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Else
+                    Try
+                        If gobj.InputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj.InputConnectors(index).AttachedConnector.AttachedFrom, gobj)
+                        flowsheet.ConnectObjects(flowsheet.GetFlowsheetSimulationObject(text).GraphicObject, gobj, 0, index)
+                    Catch ex As Exception
+                        MessageBox.Show(ex.Message, flowsheet.GetTranslatedString("Erro"), MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End Try
+                End If
+                UpdateInfo()
+            Else
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
             End If
 
         End If
@@ -246,7 +284,7 @@ Public Class EditingForm_Recompletor
                 End If
                 UpdateInfo()
             Else
-                If gobj.OutputConnectors(Index).IsAttached Then FlowSheet.DisconnectObjects(gobj, gobj.OutputConnectors(Index).AttachedConnector.AttachedTo)
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
             End If
 
         End If
@@ -305,7 +343,7 @@ Public Class EditingForm_Recompletor
                 End If
                 UpdateInfo()
             Else
-                If gobj.OutputConnectors(Index).IsAttached Then FlowSheet.DisconnectObjects(gobj, gobj.OutputConnectors(Index).AttachedConnector.AttachedTo)
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
             End If
 
         End If
@@ -316,6 +354,33 @@ Public Class EditingForm_Recompletor
 
             Dim text As String = ComboBoxRecirculation.Text
             Dim index As Integer = 3
+            Dim gobj = SimObject.GraphicObject
+            Dim flowsheet = SimObject.FlowSheet
+
+            If text <> "" Then
+                If flowsheet.GetFlowsheetSimulationObject(text).GraphicObject.InputConnectors(0).IsAttached Then
+                    MessageBox.Show(flowsheet.GetTranslatedString("Todasasconexespossve"), flowsheet.GetTranslatedString("Erro"), MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Else
+                    Try
+                        If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
+                        flowsheet.ConnectObjects(gobj, flowsheet.GetFlowsheetSimulationObject(text).GraphicObject, index, 0)
+                    Catch ex As Exception
+                        MessageBox.Show(ex.Message, flowsheet.GetTranslatedString("Erro"), MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End Try
+                End If
+                UpdateInfo()
+            Else
+                If gobj.OutputConnectors(index).IsAttached Then flowsheet.DisconnectObjects(gobj, gobj.OutputConnectors(index).AttachedConnector.AttachedTo)
+            End If
+
+        End If
+    End Sub
+
+    Private Sub ComboBox1_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles ComboBoxDistillatOut.SelectedIndexChanged
+        If Loaded Then
+
+            Dim text As String = ComboBoxDistillatOut.Text
+            Dim index As Integer = 4
             Dim gobj = SimObject.GraphicObject
             Dim flowsheet = SimObject.FlowSheet
 

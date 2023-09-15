@@ -656,7 +656,8 @@ Namespace Streams
                     IObj?.Paragraphs.Add("Phase Properties will be calculated using the currently selected Property Package.")
 
                     IObj?.Paragraphs.Add("To calculate the phase properties, DWSIM will call the 'DW_CalcPhaseProps' routine from the Property Package for each present phase.")
-                    'Console.WriteLine(String.Format("H from Calc before Calc {0:n2}", {Me.Phases(3).Properties.enthalpy}))
+
+                    'Console.WriteLine(String.Format("H before Calc {0:n2}", {Me.Phases(0).Properties.enthalpy}))
                     If doparallel Then
 
                         Dim task1 = TaskHelper.Run(Sub()

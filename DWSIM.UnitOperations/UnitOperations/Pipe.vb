@@ -358,8 +358,10 @@ Namespace UnitOperations
                 End If
                 Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
                 AccumulationStream.SetMassFlow(density * volume)
-                AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
-                oms.SpecType = StreamSpec.Pressure_and_Enthalpy
+                'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
+                'oms.SpecType = StreamSpec.Pressure_and_Enthalpy
+                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                oms.SpecType = StreamSpec.Temperature_and_Pressure
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
@@ -371,7 +373,7 @@ Namespace UnitOperations
                 If ims.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(ims, timestep)
                     'AccumulationStream.Calculate()
-                    If Not oms.Calculated Then oms.Calculate()
+                    'If Not oms.Calculated Then oms.Calculate()
                     AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 End If
                 AccumulationStream.PropertyPackage = PropertyPackage

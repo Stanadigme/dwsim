@@ -233,17 +233,17 @@ Namespace UnitOperations
                 Throw New Exception("The Gas-Liquid Separator currently supports only a single liquid phase in Dynamic Mode.")
             End If
 
-            Dim imsmix As MaterialStream = Nothing
+            Dim imsmix As MaterialStream = GetInletMaterialStream(0)
 
-            For i = 0 To 5
-                If Me.GraphicObject.InputConnectors(i).IsAttached Then
-                    Dim imsx = GetInletMaterialStream(i)
-                    If imsmix Is Nothing Then imsmix = imsx.CloneXML Else If imsx.GetMassFlow > 0 Then imsmix = imsmix.Add(imsx)
-                    'imsmix = imsmix.Add(imsx)
-                End If
-            Next
-            imsmix.PropertyPackage.CurrentMaterialStream = imsmix
-            imsmix.Calculate()
+            'For i = 0 To 5
+            '    If Me.GraphicObject.InputConnectors(i).IsAttached Then
+            '        Dim imsx = GetInletMaterialStream(i)
+            '        If imsmix Is Nothing Then imsmix = imsx.CloneXML Else If imsx.GetMassFlow > 0 Then imsmix = imsmix.Add(imsx)
+            '        'imsmix = imsmix.Add(imsx)
+            '    End If
+            'Next
+            'imsmix.PropertyPackage.CurrentMaterialStream = imsmix
+            'imsmix.Calculate()
 
             Dim Vol As Double = GetDynamicProperty("Volume")
             Dim Height As Double = GetDynamicProperty("Height")
@@ -276,7 +276,8 @@ Namespace UnitOperations
                 Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
 
                 AccumulationStream.SetMassFlow(density * Vol)
-                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
@@ -289,10 +290,11 @@ Namespace UnitOperations
                 End With
 
                 oms2.AssignFromPhaseSowage(PhaseLabel.LiquidMixture, AccumulationStream)
+
                 oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
-                oms1.Calculate()
+                'oms1.Calculate()
                 oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
-                oms2.Calculate()
+                'oms2.Calculate()
             Else
 
                 AccumulationStream.SetFlowsheet(FlowSheet)

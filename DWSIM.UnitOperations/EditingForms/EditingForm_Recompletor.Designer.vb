@@ -30,11 +30,11 @@ Partial Class EditingForm_Recompletor
         Me.LabelStatutObjet = New System.Windows.Forms.Label()
         Me.lblTag = New System.Windows.Forms.TextBox()
         Me.LabelEdMIn = New System.Windows.Forms.Label()
-        Me.LabelXFlashLiq = New System.Windows.Forms.Label()
+        Me.LabelEdMFlashLiq = New System.Windows.Forms.Label()
         Me.LabelXFlashVapor = New System.Windows.Forms.Label()
         Me.LabelXCoolerOut = New System.Windows.Forms.Label()
         Me.ComboBoxEdMIn = New System.Windows.Forms.ComboBox()
-        Me.ComboBoxXFlashLiq = New System.Windows.Forms.ComboBox()
+        Me.ComboBoxXEdMFlashLiq = New System.Windows.Forms.ComboBox()
         Me.ComboBoxXFlashVapor = New System.Windows.Forms.ComboBox()
         Me.ComboBoxXCoolerOut = New System.Windows.Forms.ComboBox()
         Me.ComboBoxXHeaterOut = New System.Windows.Forms.ComboBox()
@@ -45,6 +45,10 @@ Partial Class EditingForm_Recompletor
         Me.LabelRejet = New System.Windows.Forms.Label()
         Me.ComboBoxRecirculation = New System.Windows.Forms.ComboBox()
         Me.LabelRecirculation = New System.Windows.Forms.Label()
+        Me.ComboBoxXFlashLiq = New System.Windows.Forms.ComboBox()
+        Me.LabelXFlashLiq = New System.Windows.Forms.Label()
+        Me.ComboBoxDistillatOut = New System.Windows.Forms.ComboBox()
+        Me.LabelDistillatOut = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'ToolTipChangeTag
@@ -104,19 +108,19 @@ Partial Class EditingForm_Recompletor
         Me.LabelEdMIn.TabIndex = 5
         Me.LabelEdMIn.Text = "EdM In"
         '
-        'LabelXFlashLiq
+        'LabelEdMFlashLiq
         '
-        Me.LabelXFlashLiq.AutoSize = True
-        Me.LabelXFlashLiq.Location = New System.Drawing.Point(16, 113)
-        Me.LabelXFlashLiq.Name = "LabelXFlashLiq"
-        Me.LabelXFlashLiq.Size = New System.Drawing.Size(53, 13)
-        Me.LabelXFlashLiq.TabIndex = 6
-        Me.LabelXFlashLiq.Text = "XFlashLiq"
+        Me.LabelEdMFlashLiq.AutoSize = True
+        Me.LabelEdMFlashLiq.Location = New System.Drawing.Point(262, 86)
+        Me.LabelEdMFlashLiq.Name = "LabelEdMFlashLiq"
+        Me.LabelEdMFlashLiq.Size = New System.Drawing.Size(75, 13)
+        Me.LabelEdMFlashLiq.TabIndex = 6
+        Me.LabelEdMFlashLiq.Text = "XEdMFlashLiq"
         '
         'LabelXFlashVapor
         '
         Me.LabelXFlashVapor.AutoSize = True
-        Me.LabelXFlashVapor.Location = New System.Drawing.Point(16, 142)
+        Me.LabelXFlashVapor.Location = New System.Drawing.Point(16, 117)
         Me.LabelXFlashVapor.Name = "LabelXFlashVapor"
         Me.LabelXFlashVapor.Size = New System.Drawing.Size(67, 13)
         Me.LabelXFlashVapor.TabIndex = 7
@@ -139,18 +143,18 @@ Partial Class EditingForm_Recompletor
         Me.ComboBoxEdMIn.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxEdMIn.TabIndex = 9
         '
-        'ComboBoxXFlashLiq
+        'ComboBoxXEdMFlashLiq
         '
-        Me.ComboBoxXFlashLiq.FormattingEnabled = True
-        Me.ComboBoxXFlashLiq.Location = New System.Drawing.Point(106, 110)
-        Me.ComboBoxXFlashLiq.Name = "ComboBoxXFlashLiq"
-        Me.ComboBoxXFlashLiq.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBoxXFlashLiq.TabIndex = 10
+        Me.ComboBoxXEdMFlashLiq.FormattingEnabled = True
+        Me.ComboBoxXEdMFlashLiq.Location = New System.Drawing.Point(352, 83)
+        Me.ComboBoxXEdMFlashLiq.Name = "ComboBoxXEdMFlashLiq"
+        Me.ComboBoxXEdMFlashLiq.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxXEdMFlashLiq.TabIndex = 10
         '
         'ComboBoxXFlashVapor
         '
         Me.ComboBoxXFlashVapor.FormattingEnabled = True
-        Me.ComboBoxXFlashVapor.Location = New System.Drawing.Point(106, 139)
+        Me.ComboBoxXFlashVapor.Location = New System.Drawing.Point(106, 114)
         Me.ComboBoxXFlashVapor.Name = "ComboBoxXFlashVapor"
         Me.ComboBoxXFlashVapor.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxXFlashVapor.TabIndex = 11
@@ -166,7 +170,7 @@ Partial Class EditingForm_Recompletor
         'ComboBoxXHeaterOut
         '
         Me.ComboBoxXHeaterOut.FormattingEnabled = True
-        Me.ComboBoxXHeaterOut.Location = New System.Drawing.Point(106, 194)
+        Me.ComboBoxXHeaterOut.Location = New System.Drawing.Point(106, 229)
         Me.ComboBoxXHeaterOut.Name = "ComboBoxXHeaterOut"
         Me.ComboBoxXHeaterOut.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxXHeaterOut.TabIndex = 14
@@ -174,7 +178,7 @@ Partial Class EditingForm_Recompletor
         'LabelXHeaterOut
         '
         Me.LabelXHeaterOut.AutoSize = True
-        Me.LabelXHeaterOut.Location = New System.Drawing.Point(16, 197)
+        Me.LabelXHeaterOut.Location = New System.Drawing.Point(16, 232)
         Me.LabelXHeaterOut.Name = "LabelXHeaterOut"
         Me.LabelXHeaterOut.Size = New System.Drawing.Size(63, 13)
         Me.LabelXHeaterOut.TabIndex = 13
@@ -199,7 +203,7 @@ Partial Class EditingForm_Recompletor
         'ComboBoxRejet
         '
         Me.ComboBoxRejet.FormattingEnabled = True
-        Me.ComboBoxRejet.Location = New System.Drawing.Point(106, 223)
+        Me.ComboBoxRejet.Location = New System.Drawing.Point(352, 198)
         Me.ComboBoxRejet.Name = "ComboBoxRejet"
         Me.ComboBoxRejet.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxRejet.TabIndex = 18
@@ -207,7 +211,7 @@ Partial Class EditingForm_Recompletor
         'LabelRejet
         '
         Me.LabelRejet.AutoSize = True
-        Me.LabelRejet.Location = New System.Drawing.Point(16, 226)
+        Me.LabelRejet.Location = New System.Drawing.Point(262, 201)
         Me.LabelRejet.Name = "LabelRejet"
         Me.LabelRejet.Size = New System.Drawing.Size(32, 13)
         Me.LabelRejet.TabIndex = 17
@@ -216,7 +220,7 @@ Partial Class EditingForm_Recompletor
         'ComboBoxRecirculation
         '
         Me.ComboBoxRecirculation.FormattingEnabled = True
-        Me.ComboBoxRecirculation.Location = New System.Drawing.Point(106, 251)
+        Me.ComboBoxRecirculation.Location = New System.Drawing.Point(352, 226)
         Me.ComboBoxRecirculation.Name = "ComboBoxRecirculation"
         Me.ComboBoxRecirculation.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxRecirculation.TabIndex = 20
@@ -224,17 +228,55 @@ Partial Class EditingForm_Recompletor
         'LabelRecirculation
         '
         Me.LabelRecirculation.AutoSize = True
-        Me.LabelRecirculation.Location = New System.Drawing.Point(16, 254)
+        Me.LabelRecirculation.Location = New System.Drawing.Point(262, 229)
         Me.LabelRecirculation.Name = "LabelRecirculation"
         Me.LabelRecirculation.Size = New System.Drawing.Size(69, 13)
         Me.LabelRecirculation.TabIndex = 19
         Me.LabelRecirculation.Text = "Recirculation"
+        '
+        'ComboBoxXFlashLiq
+        '
+        Me.ComboBoxXFlashLiq.FormattingEnabled = True
+        Me.ComboBoxXFlashLiq.Location = New System.Drawing.Point(352, 114)
+        Me.ComboBoxXFlashLiq.Name = "ComboBoxXFlashLiq"
+        Me.ComboBoxXFlashLiq.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxXFlashLiq.TabIndex = 22
+        '
+        'LabelXFlashLiq
+        '
+        Me.LabelXFlashLiq.AutoSize = True
+        Me.LabelXFlashLiq.Location = New System.Drawing.Point(262, 117)
+        Me.LabelXFlashLiq.Name = "LabelXFlashLiq"
+        Me.LabelXFlashLiq.Size = New System.Drawing.Size(53, 13)
+        Me.LabelXFlashLiq.TabIndex = 21
+        Me.LabelXFlashLiq.Text = "XFlashLiq"
+        '
+        'ComboBoxDistillatOut
+        '
+        Me.ComboBoxDistillatOut.FormattingEnabled = True
+        Me.ComboBoxDistillatOut.Location = New System.Drawing.Point(352, 171)
+        Me.ComboBoxDistillatOut.Name = "ComboBoxDistillatOut"
+        Me.ComboBoxDistillatOut.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxDistillatOut.TabIndex = 24
+        '
+        'LabelDistillatOut
+        '
+        Me.LabelDistillatOut.AutoSize = True
+        Me.LabelDistillatOut.Location = New System.Drawing.Point(262, 174)
+        Me.LabelDistillatOut.Name = "LabelDistillatOut"
+        Me.LabelDistillatOut.Size = New System.Drawing.Size(57, 13)
+        Me.LabelDistillatOut.TabIndex = 23
+        Me.LabelDistillatOut.Text = "DistillatOut"
         '
         'EditingForm_Recompletor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(520, 336)
+        Me.Controls.Add(Me.ComboBoxDistillatOut)
+        Me.Controls.Add(Me.LabelDistillatOut)
+        Me.Controls.Add(Me.ComboBoxXFlashLiq)
+        Me.Controls.Add(Me.LabelXFlashLiq)
         Me.Controls.Add(Me.ComboBoxRecirculation)
         Me.Controls.Add(Me.LabelRecirculation)
         Me.Controls.Add(Me.ComboBoxRejet)
@@ -245,11 +287,11 @@ Partial Class EditingForm_Recompletor
         Me.Controls.Add(Me.LabelXHeaterOut)
         Me.Controls.Add(Me.ComboBoxXCoolerOut)
         Me.Controls.Add(Me.ComboBoxXFlashVapor)
-        Me.Controls.Add(Me.ComboBoxXFlashLiq)
+        Me.Controls.Add(Me.ComboBoxXEdMFlashLiq)
         Me.Controls.Add(Me.ComboBoxEdMIn)
         Me.Controls.Add(Me.LabelXCoolerOut)
         Me.Controls.Add(Me.LabelXFlashVapor)
-        Me.Controls.Add(Me.LabelXFlashLiq)
+        Me.Controls.Add(Me.LabelEdMFlashLiq)
         Me.Controls.Add(Me.LabelEdMIn)
         Me.Controls.Add(Me.lblTag)
         Me.Controls.Add(Me.LabelStatutObjet)
@@ -269,11 +311,11 @@ Partial Class EditingForm_Recompletor
     Friend WithEvents LabelStatutObjet As Label
     Friend WithEvents lblTag As TextBox
     Friend WithEvents LabelEdMIn As Label
-    Friend WithEvents LabelXFlashLiq As Label
+    Friend WithEvents LabelEdMFlashLiq As Label
     Friend WithEvents LabelXFlashVapor As Label
     Friend WithEvents LabelXCoolerOut As Label
     Friend WithEvents ComboBoxEdMIn As ComboBox
-    Friend WithEvents ComboBoxXFlashLiq As ComboBox
+    Friend WithEvents ComboBoxXEdMFlashLiq As ComboBox
     Friend WithEvents ComboBoxXFlashVapor As ComboBox
     Friend WithEvents ComboBoxXCoolerOut As ComboBox
     Friend WithEvents ComboBoxXHeaterOut As ComboBox
@@ -284,4 +326,8 @@ Partial Class EditingForm_Recompletor
     Friend WithEvents LabelRejet As Label
     Friend WithEvents ComboBoxRecirculation As ComboBox
     Friend WithEvents LabelRecirculation As Label
+    Friend WithEvents ComboBoxXFlashLiq As ComboBox
+    Friend WithEvents LabelXFlashLiq As Label
+    Friend WithEvents ComboBoxDistillatOut As ComboBox
+    Friend WithEvents LabelDistillatOut As Label
 End Class
