@@ -136,7 +136,7 @@ Namespace UnitOperations
             Dim recirculation = Me.GetOutletMaterialStream(3)
             Dim distillatOut = Me.GetOutletMaterialStream(4)
 
-            edmIn.SetPressure(flashLiq.GetPressure)
+            'edmIn.SetPressure(edmFlashLiq.GetPressure)
 
 
             m_Cooler.GraphicObject = New CoolerGraphic()
@@ -202,7 +202,8 @@ Namespace UnitOperations
                     m_Heater.DeltaQ = Pcond
 
                     'Pas de rejet pour conserver le max de chaleur
-                    rejet.SetMassFlow(0)
+                    recirculation.SetMassFlow(edmFlashLiq.GetMassFlow)
+                    'rejet.SetMassFlow(0)
                     'recirculation.SetMassFlow(rejet.GetMassFlow)
                 Else
                     ' Qdistillat < QEdmin
@@ -215,12 +216,13 @@ Namespace UnitOperations
                     ' La qté à intégrer peut être plus grande que la Qté de circulation
                     If W <= (edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) Then
                         recirculation.SetMassFlow((edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) - W)
-                        rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
 
                     End If
                     ' La Qté à rejeter peut être supérieure au flux disponible !
 
                 End If
+
+                rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
 
             ElseIf distillatOut.GetMassFlow > 0 Then
                 ' On produit du distillat déjà condensé (re-démarrage)
@@ -228,11 +230,18 @@ Namespace UnitOperations
                 edmIn.SetMassFlow(W)
                 m_Heater.CalcMode = Heater.CalculationMode.HeatAddedRemoved
                 m_Heater.DeltaQ = 0
+                rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
                 ' TODO : Il faudrait que le distillat chaud puisse transférer de la chaleur
-
+            ElseIf distillatOut.GetMassFlow Then
+                'Chauffage sans production distillat
+                edmIn.SetMassFlow(W)
+                recirculation.SetMassFlow(edmFlashLiq.GetMassFlow)
+                rejet.SetMassFlow(0)
             End If
 
             m_Heater.RunDynamicModel()
+
+            Dim edm_hx_in As MaterialStream = FlowSheet.GetObject("edm_hx_in")
 
             If W > (edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) Then
 
@@ -247,6 +256,9 @@ Namespace UnitOperations
 
             End If
 
+            If Math.Abs(edm_hx_in.GetMassFlow - (recirculation.GetMassFlow + heaterOut.GetMassFlow)) > 0.001 Then
+                Console.WriteLine("Math.Abs(edm_hx_in.GetMassFlow - (recirculation.GetMassFlow + heaterOut.GetMassFlow)) > 0.001")
+            End If
 
         End Sub
 

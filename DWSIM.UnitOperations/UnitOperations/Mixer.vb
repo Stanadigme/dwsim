@@ -143,12 +143,14 @@ Namespace UnitOperations
                             refMs = ms
                         End If
                     ElseIf Me.PressureCalculation = PressureBehavior.Maximum Then
-                        If ms.Phases(0).Properties.pressure.GetValueOrDefault > P Then
+                        'TODO : Correct Or ms.GraphicObject.Tag = "recirculation_in" 
+                        If ms.Phases(0).Properties.pressure.GetValueOrDefault > P Or ms.GraphicObject.Tag = "recirculation" Then
                             P = ms.Phases(0).Properties.pressure
                             refMs = ms
                         ElseIf P = 0 Then
                             P = ms.Phases(0).Properties.pressure
                             refMs = ms
+
                         End If
                     Else
                         P = P + ms.Phases(0).Properties.pressure.GetValueOrDefault
@@ -194,6 +196,8 @@ Namespace UnitOperations
                 End If
 
             Next
+
+
 
             Me.PropertyPackage.CurrentMaterialStream = refMs
 
@@ -273,8 +277,16 @@ Namespace UnitOperations
             End With
 
             If W = 0.0 Then
+                For Each cp In Me.GraphicObject.InputConnectors
+                    If cp.IsAttached Then
+                        ms = Me.FlowSheet.SimulationObjects(cp.AttachedConnector.AttachedFrom.Name)
+                        If ms.GraphicObject.Tag.Contains("recirculation") Then refMs = ms
+                    End If
+                Next
                 omstr.CopyFromMaterial(refMs)
             End If
+
+
 
             IObj?.Close()
 

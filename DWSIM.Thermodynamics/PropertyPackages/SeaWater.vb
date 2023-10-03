@@ -355,10 +355,10 @@ Namespace PropertyPackages
 
             End If
 
-            'Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
+            Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
 
             If phaseID = 2 Then
-                'T += 0.01
+                If Math.Abs(T - Tsat) < 0.01 Then T += 0.01
 
                 result = Me.m_iapws97.densW(T, P / 100000)
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
@@ -482,6 +482,7 @@ Namespace PropertyPackages
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.kinematic_viscosity = Me.CurrentMaterialStream.Phases(phaseID).Properties.viscosity.GetValueOrDefault / result
                     Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
                 Else
+                    T -= 0.001
                     result = Me.m_iapws97.densSatLiqTW(T)
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.density = result
                     'result = DW_CalcEnthalpy(RET_VMOL(Phase), T, P, State.Liquid)

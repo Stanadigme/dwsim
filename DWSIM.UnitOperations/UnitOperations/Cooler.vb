@@ -24,6 +24,7 @@ Imports System.Windows.Forms
 Imports DWSIM.UnitOperations.UnitOperations.Auxiliary
 Imports DWSIM.Thermodynamics.BaseClasses
 Imports DWSIM.Interfaces.Enums
+Imports DWSIM.UnitOperations.UnitOperations.Auxiliary.Pipe
 
 Namespace UnitOperations
 
@@ -93,8 +94,19 @@ Namespace UnitOperations
 
         Public Overrides Function CloneXML() As Object
             Dim obj As ICustomXMLSerialization = New Cooler()
-            obj.LoadData(Me.SaveData)
+            obj.LoadData(SaveData)
             Return obj
+        End Function
+
+        Public Overrides Function SaveData() As System.Collections.Generic.List(Of System.Xml.Linq.XElement)
+
+            Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = MyBase.SaveData()
+
+            elements.Add(New XElement("DeltaQ", DeltaQ.GetValueOrDefault))
+
+
+            Return elements
+
         End Function
 
         Public Overrides Function CloneJSON() As Object
@@ -237,6 +249,7 @@ Namespace UnitOperations
             Else
                 tempH = AccumulationStream.GetMassEnthalpy
                 AccumulationStream.SetFlowsheet(FlowSheet)
+                AccumulationStream.SetPressure(ims.GetPressure)
                 If ims.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Add(ims, timestep)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 'AccumulationStream.Calculate()
@@ -244,18 +257,23 @@ Namespace UnitOperations
                 If oms.GetMassFlow() > 0 Then AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
 
+                Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
+                AccumulationStream.SetFlowsheet(FlowSheet)
+                'AccumulationStream.SetPressure(ims.GetPressure)
+                AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+
+
             End If
-            Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
-            AccumulationStream.SetFlowsheet(FlowSheet)
-            'AccumulationStream.SetPressure(ims.GetPressure)
-            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+
+
             Select Case CalcMode
                 Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
                     AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
                 Case Else
                     AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
             End Select
-            AccumulationStream.Calculate()
+            'AccumulationStream.Calculate()
+            'Console.WriteLine("H after " & AccumulationStream.GetMassEnthalpy)
 
 
 
@@ -267,10 +285,13 @@ Namespace UnitOperations
                     Dim Q1, H20, H21, H10, H11, VF0, T10, T11, T20, T21, DP1, DP2, VW0, VH0 As Double
                     Dim tmp As IFlashCalculationResult
 
+                    AccumulationStream.Calculate()
+
                     VW0 = AccumulationStream.GetPhase("Vapor").Properties.massflow.GetValueOrDefault()
                     VH0 = AccumulationStream.GetPhase("Vapor").Properties.enthalpy.GetValueOrDefault
                     H10 = AccumulationStream.GetMassEnthalpy()
                     T10 = AccumulationStream.GetTemperature
+                    'Console.WriteLine("Frac Vap " & VW0 / AccumulationStream.GetMassFlow)
                     If VW0 > 0 Then
                         AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                         tmp = AccumulationStream.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureVaporFraction, AccumulationStream.GetPressure, m_VFout.GetValueOrDefault, T10)
@@ -289,8 +310,15 @@ Namespace UnitOperations
                         'AccumulationStream.SetMassEnthalpy(H11)
                     End If
 
+                    'Console.WriteLine("H10 " & H10)
+                    'Console.WriteLine("H11 " & H11)
+
                     Me.DeltaT = T11 - T10
                     Me.DeltaQ = -(H11 - H10) * AccumulationStream.GetMassFlow() * timestep / (Me.Eficiencia.GetValueOrDefault / 100)
+                    If DeltaQ < 0 Then
+                        Console.WriteLine(Me.ToString & " DeltaQ : " & DeltaQ & " H11 " & H11 & " H10 " & H10 & " -(H11 - H10) " & (-(H11 - H10)))
+                        DeltaQ = 0
+                    End If
                     Dim esout As Streams.EnergyStream = GetEnergyStream()
                     If esout IsNot Nothing Then
                         'energy stream - update energy flow value (kW)
@@ -300,15 +328,7 @@ Namespace UnitOperations
                         End With
                     End If
 
-                    'oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
-                    'With oms
-                    '    '.Clear()
-                    '    .Phases(0).Properties.temperature = T11
-                    '    '.Phases(0).Properties.pressure = AccumulationStream.GetPressure
-                    '    .Phases(0).Properties.enthalpy = AccumulationStream.GetMassEnthalpy
-                    '    .Phases(2).Properties.molarfraction = m_VFout.GetValueOrDefault
 
-                    'End With
 
 
                 Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
@@ -340,19 +360,17 @@ Namespace UnitOperations
 
                     AccumulationStream.SetMassEnthalpy(newH)
 
-
-
                     'calculate pressure
 
-
+                    AccumulationStream.PropertyPackage = PropertyPackage
+                    AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
+                    AccumulationStream.Calculate()
 
             End Select
 
             'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
 
-            AccumulationStream.PropertyPackage = PropertyPackage
-            AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-            AccumulationStream.Calculate()
+
 
             oms.AssignFromPhase(PhaseLabel.Mixture, AccumulationStream, False)
             oms.SetTemperature(AccumulationStream.GetTemperature)

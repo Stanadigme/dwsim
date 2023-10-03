@@ -72,9 +72,25 @@ Module SowageProcessData
             Dim Type As String = element.GetElement("Type").Value.AsString
 
             Select Case Type
+                Case "DWSIM.UnitOperations.UnitOperations.Heater"
+                    With doc
+                        .Add(element.GetElement("OutletTemperature"))
+                        .Add(element.GetElement("DeltaQ"))
+                    End With
+                    toWriteData.Add(doc)
+
+                Case "DWSIM.UnitOperations.UnitOperations.Cooler"
+                    With doc
+                        .Add(element.GetElement("OutletTemperature"))
+                        .Add(element.GetElement("OutletVaporFraction"))
+                        .Add(element.GetElement("DeltaQ"))
+                    End With
+                    toWriteData.Add(doc)
+
                 Case "DWSIM.Thermodynamics.Streams.MaterialStream"
                     doc.Add(element.GetElement("Phases"))
                     toWriteData.Add(doc)
+
                 Case "DWSIM.UnitOperations.UnitOperations.Pipe"
                     Dim towrite = doc
                     With towrite
@@ -85,6 +101,7 @@ Module SowageProcessData
                         .Add(element.GetElement("DeltaT"))
                     End With
                     toWriteData.Add(doc)
+
                 Case Else
                     Console.WriteLine(String.Format("{0} non traité", {element.GetElement("String").Value.AsString, element.GetElement("step").Value.AsDouble}))
             End Select

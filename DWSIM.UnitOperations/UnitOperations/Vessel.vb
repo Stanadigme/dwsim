@@ -304,6 +304,7 @@ Namespace UnitOperations
                 'oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
                 'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
                 tempH = AccumulationStream.GetMassEnthalpy
+                wfrac = AccumulationStream.Phases(2).Properties.massfraction.GetValueOrDefault
                 If imsmix.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Add(imsmix, timestep)
                     'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
@@ -313,7 +314,7 @@ Namespace UnitOperations
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 'AccumulationStream.SetPressure(imsmix.GetPressure)
                 'AccumulationStream.Calculate(True, True)
-                AccumulationStream.Calculate()
+                'AccumulationStream.Calculate()
                 'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
                 'Si il y a une phase vapeur présente, elle est extraite
 
@@ -345,6 +346,10 @@ Namespace UnitOperations
                 'oms1.Calculate()
                 'oms2.Calculate()
 
+                oms1.SetMassFlow(imsmix.GetMassFlow * wfrac)
+                'oms1.Calculate()
+                oms2.SetMassFlow(imsmix.GetMassFlow * (1 - wfrac))
+
                 If oms1.GetMassFlow() > 0 Then
                     AccumulationStream = AccumulationStream.Subtract(oms1, timestep)
                     'AccumulationStream.Calculate(True, True)
@@ -369,7 +374,10 @@ Namespace UnitOperations
             AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
             PropertyPackage.CurrentMaterialStream = AccumulationStream
             AccumulationStream.Calculate()
-            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+
+            'If Me.GraphicObject.Tag = "1_flash_vessel" Then
+            '    Console.WriteLine("Stop")
+            'End If
             'Console.WriteLine("AccumulationStream" + AccumulationStream.ToResume)
 
             'Console.WriteLine(String.Format("dH : {0:n3}, true dH : {1:n3}",

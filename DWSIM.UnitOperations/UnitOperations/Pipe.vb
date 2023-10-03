@@ -358,39 +358,58 @@ Namespace UnitOperations
                 End If
                 Dim density = AccumulationStream.Phases(0).Properties.density.GetValueOrDefault
                 AccumulationStream.SetMassFlow(density * volume)
+                'If GraphicObject.Tag = "vapor_pipe" Then
+                '    Console.WriteLine(density)
+                '    Console.WriteLine(volume)
+                'End If
                 'AccumulationStream.SpecType = StreamSpec.Pressure_and_Enthalpy
                 'oms.SpecType = StreamSpec.Pressure_and_Enthalpy
-                AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
-                oms.SpecType = StreamSpec.Temperature_and_Pressure
+                'AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure
+                'oms.SpecType = StreamSpec.Temperature_and_Pressure
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 AccumulationStream.Calculate()
                 tempH = AccumulationStream.GetMassEnthalpy
+
             Else
                 AccumulationStream.SetFlowsheet(FlowSheet)
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 tempH = AccumulationStream.GetMassEnthalpy
                 If ims.GetMassFlow() > 0 Then
+
                     AccumulationStream = AccumulationStream.Add(ims, timestep)
                     'AccumulationStream.Calculate()
-                    'If Not oms.Calculated Then oms.Calculate()
+
                     AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 End If
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
                 'AccumulationStream.Calculate()
-                If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
+                If AccumulationStream.GetMassFlow <= 0.0 Then
+                    AccumulationStream.SetMassFlow(0.0)
+                End If
+
+                Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
+
+                AccumulationStream.SetFlowsheet(FlowSheet)
+                PropertyPackage.CurrentMaterialStream = AccumulationStream
+                AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+                AccumulationStream.SetPressure(ims.GetPressure)
+                AccumulationStream.Calculate()
+
+                If GraphicObject.Tag = "vapor_pipe" Then
+                    Console.WriteLine(ims.ToResume)
+                    Console.WriteLine(oms.ToResume)
+                    Console.WriteLine(AccumulationStream.ToResume)
+                    Console.WriteLine(tempH)
+                    Console.WriteLine(dH_theory)
+                    Console.WriteLine("---------------------------")
+                End If
+
 
             End If
 
 
-            Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
-
-            AccumulationStream.SetFlowsheet(FlowSheet)
-            PropertyPackage.CurrentMaterialStream = AccumulationStream
-            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
-            AccumulationStream.SetPressure(ims.GetPressure)
-            AccumulationStream.Calculate()
             'AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
 
             'Console.WriteLine(String.Format("dH : {0:n3}, true dH : {1:n3}",

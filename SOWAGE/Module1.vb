@@ -15,10 +15,86 @@ Imports DWSIM
 Module Module1
 
 
+    Function SimpleCalculate()
+
+        Console.WriteLine(String.Format("Fichier : "))
+
+        Dim fSName As String = "20230927_104701"
+
+        Dim fSName2 = Console.ReadLine()
+
+        If fSName2.Length > 0 Then fSName = fSName2
+
+        Dim interf As New DWSIM.Automation.Automation3
+        Dim solver As New DWSIM.FlowsheetSolver.FlowsheetSolver
+
+        Dim sim As DWSIM.Interfaces.IFlowsheet
+        sim = interf.LoadFlowsheet(String.Format("D:/git/sowage/{0}.dwxmz", fSName))
+
+        Dim state = sim.GetProcessData()
+
+
+
+        Dim Controllers = sim.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_PID).ToList
+        Dim PyControllers = sim.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = ObjectType.Controller_Python).ToList
+        Dim sch As String = fSName
+        Dim schedule = sim.DynamicsManager.ScheduleList.First.Value
+
+        Dim integrator = sim.DynamicsManager.IntegratorList(schedule.CurrentIntegrator)
+        sim.DynamicsManager.CurrentSchedule = sch
+
+        sim.DynamicMode = True
+        sim.LoadProcessData(sim.StoredSolutions(schedule.InitialFlowsheetStateID))
+        solver.InitFlowsheet(sim)
+
+        Dim start As Double = 0
+        Dim final = integrator.Duration.TotalSeconds
+        Dim integrationStep = integrator.IntegrationStep.TotalSeconds
+        integrator.ShouldCalculateControl = True
+        integrator.ShouldCalculateEquilibrium = True
+        integrator.ShouldCalculatePressureFlow = True
+        Dim d0, d1, d2 As Date
+        Dim dt As TimeSpan
+        d0 = Date.Now
+        While start < final
+            d1 = Date.Now
+
+            Dim ex = interf.CalculateFlowsheet4(sim)
+            For Each controller As PIDController In Controllers
+                If controller.Active Then
+                    controller.Calculate()
+                End If
+            Next
+            'For Each controller As PythonController In PyControllers
+            '    If controller.Active Then
+            '        controller.Calculate()
+            '    End If
+            'Next
+
+
+            If ex.Count > 0 Then
+                start = final
+                Console.WriteLine(ex.ElementAt(0))
+            End If
+            start += integrationStep
+            d2 = Date.Now
+            dt = d2 - d1
+            Console.WriteLine(String.Format("Step :{0} {1:n3}s", {start, dt.TotalSeconds}))
+
+        End While
+
+
+        d2 = Date.Now
+        dt = d2 - d0
+
+        Console.WriteLine(String.Format("Total :{0}", dt.TotalSeconds))
+        Console.Read()
+    End Function
+
     Function Calculate()
         Console.WriteLine(String.Format("Fichier : "))
 
-        Dim fSName As String = "R10-120-800-10E6r5P1DpMax"
+        Dim fSName As String = "R10-120-1200-10E16r15P1DpMax_Hpress-8300"
 
         Dim fSName2 = Console.ReadLine()
 
@@ -127,7 +203,7 @@ Module Module1
             Dim data As List(Of XElement) = New List(Of XElement)
             For Each so As SharedClasses.UnitOperations.BaseClass In sim.SimulationObjects.Values
                 Select Case so.GraphicObject.ObjectType
-                    Case ObjectType.MaterialStream, ObjectType.Pipe
+                    Case ObjectType.MaterialStream, ObjectType.Pipe, ObjectType.Heater, ObjectType.Cooler
                         data.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
                 End Select
             Next
@@ -164,7 +240,7 @@ Module Module1
     End Function
 
     Sub Main()
-
+        'SimpleCalculate()
         Calculate()
         'ConvertCollection()
         'ConvertCollections()

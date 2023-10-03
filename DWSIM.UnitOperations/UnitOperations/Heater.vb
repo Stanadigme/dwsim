@@ -148,6 +148,17 @@ Namespace UnitOperations
             Return obj
         End Function
 
+        Public Overrides Function SaveData() As System.Collections.Generic.List(Of System.Xml.Linq.XElement)
+
+            Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = MyBase.SaveData()
+
+            elements.Add(New XElement("DeltaQ", DeltaQ.GetValueOrDefault))
+
+
+            Return elements
+
+        End Function
+
         Public Overrides Function CloneJSON() As Object
             Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of Heater)(Newtonsoft.Json.JsonConvert.SerializeObject(Me))
         End Function
@@ -244,7 +255,7 @@ Namespace UnitOperations
 
                 AccumulationStream.PropertyPackage = PropertyPackage
                 AccumulationStream.PropertyPackage.CurrentMaterialStream = AccumulationStream
-                AccumulationStream.Calculate()
+                'AccumulationStream.Calculate()
                 tempH = AccumulationStream.GetMassEnthalpy
 
             Else
@@ -261,14 +272,18 @@ Namespace UnitOperations
                     AccumulationStream = AccumulationStream.Subtract(oms, timestep)
                 End If
                 If AccumulationStream.GetMassFlow <= 0.0 Then AccumulationStream.SetMassFlow(0.0)
+
+                Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
+
+                AccumulationStream.SetFlowsheet(FlowSheet)
+                'AccumulationStream.SetPressure(ims.GetPressure)
+                'AccumulationStream.Calculate()
+                AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+
             End If
 
-            Dim dH_theory As Double = (ims.GetMassFlow * ims.GetMassEnthalpy - oms.GetMassFlow * oms.GetMassEnthalpy) * timestep / AccumulationStream.GetMassFlow
 
-            AccumulationStream.SetFlowsheet(FlowSheet)
-            'AccumulationStream.SetPressure(ims.GetPressure)
-            'AccumulationStream.Calculate()
-            AccumulationStream.SetMassEnthalpy(tempH + dH_theory)
+
             Select Case CalcMode
                 Case CalculationMode.TemperatureChange, CalculationMode.OutletTemperature
                     AccumulationStream.SpecType = StreamSpec.Temperature_and_Pressure

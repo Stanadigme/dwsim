@@ -8441,11 +8441,14 @@ Namespace Streams
                 Dim sub1 As BaseClasses.Compound
                 Dim p = .Phases(0)
                 Dim mass_div_mm As Double = 0
+                'Dim total As Double = W0
+                'Dim totalm As Double = M0
                 Dim total As Double = 0
+                Dim totalm As Double = 0
                 For Each sub1 In p.Compounds.Values
                     total += sub1.MassFlow.GetValueOrDefault
                 Next
-                Dim totalm As Double = 0
+
                 For Each sub1 In p.Compounds.Values
                     totalm += sub1.MolarFlow.GetValueOrDefault
                 Next
@@ -8528,11 +8531,14 @@ Namespace Streams
                 Dim sub1 As BaseClasses.Compound
                 Dim p = .Phases(0)
                 Dim mass_div_mm As Double = 0
+                'Dim total As Double = W0
+                'Dim totalm As Double = M0
                 Dim total As Double = 0
+                Dim totalm As Double = 0
                 For Each sub1 In p.Compounds.Values
                     total += sub1.MassFlow.GetValueOrDefault
                 Next
-                Dim totalm As Double = 0
+
                 For Each sub1 In p.Compounds.Values
                     totalm += sub1.MolarFlow.GetValueOrDefault
                 Next
