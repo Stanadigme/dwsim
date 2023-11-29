@@ -19,6 +19,8 @@ Public Class EditingForm_ReaktoroGibbs
 
         Me.ShowHint = GlobalSettings.Settings.DefaultEditFormLocation
 
+        ChangeDefaultFont()
+
         UpdateInfo()
 
     End Sub
@@ -160,7 +162,15 @@ Public Class EditingForm_ReaktoroGibbs
 
             chkUseEmbeddedImage.Checked = .UseEmbeddedImage
 
+            chkUseExternalDatabase.Checked = .UseExternalDatabase
+
+            tbExternalDB.Text = .ExternalDatabaseFileName
+
         End With
+
+        tbExternalDB.Visible = False
+        chkUseExternalDatabase.Visible = False
+        Button7.Visible = False
 
         Loaded = True
 
@@ -323,6 +333,7 @@ Public Class EditingForm_ReaktoroGibbs
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"
@@ -415,7 +426,7 @@ Public Class EditingForm_ReaktoroGibbs
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub tb_TextChanged(sender As Object, e As EventArgs) Handles tbPDrop.TextChanged
@@ -527,7 +538,7 @@ Public Class EditingForm_ReaktoroGibbs
     End Sub
 
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
-        Process.Start("https://reaktoro.org/v1/thermodynamic-databases.html")
+        SimObject.FlowSheet.DisplayBrowserWindow("https://reaktoro.org/v1/thermodynamic-databases.html")
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
@@ -539,6 +550,32 @@ Public Class EditingForm_ReaktoroGibbs
         ft.TextBox1.Text = comps
         ft.TextBox1.SelectedText = ""
         ft.ShowDialog()
+
+    End Sub
+
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+
+        Dim filePickerForm As IFilePicker = FilePickerService.GetInstance().GetFilePicker()
+
+        Dim handler As IVirtualFile = filePickerForm.ShowOpenDialog(
+            New List(Of FilePickerAllowedType) From {New FilePickerAllowedType("YAML files", "*.yaml")})
+
+        If handler IsNot Nothing Then
+            Try
+                Dim text = handler.ReadAllText()
+                tbExternalDB.Text = handler.Filename
+                SimObject.ExternalDatabaseFileName = handler.Filename
+                SimObject.ExternalDatabaseContents = text
+            Catch ex As Exception
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+
+    End Sub
+
+    Private Sub chkUseExternalDatabase_CheckedChanged(sender As Object, e As EventArgs) Handles chkUseExternalDatabase.CheckedChanged
+
+        SimObject.UseExternalDatabase = chkUseExternalDatabase.Checked
 
     End Sub
 

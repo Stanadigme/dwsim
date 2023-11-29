@@ -122,7 +122,7 @@ Namespace PropertyPackages
                 i2 = 0
                 For Each c2 In CurrentMaterialStream.Phases(0).Compounds.Values
                     If c.Name <> c2.Name AndAlso Vx(i1) * Vx(i2) > 0.0 Then
-                        ipdata = ExcelAddIn.ExcelIntegration.GetInteractionParameterSet(Me, "UNIQUAC", c.Name, c2.Name)
+                        ipdata = ExcelAddIn.ExcelIntegrationNoAttr.GetInteractionParameterSet(Me, "UNIQUAC", c.Name, c2.Name)
                         Dim i As Integer, sum As Double
                         sum = 0
                         For i = 2 To 8
@@ -311,6 +311,9 @@ Namespace PropertyPackages
                                 End If
 
                             Catch ex As Exception
+
+                                ipset.Value.A12 = 0.0000000001
+                                ipset.Value.A21 = 0.0000000001
 
                                 'If verbose Then
                                 '    Console.WriteLine(String.Format("Error estimating UNIQUAC IP set for {0}/{1}: {2}",

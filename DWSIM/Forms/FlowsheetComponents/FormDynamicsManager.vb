@@ -69,11 +69,11 @@ Public Class FormDynamicsManager
 
         Dim cbobjects = New DataGridViewComboBoxCell
         cbobjects.Items.Add("")
-        cbobjects.Items.AddRange(Flowsheet.SimulationObjects.Values.Select(Function(x) x.GraphicObject.Tag).ToArray)
+        cbobjects.Items.AddRange(Flowsheet.SimulationObjects.Values.Select(Function(x) x.GraphicObject.Tag).OrderBy(Function(o) o).ToArray)
 
         Dim cbindicators = New DataGridViewComboBoxCell
         cbindicators.Items.Add("")
-        cbindicators.Items.AddRange(Flowsheet.SimulationObjects.Values.Where(Function(x0) TypeOf x0 Is IIndicator).Select(Function(x) x.GraphicObject.Tag).ToArray)
+        cbindicators.Items.AddRange(Flowsheet.SimulationObjects.Values.Where(Function(x0) TypeOf x0 Is IIndicator).Select(Function(x) x.GraphicObject.Tag).OrderBy(Function(o) o).ToArray)
 
         Dim cbeventtype = New DataGridViewComboBoxCell
         cbeventtype.Items.Add(Flowsheet.GetTranslatedString1("ChangeProperty"))
@@ -269,7 +269,7 @@ Public Class FormDynamicsManager
                     etype = Flowsheet.GetTranslatedString1("RunScript")
                 End If
                 Dim obj, prop As String
-                gridselectedset.Rows.Add(New Object() { .ID, .Enabled, .Description, .TimeStamp, etype, "", "", "", ""})
+                gridselectedset.Rows.Add(New Object() { .ID, .Enabled, .Description, .TimeStamp - Date.MinValue, etype, "", "", "", ""})
                 Dim addedrow = gridselectedset.Rows(gridselectedset.Rows.Count - 1)
                 If Flowsheet.SimulationObjects.ContainsKey(ev.SimulationObjectID) Then
                     obj = Flowsheet.SimulationObjects(ev.SimulationObjectID).GraphicObject.Tag
@@ -286,6 +286,25 @@ Public Class FormDynamicsManager
                 End If
                 addedrow.Cells(7).Value = .SimulationObjectPropertyValue
                 addedrow.Cells(8).Value = .SimulationObjectPropertyUnits
+                Select Case ev.TransitionType
+                    Case Dynamics.DynamicsEventTransitionType.StepChange
+                        addedrow.Cells(9).Value = "Step"
+                    Case Dynamics.DynamicsEventTransitionType.LinearChange
+                        addedrow.Cells(9).Value = "Linear"
+                    Case Dynamics.DynamicsEventTransitionType.LogChange
+                        addedrow.Cells(9).Value = "Log"
+                    Case Dynamics.DynamicsEventTransitionType.InverseLogChange
+                        addedrow.Cells(9).Value = "Inverse Log"
+                    Case Dynamics.DynamicsEventTransitionType.RandomChange
+                        addedrow.Cells(9).Value = "Random"
+                End Select
+                Select Case ev.TransitionReference
+                    Case Dynamics.DynamicsEventTransitionReferenceType.InitialState
+                        addedrow.Cells(10).Value = "Initial State"
+                    Case Dynamics.DynamicsEventTransitionReferenceType.PreviousEvent
+                        addedrow.Cells(10).Value = "Previous Event"
+                End Select
+                addedrow.Cells(11).Value = .TransitionReferenceEventID
             End With
         Next
 
@@ -296,6 +315,8 @@ Public Class FormDynamicsManager
     Private Sub btnAddEvent_Click(sender As Object, e As EventArgs) Handles btnAddEvent.Click
 
         Try
+
+            UpdateSelectables()
 
             Dim es = Manager.EventSetList(gridsets.Rows(gridsets.SelectedCells(0).RowIndex).Cells(0).Value)
 
@@ -310,7 +331,7 @@ Public Class FormDynamicsManager
                 Else
                     etype = Flowsheet.GetTranslatedString1("RunScript")
                 End If
-                gridselectedset.Rows.Add(New Object() { .ID, .Enabled, .Description, .TimeStamp, etype, "", "", "", ""})
+                gridselectedset.Rows.Add(New Object() { .ID, .Enabled, .Description, .TimeStamp - Date.MinValue, etype, "", "", "", "", "Step", "Previous Event"})
             End With
 
         Catch ex As Exception
@@ -338,7 +359,7 @@ Public Class FormDynamicsManager
                 Case 2
                     ev.Description = value
                 Case 3
-                    ev.TimeStamp = value
+                    ev.TimeStamp = Date.MinValue.Add(TimeSpan.Parse(value))
                 Case 4
                     If value = Flowsheet.GetTranslatedString1("ChangeProperty") Then
                         ev.EventType = Dynamics.DynamicsEventType.ChangeProperty
@@ -364,6 +385,28 @@ Public Class FormDynamicsManager
                     ev.SimulationObjectPropertyValue = value
                 Case 8
                     ev.SimulationObjectPropertyUnits = value
+                Case 9
+                    If value IsNot Nothing Then
+                        If value = "Step" Then
+                            ev.TransitionType = Dynamics.DynamicsEventTransitionType.StepChange
+                        ElseIf value = "Linear" Then
+                            ev.TransitionType = Dynamics.DynamicsEventTransitionType.LinearChange
+                        ElseIf value = "Log" Then
+                            ev.TransitionType = Dynamics.DynamicsEventTransitionType.LogChange
+                        ElseIf value = "Inverse Log" Then
+                            ev.TransitionType = Dynamics.DynamicsEventTransitionType.InverseLogChange
+                        ElseIf value = "Random" Then
+                            ev.TransitionType = Dynamics.DynamicsEventTransitionType.RandomChange
+                        End If
+                    End If
+                Case 10
+                    If value IsNot Nothing Then
+                        If value = "Initial State" Then
+                            ev.TransitionReference = Dynamics.DynamicsEventTransitionReferenceType.InitialState
+                        ElseIf value = "Previous Event" Then
+                            ev.TransitionReference = Dynamics.DynamicsEventTransitionReferenceType.PreviousEvent
+                        End If
+                    End If
             End Select
         Catch ex As Exception
             MessageBox.Show(ex.Message, Flowsheet.GetTranslatedString1("Erro"), MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -466,6 +509,8 @@ Public Class FormDynamicsManager
     Private Sub btnAddMatrixItem_Click(sender As Object, e As EventArgs) Handles btnAddMatrixItem.Click
 
         Try
+
+            UpdateSelectables()
 
             Dim cem = Manager.CauseAndEffectMatrixList(gridmatrices.Rows(gridmatrices.SelectedCells(0).RowIndex).Cells(0).Value)
 
@@ -591,7 +636,13 @@ Public Class FormDynamicsManager
 
         nupIntegrationStep.Value = i1.IntegrationStep.TotalMilliseconds
 
-        dtpIntegratorDuration.Value = dtpIntegratorDuration.MinDate.Add(i1.Duration)
+        nupDays.Value = i1.Duration.Days
+
+        nupHours.Value = i1.Duration.Hours
+
+        nupMinutes.Value = i1.Duration.Minutes
+
+        nupSeconds.Value = i1.Duration.Seconds
 
         nupRTStep.Value = i1.RealTimeStepMs
 
@@ -632,14 +683,7 @@ Public Class FormDynamicsManager
 
     End Sub
 
-    Private Sub dtpIntegratorDuration_ValueChanged(sender As Object, e As EventArgs) Handles dtpIntegratorDuration.ValueChanged
-        If Manager Is Nothing Then Exit Sub
-
-        Try
-            Dim i1 = Manager.IntegratorList(gridintegrators.Rows(gridintegrators.SelectedCells(0).RowIndex).Cells(0).Value)
-            i1.Duration = dtpIntegratorDuration.Value - dtpIntegratorDuration.MinDate
-        Catch ex As Exception
-        End Try
+    Private Sub dtpIntegratorDuration_ValueChanged(sender As Object, e As EventArgs)
 
     End Sub
 
@@ -965,6 +1009,15 @@ Public Class FormDynamicsManager
 
             Try
 
+                UpdateSelectables()
+
+                Dim cbobjects = New DataGridViewComboBoxCell
+                cbobjects.Items.Add("")
+                cbobjects.Items.AddRange(Flowsheet.SimulationObjects.Values.Select(Function(x) x.GraphicObject.Tag).OrderBy(Function(o) o).ToArray)
+
+                gridMonitoredVariables.Columns(2).CellTemplate = cbobjects
+
+
                 Dim int = Manager.IntegratorList(gridintegrators.Rows(gridintegrators.SelectedCells(0).RowIndex).Cells(0).Value)
 
                 Dim v1 As New MonitoredVariable With {.ID = Guid.NewGuid.ToString}
@@ -1043,9 +1096,9 @@ Public Class FormDynamicsManager
 
     Private Sub TabControl1_Selected(sender As Object, e As TabControlEventArgs) Handles TabControl1.Selected
 
-        If e.TabPage Is TabPage1 Then
-            CheckModelStatus()
-        End If
+        'If e.TabPage Is TabPage1 Then
+        '    CheckModelStatus()
+        'End If
 
     End Sub
 
@@ -1096,23 +1149,23 @@ Public Class FormDynamicsManager
             End If
         Next
 
-        If streams_ok Then
-            pbStreamValves.Image = My.Resources.icons8_ok
-        Else
-            pbStreamValves.Image = My.Resources.icons8_cancel
-        End If
+        'If streams_ok Then
+        '    pbStreamValves.Image = My.Resources.icons8_ok
+        'Else
+        '    pbStreamValves.Image = My.Resources.icons8_cancel
+        'End If
 
-        If uos_ok Then
-            pbUnitOps.Image = My.Resources.icons8_ok
-        Else
-            pbUnitOps.Image = My.Resources.icons8_cancel
-        End If
+        'If uos_ok Then
+        '    pbUnitOps.Image = My.Resources.icons8_ok
+        'Else
+        '    pbUnitOps.Image = My.Resources.icons8_cancel
+        'End If
 
-        If valves_ok Then
-            pbValves.Image = My.Resources.icons8_ok
-        Else
-            pbValves.Image = My.Resources.icons8_cancel
-        End If
+        'If valves_ok Then
+        '    pbValves.Image = My.Resources.icons8_ok
+        'Else
+        '    pbValves.Image = My.Resources.icons8_cancel
+        'End If
 
     End Sub
 
@@ -1122,7 +1175,7 @@ Public Class FormDynamicsManager
 
     End Sub
 
-    Private Sub TabPage1_MouseHover(sender As Object, e As EventArgs) Handles TabPage1.MouseHover
+    Private Sub TabPage1_MouseHover(sender As Object, e As EventArgs)
 
         CheckModelStatus()
 
@@ -1195,4 +1248,58 @@ Public Class FormDynamicsManager
     Private Sub FormDynamicsManager_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         FormMain.TranslateFormFunction?.Invoke(Me)
     End Sub
+
+    Private Sub gridsets_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridsets.DataError
+
+    End Sub
+
+    Private Sub gridselectedset_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridselectedset.DataError
+
+    End Sub
+
+    Private Sub gridmatrices_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridmatrices.DataError
+
+    End Sub
+
+    Private Sub grdiselmatrix_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles grdiselmatrix.DataError
+
+    End Sub
+
+    Private Sub gridintegrators_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridintegrators.DataError
+
+    End Sub
+
+    Private Sub gridMonitoredVariables_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridMonitoredVariables.DataError
+
+    End Sub
+
+    Private Sub nupDays_ValueChanged(sender As Object, e As EventArgs) Handles nupHours.ValueChanged, nupDays.ValueChanged, nupSeconds.ValueChanged, nupMinutes.ValueChanged
+
+        If Manager Is Nothing Then Exit Sub
+
+        Try
+            Dim i1 = Manager.IntegratorList(gridintegrators.Rows(gridintegrators.SelectedCells(0).RowIndex).Cells(0).Value)
+            i1.Duration = New TimeSpan(nupDays.Value, nupHours.Value, nupMinutes.Value, nupSeconds.Value)
+        Catch ex As Exception
+        End Try
+
+    End Sub
+
+    Private Sub gridselectedset_SelectionChanged(sender As Object, e As EventArgs) Handles gridselectedset.SelectionChanged
+
+        If gridselectedset.CurrentCell IsNot Nothing Then
+
+            Dim eventID = gridselectedset.Rows(gridselectedset.CurrentCell.RowIndex).Cells(0).Value
+            tbEventID.Text = eventID
+
+        End If
+
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+        Clipboard.SetText(tbEventID.Text)
+
+    End Sub
+
 End Class

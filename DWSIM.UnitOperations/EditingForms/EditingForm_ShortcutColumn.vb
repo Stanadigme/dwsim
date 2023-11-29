@@ -18,6 +18,8 @@ Public Class EditingForm_ShortcutColumn
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Sub UpdateInfo()
@@ -169,7 +171,7 @@ Public Class EditingForm_ShortcutColumn
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -217,7 +219,7 @@ Public Class EditingForm_ShortcutColumn
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation2(False)
 
     End Sub
 
@@ -241,6 +243,8 @@ Public Class EditingForm_ShortcutColumn
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             UpdateProps(sender)
 
             DirectCast(sender, TextBox).SelectAll()
@@ -251,6 +255,7 @@ Public Class EditingForm_ShortcutColumn
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.PropertyPackage = SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -510,6 +515,7 @@ Public Class EditingForm_ShortcutColumn
     Private Sub rbTotalCond_CheckedChanged(sender As Object, e As EventArgs) Handles rbTotalCond.CheckedChanged, rbPartialCond.CheckedChanged
 
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             If rbTotalCond.Checked Then SimObject.condtype = UnitOperations.ShortcutColumn.CondenserType.TotalCond Else SimObject.condtype = UnitOperations.ShortcutColumn.CondenserType.PartialCond
             RequestCalc()
         End If
@@ -517,10 +523,12 @@ Public Class EditingForm_ShortcutColumn
     End Sub
 
     Private Sub cbLKey_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbLKey.SelectedIndexChanged
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If Loaded Then SimObject.m_lightkey = cbLKey.SelectedItem.ToString
     End Sub
 
     Private Sub cbHKey_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbHKey.SelectedIndexChanged
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If Loaded Then SimObject.m_heavykey = cbHKey.SelectedItem.ToString
     End Sub
 
@@ -548,6 +556,7 @@ Public Class EditingForm_ShortcutColumn
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"

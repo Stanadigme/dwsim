@@ -39,7 +39,7 @@ Public Class FormConfigDH
 
         Me.Text += " (" & _pp.Tag & ") [" + _pp.ComponentName + "]"
 
-        Dim ppu As PropertyPackages.DebyeHuckelPropertyPackage = _pp
+        Dim ppu As PropertyPackages.ElectrolyteBasePropertyPackage = _pp
 
         Dim nf As String = "0.####"
 
@@ -90,7 +90,7 @@ Public Class FormConfigDH
 
     Private Sub TextBox1_TextChanged(sender As System.Object, e As System.EventArgs) Handles tbMaxIts.TextChanged
         If Loaded Then
-            Dim ppu As PropertyPackages.DebyeHuckelPropertyPackage = _pp
+            Dim ppu As PropertyPackages.ElectrolyteBasePropertyPackage = _pp
             If Integer.TryParse(tbMaxIts.Text, New Integer) Then
                 tbMaxIts.ForeColor = Color.Blue
                 ppu.MaxIterations = tbMaxIts.Text
@@ -102,7 +102,7 @@ Public Class FormConfigDH
 
     Private Sub tbTol_TextChanged(sender As System.Object, e As System.EventArgs) Handles tbTol.TextChanged
         If Loaded Then
-            Dim ppu As PropertyPackages.ExUNIQUACPropertyPackage = _pp
+            Dim ppu As PropertyPackages.ElectrolyteBasePropertyPackage = _pp
             If Double.TryParse(tbTol.Text, New Double) Then
                 tbTol.ForeColor = Color.Blue
                 ppu.Tolerance = tbTol.Text
@@ -114,7 +114,7 @@ Public Class FormConfigDH
 
     Private Sub cbReacSets_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cbReacSets.SelectedIndexChanged
         If Loaded Then
-            Dim ppu As PropertyPackages.DebyeHuckelPropertyPackage = _pp
+            Dim ppu As PropertyPackages.ElectrolyteBasePropertyPackage = _pp
             Dim reacsetID As String = (From rset As ReactionSet In _form.ReactionSets.Values Select rset Where rset.Name = cbReacSets.SelectedItem.ToString).FirstOrDefault.ID
             ppu.ReactionSet = reacsetID
         End If

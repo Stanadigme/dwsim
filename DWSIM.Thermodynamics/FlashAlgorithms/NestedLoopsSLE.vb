@@ -431,14 +431,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 IObj?.Paragraphs.Add(String.Format("<h3>Loop {0}</h3>", ecount))
 
                 IObj?.SetCurrent
-                If TypeOf PP Is ElectrolyteNRTLPropertyPackage Then
-                    ActCoeff = CType(PP, ElectrolyteNRTLPropertyPackage).m_enrtl.GAMMA_MR(T, Vx, CompoundProperties)
-                ElseIf TypeOf PP Is ElectrolyteNRTLPropertyPackage Then
-                    ActCoeff = CType(PP, ExUNIQUACPropertyPackage).m_uni.GAMMA_MR(T, Vx, CompoundProperties)
-                ElseIf TypeOf PP Is LIQUAC2PropertyPackage Then
-                    ActCoeff = CType(PP, LIQUAC2PropertyPackage).m_liquac.GAMMA_MR(T, Vx, CompoundProperties)
-                ElseIf TypeOf PP Is DebyeHuckelPropertyPackage Then
-                    ActCoeff = CType(PP, DebyeHuckelPropertyPackage).m_dh.GAMMA_MR(T, Vx, CompoundProperties)
+                If TypeOf PP Is IdealElectrolytePropertyPackage Then
+                    ActCoeff = PP.RET_UnitaryVector()
                 Else
                     ActCoeff = PP.DW_CalcFugCoeff(Vx, T, P, State.Liquid).MultiplyConstY(P).DivideY(Vp)
                 End If
@@ -1416,13 +1410,13 @@ out2:           If (Math.Abs(GL_old - L) < 0.0000005) And (Math.Abs(GV_old - V) 
 
             End If
 
-
-
             d2 = Date.Now
 
             dt = d2 - d1
 
-            If ecount > maxit_e Then Throw New Exception(Calculator.GetLocalString("PropPack_FlashMaxIt2"))
+            If ecount > maxit_e Then
+                Throw New Exception(Calculator.GetLocalString("PropPack_FlashMaxIt2"))
+            End If
 
             If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("PV Flash [SLE]: Invalid result: converged to the trivial solution (T = " & T & " ).")
 

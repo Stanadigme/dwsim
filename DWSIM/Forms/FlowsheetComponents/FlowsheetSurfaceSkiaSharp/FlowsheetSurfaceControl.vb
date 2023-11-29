@@ -1,5 +1,6 @@
 ﻿Imports DWSIM.Drawing.SkiaSharp
 Imports DWSIM.Drawing.SkiaSharp.GraphicObjects
+Imports DWSIM.Interfaces
 Imports DWSIM.UnitOperations
 Imports SkiaSharp.Views.Desktop
 
@@ -12,6 +13,9 @@ Public Class FlowsheetSurfaceControl
     Public FlowsheetObject As FormFlowsheet
 
     Public Event ObjectSelected(ByVal sender As FormFlowsheet)
+
+    Public Shared SingleClickAction As Action(Of IFlowsheet, MouseEventArgs)
+    Public Shared DoubleClickAction As Action(Of IFlowsheet, MouseEventArgs)
 
     Public Sub New()
 
@@ -37,12 +41,6 @@ Public Class FlowsheetSurfaceControl
 
     Private Sub FlowsheetSurfaceControl_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
         FlowsheetSurface.InputRelease()
-#If Not WINE32 Then
-        If My.Settings.DisplayPFDTip Then
-            MessageBox.Show(DWSIM.App.GetLocalString("PFDTip"), "DWSIM", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            My.Settings.DisplayPFDTip = False
-        End If
-#End If
         Invalidate()
         Invalidate()
     End Sub
@@ -55,6 +53,7 @@ Public Class FlowsheetSurfaceControl
 
     Private Sub FlowsheetSurfaceControl_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
 
+        FlowsheetObject.RegisterSnapshot(SnapshotType.ObjectLayout)
         FlowsheetSurface.InputPress(e.X, e.Y)
         Invalidate()
         Invalidate()
@@ -67,14 +66,13 @@ Public Class FlowsheetSurfaceControl
 
     Private Sub FlowsheetSurfaceControl_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles Me.MouseDoubleClick
 
-        If FlowsheetObject.BidirectionalSolver IsNot Nothing Then
-            If FlowsheetObject.BidirectionalSolver.Activated Then
-                FlowsheetObject.BidirectionalSolver.ObjectDoubleClickAction(sender, e)
-                Exit Sub
-            End If
+        If FlowsheetObject.BidirectionalSolver IsNot Nothing AndAlso FlowsheetObject.BidirectionalSolver.Activated Then
+            FlowsheetObject.BidirectionalSolver.ObjectDoubleClickAction(sender, e)
+        ElseIf DoubleClickAction IsNot Nothing Then
+            DoubleClickAction?.Invoke(FlowsheetObject, e)
+        Else
+            DoubleClickHandler(sender, e)
         End If
-
-        DoubleClickHandler(sender, e)
 
     End Sub
 
@@ -84,8 +82,9 @@ Public Class FlowsheetSurfaceControl
 
         If (obj Is Nothing) Then
 
+            FlowsheetObject.RegisterSnapshot(SnapshotType.ObjectLayout)
             FlowsheetSurface.ZoomAll(Width, Height)
-            FlowsheetSurface.ZoomAll(Width, Height)
+            FlowsheetSurface.Center(Width, Height)
             FlowsheetObject.FormSurface.TSTBZoom.Text = FlowsheetSurface.Zoom.ToString("###%")
             Invalidate()
             Invalidate()
@@ -186,9 +185,13 @@ Public Class FlowsheetSurfaceControl
     End Sub
 
     Private Sub FlowsheetSurfaceControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
+        FlowsheetObject.RegisterSnapshot(SnapshotType.ObjectLayout)
+        Dim oldzoom = FlowsheetSurface.Zoom
         FlowsheetSurface.Zoom += e.Delta / 4 / 100.0
         If FlowsheetSurface.Zoom < 0.05 Then FlowsheetSurface.Zoom = 0.05
         FlowsheetObject.FormSurface.TSTBZoom.Text = FlowsheetSurface.Zoom.ToString("###%")
+        FlowsheetObject.FormSurface.FlowsheetSurface.CenterTo(oldzoom, e.Location.X, e.Location.Y, FlowsheetObject.FormSurface.SplitContainerHorizontal.Panel1.Width,
+                                                            FlowsheetObject.FormSurface.SplitContainerHorizontal.Panel1.Height)
         Invalidate()
         Invalidate()
     End Sub
@@ -197,14 +200,13 @@ Public Class FlowsheetSurfaceControl
 
     Public Sub FlowsheetDesignSurface_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseUp
 
-        If FlowsheetObject.BidirectionalSolver IsNot Nothing Then
-            If FlowsheetObject.BidirectionalSolver.Activated Then
-                FlowsheetObject.BidirectionalSolver.ObjectClickAction(sender, e)
-                Exit Sub
-            End If
+        If FlowsheetObject.BidirectionalSolver IsNot Nothing AndAlso FlowsheetObject.BidirectionalSolver.Activated Then
+            FlowsheetObject.BidirectionalSolver.ObjectClickAction(sender, e)
+        ElseIf SingleClickAction IsNot Nothing Then
+            SingleClickAction.Invoke(FlowsheetObject, e)
+        Else
+            SingleClickHandler(sender, e)
         End If
-
-        SingleClickHandler(sender, e)
 
     End Sub
 
@@ -304,20 +306,25 @@ Public Class FlowsheetSurfaceControl
 
             Dim pt = PointToClient(New Point(e.X, e.Y))
 
-
             If scriptpath <> "" Then
 
                 Dim uobjid = FlowsheetObject.FormSurface.AddObjectToSurface(ObjectType.CustomUO, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, False, "", "")
                 Dim suo = DirectCast(FlowsheetObject.SimulationObjects(uobjid), CustomUO)
                 suo.ScriptText = IO.File.ReadAllText(scriptpath)
 
+                FormMain.AnalyticsProvider?.RegisterEvent("Added Object", "FOSSEE Custom Unit Operation: " + scriptpath, Nothing)
+
                 Process.Start(pdfpath)
 
             ElseIf t.GetInterface("DWSIM.Interfaces.IExternalUnitOperation", True) Is Nothing Then
 
+                FormMain.AnalyticsProvider?.RegisterEvent("Added Object", t.Name, Nothing)
+
                 FlowsheetObject.FormSurface.AddObject(t.Name, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, c, True)
 
             Else
+
+                FormMain.AnalyticsProvider?.RegisterEvent("Added Object", "External: " + t.FullName, Nothing)
 
                 FlowsheetObject.FormSurface.AddObjectToSurface(ObjectType.External, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, False, "", "", Activator.CreateInstance(t))
 

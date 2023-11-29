@@ -23,6 +23,8 @@ Imports DWSIM.MathOps.MathEx
 Imports System.Runtime.InteropServices
 Imports System.Linq
 Imports DWSIM.Interfaces.Enums
+Imports System.IO
+Imports System.Reflection
 
 Namespace PropertyPackages
 
@@ -70,22 +72,61 @@ Namespace PropertyPackages
 
         Sub GetListOfSupportedCompounds()
 
-            Dim comps As List(Of String) = CoolProp.get_global_param_string("FluidsList").Split(",").ToList()
+            Dim comps As List(Of String)
+            'comps= CoolProp.get_global_param_string("FluidsList").Split(",").ToList()
+
+            Using filestr As Stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DWSIM.Thermodynamics.CoolPropFluids.txt")
+                Using t As New StreamReader(filestr)
+                    comps = t.ReadToEnd().Split(vbLf).ToList()
+                End Using
+            End Using
+
             comps = comps.Select(Function(a) a.Trim()).ToList()
+
+            'IO.File.WriteAllLines("CoolPropFluids.txt", comps.ToArray())
 
             CompoundAliases.Clear()
             SupportedComponents.Clear()
 
+            Dim data As String()
+
+            Using filestr As Stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DWSIM.Thermodynamics.CoolPropFluidAliases.txt")
+                Using t As New StreamReader(filestr)
+                    data = t.ReadToEnd().Split(vbLf)
+                End Using
+            End Using
+
             Dim aliases As New List(Of String), cas As String
 
+            Dim i = 0
             For Each c In comps
-                aliases = CoolProp.get_fluid_param_string(c, "aliases").Split(",").ToList()
+                Dim sdata = data(i).Split(vbTab)
+                aliases = sdata(1).Split(",").ToList()
                 aliases = aliases.Select(Function(a) a.Trim()).Where(Function(a2) a2 <> "" And a2 <> " ").ToList()
                 aliases.Add(c)
                 SupportedComponents.AddRange(aliases)
-                cas = CoolProp.get_fluid_param_string(c, "CAS")
+                cas = sdata(0)
                 CompoundAliases.Add(cas, aliases.ToList)
+                i += 1
             Next
+
+            'For Each c In comps
+            '    aliases = CoolProp.get_fluid_param_string(c, "aliases").Split(",").ToList()
+            '    aliases = aliases.Select(Function(a) a.Trim()).Where(Function(a2) a2 <> "" And a2 <> " ").ToList()
+            '    aliases.Add(c)
+            '    SupportedComponents.AddRange(aliases)
+            '    cas = CoolProp.get_fluid_param_string(c, "CAS")
+            '    CompoundAliases.Add(cas, aliases.ToList)
+            'Next
+
+            'For Each item In CompoundAliases
+            '    Dim al = ""
+            '    For Each ali In item.Value
+            '        al += ali + ","
+            '    Next
+            '    al.TrimEnd(",")
+            '    IO.File.AppendAllText("CoolPropFluidAliases.txt", item.Key & vbTab & al & vbCrLf)
+            'Next
 
         End Sub
 
@@ -196,7 +237,7 @@ Namespace PropertyPackages
             Return val
         End Function
 
-        Public Overrides Function AUX_PVAPi(sub1 As String, T As Double) As Object
+        Public Overrides Function AUX_PVAPi(sub1 As String, T As Double) As Double
 
             Dim IObj As Inspector.InspectorItem = Inspector.Host.GetNewInspectorItem()
             Dim routinename As String = ComponentName & String.Format(" (Vapor Pressure - {0})", sub1)
@@ -1341,19 +1382,31 @@ Namespace PropertyPackages
                                 Pmax = CoolProp.Props1SI(GetCoolPropName(vn(i)), "PMAX")
                                 'If P > Pmin And P < Pmax Then
                                 Tb = Me.AUX_TSATi(P, i)
-                                If T < Tb And Abs(T - Tb) > 0.01 And T > Tmin Then
+                                If T < Tb And Abs(T - Tb) >= 0.01 And T > Tmin Then
                                     vk(i) = CoolProp.PropsSI("H", "T", T, "P", P, GetCoolPropName(vn(i))) / 1000
-                                ElseIf (T - Tb) < 0.01 Then
-                                    vk(i) = CoolProp.PropsSI("H", "P", P, "Q", 0, GetCoolPropName(vn(i))) / 1000
+                                ElseIf Abs(T - Tb) < 0.01 Then
+                                    Try
+                                        vk(i) = CoolProp.PropsSI("H", "P", P, "Q", 0, GetCoolPropName(vn(i))) / 1000
+                                    Catch ex As Exception
+                                        vk(i) = CoolProp.PropsSI("H", "T", Tb * 0.99, "P", P, GetCoolPropName(vn(i))) / 1000
+                                    End Try
                                 Else
                                     WriteWarningMessage("CoolProp Warning: T and/or P is/are outside the valid range for calculation of Liquid Enthalpy, compound " &
                                                      vn(i) & ". Extrapolating curve to obtain a value...")
                                     Dim x1, x2, x3, x4, x5, p1, p2, p3, p4, p5 As Double
-                                    x1 = Tmin + (Tb - Tmin) * 0.9
-                                    x2 = Tmin + (Tb - Tmin) * 0.8
-                                    x3 = Tmin + (Tb - Tmin) * 0.7
-                                    x4 = Tmin + (Tb - Tmin) * 0.6
-                                    x5 = Tmin + (Tb - Tmin) * 0.5
+                                    If Abs(T - Tmin) > Abs(Tb - T) Then
+                                        x1 = Tmin + (Tb - Tmin) * 0.5
+                                        x2 = Tmin + (Tb - Tmin) * 0.4
+                                        x3 = Tmin + (Tb - Tmin) * 0.3
+                                        x4 = Tmin + (Tb - Tmin) * 0.2
+                                        x5 = Tmin + (Tb - Tmin) * 0.1
+                                    Else
+                                        x1 = Tmin + (Tb - Tmin) * 0.9
+                                        x2 = Tmin + (Tb - Tmin) * 0.8
+                                        x3 = Tmin + (Tb - Tmin) * 0.7
+                                        x4 = Tmin + (Tb - Tmin) * 0.6
+                                        x5 = Tmin + (Tb - Tmin) * 0.5
+                                    End If
                                     p1 = CoolProp.PropsSI("H", "T", x1, "P", P, GetCoolPropName(vn(i))) / 1000
                                     p2 = CoolProp.PropsSI("H", "T", x2, "P", P, GetCoolPropName(vn(i))) / 1000
                                     p3 = CoolProp.PropsSI("H", "T", x3, "P", P, GetCoolPropName(vn(i))) / 1000
@@ -1384,9 +1437,19 @@ Namespace PropertyPackages
                                 'If P > Pmin And P < Pmax Then
                                 Tb = Me.AUX_TSATi(P, i)
                                 If T > Tb And Abs(T - Tb) > 0.01 Then
-                                    vk(i) = CoolProp.PropsSI("H", "T", T, "P", P, GetCoolPropName(vn(i))) / 1000
-                                ElseIf (T - Tb) < 0.01 Then
-                                    vk(i) = CoolProp.PropsSI("H", "P", P, "Q", 1, GetCoolPropName(vn(i))) / 1000
+                                    Try
+                                        vk(i) = CoolProp.PropsSI("H", "T", T, "P", P, GetCoolPropName(vn(i))) / 1000
+                                    Catch ex As Exception
+                                        If Abs(T - Tmin) < 0.05 Then
+                                            vk(i) = CoolProp.PropsSI("H", "T", Tmin + 0.05, "P", P, GetCoolPropName(vn(i))) / 1000
+                                        End If
+                                    End Try
+                                ElseIf Abs(T - Tb) < 0.01 Then
+                                    Try
+                                        vk(i) = CoolProp.PropsSI("H", "P", P, "Q", 1, GetCoolPropName(vn(i))) / 1000
+                                    Catch ex As Exception
+                                        vk(i) = CoolProp.PropsSI("H", "T", Tb * 1.01, "P", P, GetCoolPropName(vn(i))) / 1000
+                                    End Try
                                 Else
                                     WriteWarningMessage("CoolProp Warning: T and/or P is/are outside the valid range for calculation of Vapor Enthalpy, compound " &
                                                          vn(i) & ". Extrapolating curve to obtain a value...")
@@ -1416,7 +1479,9 @@ Namespace PropertyPackages
                         vk(i) = Vxw(i) * vk(i)
                     Next
                 Case State.Solid
-                    Return DW_CalcEnthalpy(Vx, T, P, State.Liquid) - Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T)
+                    Dim Hl = DW_CalcEnthalpy(Vx, T, P, State.Liquid)
+                    Dim Hfus = Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T)
+                    Return Hl - Hfus
             End Select
 
             val = MathEx.Common.Sum(vk)
@@ -1480,19 +1545,31 @@ Namespace PropertyPackages
                                 Pmax = CoolProp.Props1SI(GetCoolPropName(vn(i)), "PMAX")
                                 'If P > Pmin And P < Pmax Then
                                 Tb = Me.AUX_TSATi(P, i)
-                                If T < Tb And Abs(T - Tb) > 0.01 And T > Tmin Then
+                                If T < Tb And Abs(T - Tb) >= 0.01 And T > Tmin Then
                                     vk(i) = CoolProp.PropsSI("S", "T", T, "P", P, GetCoolPropName(vn(i))) / 1000
                                 ElseIf (T - Tb) < 0.01 Then
-                                    vk(i) = CoolProp.PropsSI("S", "P", P, "Q", 0, GetCoolPropName(vn(i))) / 1000
+                                    Try
+                                        vk(i) = CoolProp.PropsSI("S", "P", P, "Q", 0, GetCoolPropName(vn(i))) / 1000
+                                    Catch ex As Exception
+                                        vk(i) = CoolProp.PropsSI("S", "T", Tb * 0.99, "P", P, GetCoolPropName(vn(i))) / 1000
+                                    End Try
                                 Else
                                     WriteWarningMessage("CoolProp Warning: T and/or P is/are outside the valid range for calculation of Liquid Entropy, compound " &
                                                      vn(i) & ". Extrapolating curve to obtain a value...")
                                     Dim x1, x2, x3, x4, x5, p1, p2, p3, p4, p5 As Double
-                                    x1 = Tmin + (Tb - Tmin) * 0.9
-                                    x2 = Tmin + (Tb - Tmin) * 0.8
-                                    x3 = Tmin + (Tb - Tmin) * 0.7
-                                    x4 = Tmin + (Tb - Tmin) * 0.6
-                                    x5 = Tmin + (Tb - Tmin) * 0.5
+                                    If Abs(T - Tmin) > Abs(Tb - T) Then
+                                        x1 = Tmin + (Tb - Tmin) * 0.5
+                                        x2 = Tmin + (Tb - Tmin) * 0.4
+                                        x3 = Tmin + (Tb - Tmin) * 0.3
+                                        x4 = Tmin + (Tb - Tmin) * 0.2
+                                        x5 = Tmin + (Tb - Tmin) * 0.1
+                                    Else
+                                        x1 = Tmin + (Tb - Tmin) * 0.9
+                                        x2 = Tmin + (Tb - Tmin) * 0.8
+                                        x3 = Tmin + (Tb - Tmin) * 0.7
+                                        x4 = Tmin + (Tb - Tmin) * 0.6
+                                        x5 = Tmin + (Tb - Tmin) * 0.5
+                                    End If
                                     p1 = CoolProp.PropsSI("S", "T", x1, "P", P, GetCoolPropName(vn(i))) / 1000
                                     p2 = CoolProp.PropsSI("S", "T", x2, "P", P, GetCoolPropName(vn(i))) / 1000
                                     p3 = CoolProp.PropsSI("S", "T", x3, "P", P, GetCoolPropName(vn(i))) / 1000
@@ -1525,7 +1602,11 @@ Namespace PropertyPackages
                                 If T > Tb And Abs(T - Tb) > 0.01 Then
                                     vk(i) = CoolProp.PropsSI("S", "T", T, "P", P, GetCoolPropName(vn(i))) / 1000
                                 ElseIf (T - Tb) < 0.01 Then
-                                    vk(i) = CoolProp.PropsSI("S", "P", P, "Q", 1, GetCoolPropName(vn(i))) / 1000
+                                    Try
+                                        vk(i) = CoolProp.PropsSI("S", "P", P, "Q", 1, GetCoolPropName(vn(i))) / 1000
+                                    Catch ex As Exception
+                                        vk(i) = CoolProp.PropsSI("S", "T", Tb * 1.01, "P", P, GetCoolPropName(vn(i))) / 1000
+                                    End Try
                                 Else
                                     WriteWarningMessage("CoolProp Warning: T and/or P is/are outside the valid range for calculation of Vapor Entropy, compound " &
                                                      vn(i) & ". Extrapolating curve to obtain a value...")
@@ -1604,9 +1685,6 @@ Namespace PropertyPackages
                 For i = 0 To n
                     If T / Tc(i) >= 1 Then
                         IObj?.SetCurrent()
-                        fugcoeff(i) = AUX_KHenry(Me.RET_VNAMES(i), T) / P
-                    Else
-                        IObj?.SetCurrent()
                         If UseHenryConstants And HasHenryConstants(RET_VNAMES(i)) Then
                             Dim hc = AUX_KHenry(RET_VNAMES(i), T)
                             IObj?.Paragraphs.Add(String.Format("Henry's Constant (H) @ {0} K: {1} Pa", T, hc))
@@ -1614,6 +1692,9 @@ Namespace PropertyPackages
                         Else
                             fugcoeff(i) = Me.AUX_PVAPi(i, T) / P
                         End If
+                    Else
+                        IObj?.SetCurrent()
+                        fugcoeff(i) = Me.AUX_PVAPi(i, T) / P
                     End If
                 Next
             Else

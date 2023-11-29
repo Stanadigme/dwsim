@@ -30,10 +30,10 @@ Imports System.Dynamic
 Imports DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables
 Imports DWSIM.Thermodynamics.BaseClasses
 Imports DWSIM.Thermodynamics.PropertyPackages.Auxiliary
-Imports DWSIM.DWSIM.Editors.PropertyPackages
 Imports System.Threading.Tasks
 Imports DWSIM.SharedClassesCSharp.FilePicker
 Imports DWSIM.SharedClassesCSharp.FilePicker.Windows
+Imports DWSIM.UI.Controls.FlowsheetSurfaceControlBase
 
 <ComSourceInterfaces(GetType(Interfaces.IFlowsheetNewMessageSentEvent)), ClassInterface(ClassInterfaceType.AutoDual)>
 <System.Serializable()>
@@ -96,9 +96,9 @@ Public Class FormFlowsheet
     Public FormDynamics As New FormDynamicsManager
     Public FormIntegratorControls As New FormDynamicsIntegratorControl
     Public FormFilesExplorer As New FormFileExplorer
-    Public FormIPyConsole As New FormInteractiveIronPythonConsole
+    'Public FormIPyConsole As New FormInteractiveIronPythonConsole
 
-    Public FormProps As New frmProps
+    Public FormScript1 As New FormScript
 
     Public FormCOReports As New COReportsPanel
     Public FormWatch As New WatchPanel
@@ -114,6 +114,8 @@ Public Class FormFlowsheet
 
     Public ChartCollection As New Dictionary(Of String, IChart)
 
+    Public Property MessagesLog As New List(Of String) Implements IFlowsheet.MessagesLog
+
     Public CheckedToolstripButton As ToolStripButton
     Public ClickedToolStripMenuItem As ToolStripMenuItem
     Public InsertingObjectToPFD As Boolean = False
@@ -128,14 +130,14 @@ Public Class FormFlowsheet
 
     Private loaded As Boolean = False
 
-    Public UndoStack As New Stack(Of UndoRedoAction)
-    Public RedoStack As New Stack(Of UndoRedoAction)
+    Public UndoStack As New Stack(Of Tuple(Of Enums.SnapshotType, XDocument))
+    Public RedoStack As New Stack(Of Tuple(Of Enums.SnapshotType, XDocument))
 
     Private listeningaction As Action(Of String, Interfaces.IFlowsheet.MessageType)
 
     Public Property SupressMessages As Boolean = False Implements Interfaces.IFlowsheet.SupressMessages
 
-    Private MessagePumpTimer As Timer
+    Private WithEvents MessagePumpTimer As Timer
 
     Private MessagePump As New Queue(Of Tuple(Of String, WarningType, String))
 
@@ -150,6 +152,10 @@ Public Class FormFlowsheet
     Public Event StartedSolving(sender As Object, e As EventArgs)
 
     Public Event FinishedSolving(sender As Object, e As EventArgs)
+
+    Public Event EditingFormsUpdated(sender As Object, e As EventArgs)
+
+    Public Event InterfaceUpdated(sender As Object, e As EventArgs)
 
     Public Sub New()
 
@@ -168,9 +174,9 @@ Public Class FormFlowsheet
 
         Options.ReactionSets.Add("DefaultSet", New ReactionSet("DefaultSet", DWSIM.App.GetLocalString("Rxn_DefaultSetName"), DWSIM.App.GetLocalString("Rxn_DefaultSetDesc")))
 
-        If FormMain.AnalyticsProvider IsNot Nothing Then
+        If My.Application.MainWindowForm.AnalyticsProvider IsNot Nothing Then
             AddHandler Me.ToolOpened, Sub(sender, e)
-                                          FormMain.AnalyticsProvider.RegisterEvent(sender.ToString(), "", Nothing)
+                                          My.Application.MainWindowForm.AnalyticsProvider.RegisterEvent(sender.ToString(), "", Nothing)
                                       End Sub
         End If
 
@@ -223,27 +229,18 @@ Public Class FormFlowsheet
 
         End Using
 
+        If FormMain.IsPro Then
+            tsmiExportData.Visible = False
+        End If
+
         FormCharts.Flowsheet = Me
         FormSpreadsheet.Flowsheet = Me
         FormDynamics.Flowsheet = Me
         FormIntegratorControls.Flowsheet = Me
         FormFilesExplorer.Flowsheet = Me
-        FormIPyConsole.Flowsheet = Me
+        'FormIPyConsole.Flowsheet = Me
         FormWatch.Flowsheet = Me
-
-        Me.MdiParent = My.Application.MainWindowForm
-
-        If DWSIM.App.IsRunningOnMono Then
-            'Me.FlowLayoutPanel1.AutoSize = False
-            'Me.FlowLayoutPanel1.Height = 50
-            Me.MenuStrip1.Visible = False
-            Me.CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.Visible = False
-            'Me.WindowState = FormWindowState.Maximized
-        Else
-            'FormObjList = New frmObjList
-            Me.MenuStrip1.Visible = False
-            Me.WindowState = FormWindowState.Normal
-        End If
+        FormScript1.fc = Me
 
         Me.COObjTSMI.Checked = Me.Options.FlowsheetShowCOReportsWindow
         Me.varpaneltsmi.Checked = Me.Options.FlowsheetShowWatchWindow
@@ -286,6 +283,7 @@ Public Class FormFlowsheet
                     Dim obj = DirectCast(Activator.CreateInstance(item), Interfaces.ISimulationObject)
                     obj.SetFlowsheet(Me)
                     Me.FlowsheetOptions.VisibleProperties.Add(item.Name, obj.GetDefaultProperties.ToList)
+                    obj.SetFlowsheet(Nothing)
                     obj = Nothing
                 End If
             Next
@@ -293,6 +291,7 @@ Public Class FormFlowsheet
             For Each item In My.Application.MainWindowForm.ExternalUnitOperations.Values
                 item.SetFlowsheet(Me)
                 Me.FlowsheetOptions.VisibleProperties(item.GetType.Name) = DirectCast(item, ISimulationObject).GetDefaultProperties().ToList()
+                item.SetFlowsheet(Nothing)
             Next
 
             If Not DWSIM.App.IsRunningOnMono Then
@@ -329,7 +328,8 @@ Public Class FormFlowsheet
             FormDynamics.DockPanel = Nothing
             FormIntegratorControls.DockPanel = Nothing
             FormFilesExplorer.DockPanel = Nothing
-            FormIPyConsole.DockPanel = Nothing
+            'FormIPyConsole.DockPanel = Nothing
+            FormScript1.DockPanel = Nothing
 
             Dim myfile As String = Path.Combine(My.Application.Info.DirectoryPath, "layout.xml")
             dckPanel.LoadFromXml(myfile, New DeserializeDockContent(AddressOf ReturnForm))
@@ -343,7 +343,7 @@ Public Class FormFlowsheet
             FormSpreadsheet.Show(FormSurface.Pane, Nothing)
             FormCharts.Show(FormSurface.Pane, Nothing)
             FormFilesExplorer.Show(dckPanel)
-            FormProps.Show(dckPanel, DockState.DockLeft)
+            FormScript1.Show(FormSurface.Pane, Nothing)
 
             FormSurface.Activate()
 
@@ -368,40 +368,26 @@ Public Class FormFlowsheet
             ExternalSolvers.Add(es.ID, es)
         Next
 
+        Me.MdiParent = My.Application.MainWindowForm
+
+        If DWSIM.App.IsRunningOnMono Then
+            'Me.FlowLayoutPanel1.AutoSize = False
+            'Me.FlowLayoutPanel1.Height = 50
+            Me.MenuStrip1.Visible = False
+            Me.CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.Visible = False
+            'Me.WindowState = FormWindowState.Maximized
+        Else
+            'FormObjList = New frmObjList
+            Me.MenuStrip1.Visible = False
+            Me.WindowState = FormWindowState.Normal
+        End If
+
         loaded = True
-
-        If My.Settings.ObjectEditor = 0 Then FormProps.Hide()
-
-        Dim fs As New FormScript
-        fs.fc = Me
-        fs.Show(Me.dckPanel)
 
         FormSurface.Activate()
 
         MessagePumpTimer = New Timer()
         MessagePumpTimer.Interval = 500
-
-        AddHandler MessagePumpTimer.Tick, Sub(obj, ev)
-
-                                              If Not SupressMessages Then
-
-                                                  SyncLock MessagePump
-
-                                                      If MessagePump.Count > 0 Then
-
-                                                          For Each item In MessagePump
-                                                              ShowMessageInternal(item.Item1, item.Item2, item.Item3)
-                                                          Next
-
-                                                          MessagePump.Clear()
-
-                                                      End If
-
-                                                  End SyncLock
-
-                                              End If
-
-                                          End Sub
 
         MessagePumpTimer.Start()
 
@@ -446,6 +432,7 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.File
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         FileTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         FileTSMI.DropDownItems.Add(exttsmi)
@@ -453,12 +440,15 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.Edit
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         EditTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         EditTSMI.DropDownItems.Add(exttsmi)
                                     End If
                                 Case ExtenderCategory.Tools
                                     If item.InsertAtPosition >= 0 Then
+                                        exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         ToolsTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         ToolsTSMI.DropDownItems.Add(exttsmi)
@@ -466,6 +456,7 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.Dynamics
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         DynamicsTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         DynamicsTSMI.DropDownItems.Add(exttsmi)
@@ -473,6 +464,7 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.Optimization
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         OptimizationTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         OptimizationTSMI.DropDownItems.Add(exttsmi)
@@ -480,12 +472,15 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.Results
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         ResultsTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         ResultsTSMI.DropDownItems.Add(exttsmi)
                                     End If
                                 Case ExtenderCategory.Utilities
                                     If item.InsertAtPosition >= 0 Then
+                                        exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         UtilitiesTSMI.DropDownItems.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         UtilitiesTSMI.DropDownItems.Add(exttsmi)
@@ -495,6 +490,7 @@ Public Class FormFlowsheet
                                 Case ExtenderCategory.ToolStrip
                                     If item.InsertAtPosition >= 0 Then
                                         exttsmi.MergeAction = MergeAction.Insert
+                                        exttsmi.MergeIndex = item.InsertAtPosition
                                         ToolStrip1.Items.Insert(item.InsertAtPosition, exttsmi)
                                     Else
                                         ToolStrip1.Items.Add(exttsmi)
@@ -528,6 +524,27 @@ Public Class FormFlowsheet
 
     End Sub
 
+    Sub UnloadExtenders()
+
+        For Each extender In My.Application.MainWindowForm.Extenders.Values
+            Try
+                If extender.Level = ExtenderLevel.FlowsheetWindow Then
+                    For Each item In extender.Collection
+                        If TypeOf item Is IExtender3 Then
+                            DirectCast(item, IExtender3).ReleaseResources()
+                        Else
+                            item.SetFlowsheet(Nothing)
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                Logging.Logger.LogError("Extender Unloading (Flowsheet)", ex)
+            End Try
+        Next
+
+    End Sub
+
+
     Function ReturnForm(ByVal str As String) As IDockContent
         Select Case str
             Case "DWSIM.LogPanel", "DWSIM.frmLog"
@@ -540,8 +557,6 @@ Public Class FormFlowsheet
                 Return Me.FormSpreadsheet
             Case "DWSIM.WatchPanel", "DWSIM.frmWatch"
                 Return Me.FormWatch
-            Case "DWSIM.frmProps"
-                Return Me.FormProps
             Case "DWSIM.FormCharts"
                 Return Me.FormCharts
             Case "DWSIM.FormDynamics", "DWSIM.FormDynamicsManager"
@@ -550,18 +565,13 @@ Public Class FormFlowsheet
                 Return Me.FormIntegratorControls
             Case "DWSIM.FormFileExplorer"
                 Return Me.FormFilesExplorer
-            Case "DWSIM.FormInteractiveIronPythonConsole"
-                Return Me.FormIPyConsole
+                'Case "DWSIM.FormInteractiveIronPythonConsole"
+                '    Return Me.FormIPyConsole
         End Select
         Return Nothing
     End Function
 
     Public Sub FormChild_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
-
-        If FormMain.IsPro Then
-            DashboardToolStripMenuItem.Visible = False
-            ProToolsToolStripMenuItem.Visible = False
-        End If
 
         FrmStSim1.CurrentFlowsheet = Me
 
@@ -636,6 +646,10 @@ Public Class FormFlowsheet
         FormSurface.FlowsheetSurface.ZoomAll(FormSurface.SplitContainerHorizontal.Panel1.Width, FormSurface.SplitContainerHorizontal.Panel1.Height)
         FormSurface.FlowsheetSurface.ZoomAll(FormSurface.SplitContainerHorizontal.Panel1.Width, FormSurface.SplitContainerHorizontal.Panel1.Height)
 
+        FormSurface.FlowsheetSurface.Zoom *= 0.5
+
+        FormSurface.FlowsheetSurface.Center(FormSurface.SplitContainerHorizontal.Panel1.Width, FormSurface.SplitContainerHorizontal.Panel1.Height)
+
         Me.FormLog.Grid1.Sort(Me.FormLog.Grid1.Columns(1), ListSortDirection.Descending)
 
         For Each ws In FormSpreadsheet.Spreadsheet.Worksheets
@@ -644,11 +658,28 @@ Public Class FormFlowsheet
 
         FormMain.TranslateFormFunction?.Invoke(Me)
 
+        'send screen characteristics
+
+        Dim data = New Dictionary(Of String, String) From {
+            {"Screen Width", My.Computer.Screen.Bounds.Width},
+            {"Screen Height", My.Computer.Screen.Bounds.Height},
+            {"Screen Device Name", My.Computer.Screen.DeviceName},
+            {"Screen Scaling Factor", Settings.DpiScale}
+        }
+
+        My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Screen Characteristics", "", data)
+
     End Sub
 
     Private Sub FormChild2_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
 
-        ToolStripManager.RevertMerge(My.Application.MainWindowForm.ToolStrip1, ToolStrip1)
+        Try
+            If ToolStrip1 IsNot Nothing Then
+                ToolStripManager.RevertMerge(My.Application.MainWindowForm.ToolStrip1, ToolStrip1)
+                ToolStripManager.RevertMerge(ToolStrip1)
+            End If
+        Catch ex As Exception
+        End Try
 
         Me.ProcessScripts(Enums.Scripts.EventType.SimulationClosed, Enums.Scripts.ObjectType.Simulation, "")
 
@@ -658,11 +689,30 @@ Public Class FormFlowsheet
 
         'dispose objects
 
-        FileDatabaseProvider.ReleaseDatabase()
+        Try
+            FileDatabaseProvider.ReleaseDatabase()
+        Catch ex As Exception
 
-        For Each obj As SharedClasses.UnitOperations.BaseClass In Me.Collections.FlowsheetObjectCollection.Values
-            If obj.disposedValue = False Then obj.Dispose()
+        End Try
+
+        For Each uobj As SharedClasses.UnitOperations.BaseClass In Me.Collections.FlowsheetObjectCollection.Values
+            Try
+                If uobj.disposedValue = False Then uobj.Dispose()
+            Catch ex As Exception
+            End Try
         Next
+
+        For Each gobj In Collections.GraphicObjectCollection.Values
+            Try
+                gobj.ReleaseReferences()
+            Catch ex As Exception
+            End Try
+        Next
+
+        Collections.GraphicObjectCollection.Clear()
+        Collections.FlowsheetObjectCollection.Clear()
+        Collections.OPT_OptimizationCollection.Clear()
+        Collections.OPT_SensAnalysisCollection.Clear()
 
         If GlobalSettings.Settings.OldUI Then
 
@@ -679,29 +729,175 @@ Public Class FormFlowsheet
 
         End If
 
-        Dim cnt As Integer = My.Application.MainWindowForm.MdiChildren.Length
+        Try
+            Dim cnt As Integer = My.Application.MainWindowForm.MdiChildren.Length
 
-        If cnt = 0 Then
+            If cnt = 0 Then
 
-            My.Application.MainWindowForm.ToolStripButton1.Enabled = False
-            My.Application.MainWindowForm.SaveFileS365.Enabled = False
-            My.Application.MainWindowForm.SaveToolStripButton.Enabled = False
-            My.Application.MainWindowForm.SaveToDashboardTSMI.Enabled = False
-            My.Application.MainWindowForm.SaveToolStripMenuItem.Enabled = False
-            My.Application.MainWindowForm.SaveAsToolStripMenuItem.Enabled = False
-            My.Application.MainWindowForm.ToolStripButton1.Enabled = False
+                My.Application.MainWindowForm.ToolStripButton1.Enabled = False
+                My.Application.MainWindowForm.SaveFileS365.Enabled = False
+                My.Application.MainWindowForm.SaveToolStripButton.Enabled = False
+                My.Application.MainWindowForm.SaveToDashboardTSMI.Enabled = False
+                My.Application.MainWindowForm.SaveToolStripMenuItem.Enabled = False
+                My.Application.MainWindowForm.SaveAsToolStripMenuItem.Enabled = False
+                My.Application.MainWindowForm.ToolStripButton1.Enabled = False
 
-        Else
+            Else
 
-            My.Application.MainWindowForm.ToolStripButton1.Enabled = True
-            My.Application.MainWindowForm.SaveFileS365.Enabled = True
-            My.Application.MainWindowForm.SaveToolStripButton.Enabled = True
-            My.Application.MainWindowForm.SaveToDashboardTSMI.Enabled = True
-            My.Application.MainWindowForm.SaveToolStripMenuItem.Enabled = True
-            My.Application.MainWindowForm.SaveAsToolStripMenuItem.Enabled = True
-            My.Application.MainWindowForm.ToolStripButton1.Enabled = True
+                My.Application.MainWindowForm.ToolStripButton1.Enabled = True
+                My.Application.MainWindowForm.SaveFileS365.Enabled = True
+                My.Application.MainWindowForm.SaveToolStripButton.Enabled = True
+                My.Application.MainWindowForm.SaveToDashboardTSMI.Enabled = True
+                My.Application.MainWindowForm.SaveToolStripMenuItem.Enabled = True
+                My.Application.MainWindowForm.SaveAsToolStripMenuItem.Enabled = True
+                My.Application.MainWindowForm.ToolStripButton1.Enabled = True
 
+            End If
+        Catch ex As Exception
+
+        End Try
+
+        Try
+            MessagePumpTimer.Dispose()
+            TimerScripts1.Dispose()
+            TimerScripts15.Dispose()
+            TimerScripts30.Dispose()
+            TimerScripts5.Dispose()
+            TimerScripts60.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FrmStSim1.CurrentFlowsheet = Nothing
+            FrmStSim1.Close()
+            FrmStSim1.FloatPane?.Dispose()
+            FrmStSim1.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormSpreadsheet.ReleaseResources()
+            FormSpreadsheet.Flowsheet = Nothing
+            FormSpreadsheet.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormSurface.ReleaseResources()
+            FormSurface.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormCharts.Flowsheet = Nothing
+            FormCharts.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormDynamics.Flowsheet = Nothing
+            FormDynamics.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormIntegratorControls.Flowsheet = Nothing
+            FormIntegratorControls.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormFilesExplorer.Flowsheet = Nothing
+            FormFilesExplorer.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormWatch.Flowsheet = Nothing
+            FormWatch.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Try
+            FormScript1.fc = Nothing
+            FormScript1.Dispose()
+        Catch ex As Exception
+        End Try
+
+        Dim fields = Me.GetType().GetProperties()
+
+        Try
+            UnloadExtenders()
+        Catch ex As Exception
+        End Try
+
+        Try
+            For Each item As ToolStripMenuItem In CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.DropDownItems
+                RemoveHandler item.Click, AddressOf Me.COMOClick
+            Next
+        Catch ex As Exception
+        End Try
+
+        Try
+            For Each item As ToolStripMenuItem In PluginsTSMI.DropDownItems
+                RemoveHandler item.Click, AddressOf Me.PluginClick
+            Next
+        Catch ex As Exception
+        End Try
+
+        Try
+            For Each item As ToolStripMenuItem In UtilitiesTSMI.DropDownItems
+                RemoveHandler item.Click, AddressOf UtilitiesTSMIHandler
+            Next
+        Catch ex As Exception
+        End Try
+
+        Try
+            CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.DropDownItems.Clear()
+            CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.DropDown.Refresh()
+            RestoreLayoutTSMI.Dispose()
+            UtilitiesTSMI.DropDownItems.Clear()
+            UtilitiesTSMI.DropDown.Refresh()
+            tsmiExportData.Dispose()
+
+            RemoveHandler CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.MouseHover, AddressOf CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem_MouseHover
+            RemoveHandler CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.MouseHover, AddressOf CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem_MouseHover
+
+            RemoveHandler tsmiExportData.Click, AddressOf tsmiExportData_Click
+            RemoveHandler tsmiExportData.Click, AddressOf tsmiExportData_Click
+
+            RemoveHandler UtilitiesTSMI.DropDownOpening, AddressOf UtilitiesTSMI_Click
+            RemoveHandler UtilitiesTSMI.DropDownOpening, AddressOf UtilitiesTSMI_Click
+
+            RemoveHandler RestoreLayoutTSMI.Click, AddressOf Restorelayout
+            RemoveHandler RestoreLayoutTSMI.Click, AddressOf Restorelayout
+
+            CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem.Dispose()
+            CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem = Nothing
+            tsmiExportData.Dispose()
+            tsmiExportData = Nothing
+            UtilitiesTSMI.Dispose()
+            UtilitiesTSMI = Nothing
+            RestoreLayoutTSMI.Dispose()
+            RestoreLayoutTSMI = Nothing
+
+            ToolStrip1.Dispose()
+            MenuStrip1.Dispose()
+
+        Catch ex As Exception
+        End Try
+
+        If BidirectionalSolver IsNot Nothing Then
+            Try
+                DirectCast(BidirectionalSolver, IExtender3).ReleaseResources()
+            Catch ex As Exception
+            End Try
         End If
+
+        Try
+            ClearVariables()
+        Catch ex As Exception
+        End Try
 
         'garbage collection (frees unused memory)
         System.GC.Collect()
@@ -710,6 +906,94 @@ Public Class FormFlowsheet
         System.GC.WaitForPendingFinalizers()
 
     End Sub
+
+    Private Sub ClearVariables()
+
+        ToolStripMenuItem1 = Nothing
+        ToolStripMenuItem2 = Nothing
+        ToolStripMenuItem3 = Nothing
+        ResultsTSMI = Nothing
+        GerarRelatorioToolStripMenuItem = Nothing
+        OptimizationTSMI = Nothing
+        AnaliseDeSensibilidadeToolStripMenuItem = Nothing
+        FileTSMI = Nothing
+        CloseToolStripMenuItem = Nothing
+        MultivariateOptimizerToolStripMenuItem = Nothing
+        ToolsTSMI = Nothing
+        CaracterizacaoDePetroleosFracoesC7ToolStripMenuItem = Nothing
+        CaracterizacaoDePetroleosCurvasDeDestilacaoToolStripMenuItem = Nothing
+        PluginsTSMI = Nothing
+        CAPEOPENFlowsheetMonitoringObjectsMOsToolStripMenuItem = Nothing
+        COObjTSMI = Nothing
+        ShowTSMI = Nothing
+        varpaneltsmi = Nothing
+        GerenciadorDeAmostrasDePetroleoToolStripMenuItem = Nothing
+        ToolStripSeparator10 = Nothing
+        RestoreLayoutTSMI = Nothing
+        EditTSMI = Nothing
+        tsmiUndo = Nothing
+        tsmiRedo = Nothing
+        ToolStripSeparator14 = Nothing
+        tsmiCut = Nothing
+        tsmiCopy = Nothing
+        tsmiPaste = Nothing
+        tsmiRemoveSelected = Nothing
+        tsmiCloneSelected = Nothing
+        tsmiRecalc = Nothing
+        tsmiExportData = Nothing
+        ToolStripSeparator18 = Nothing
+        tsmiConfigSimulation = Nothing
+        ToolStripSeparator15 = Nothing
+        InsertTSMI = Nothing
+        BlocoDeSimulacaoToolStripMenuItem = Nothing
+        TabelaDePropriedadesToolStripMenuItem = Nothing
+        TabelaDePropriedatesMestraToolStripMenuItem = Nothing
+        TabelaDePropriedadesPlanilhaToolStripMenuItem = Nothing
+        FiguraToolStripMenuItem = Nothing
+        TextoToolStripMenuItem = Nothing
+        RectangleToolStripMenuItem = Nothing
+        tsmiCloseOpenedEditors = Nothing
+        UtilitiesTSMI = Nothing
+        TSMIAddUtility = Nothing
+        PropriedadesDasSubstanciasToolStripMenuItem = Nothing
+        GraficoToolStripMenuItem = Nothing
+        CompoundCreatorWizardTSMI = Nothing
+        ConsoleOutputTSMI = Nothing
+        InspectorTSMI = Nothing
+        ToolStripButton1 = Nothing
+        tsbCalc = Nothing
+        tsbAbortCalc = Nothing
+        ToolStripSeparator1 = Nothing
+        tsbSimultAdjustSolver = Nothing
+        ToolStripSeparator2 = Nothing
+        tsbUndo = Nothing
+        tsbRedo = Nothing
+        tsbCalcF = Nothing
+        ToolStripSeparator3 = Nothing
+        tsbStoreSolution = Nothing
+        tsbLoadSolution = Nothing
+        tsbDeleteSolution = Nothing
+        DynamicsTSMI = Nothing
+        GerenciadorDoModoDinamicoToolStripMenuItem = Nothing
+        ControlesDoIntegradorToolStripMenuItem = Nothing
+        ModoDinamicoAtivoToolStripMenuItem = Nothing
+        tsbDynamics = Nothing
+        tsbDynManager = Nothing
+        tsbDynIntegrator = Nothing
+        ToolStripSeparator4 = Nothing
+        FerramentaParaSintoniaDeControladoresPIDToolStripMenuItem = Nothing
+        ToolStrip1 = Nothing
+        tsmiRichText = Nothing
+        BotaoToolStripMenuItem = Nothing
+        SumarioToolStripMenuItem = Nothing
+        CriadorDeComponentesSolidosToolStripMenuItem = Nothing
+        ToggleWeatherPanelVisibilityToolStripMenuItem = Nothing
+        CriarPseudocomponentesEmBateladaToolStripMenuItem = Nothing
+        tsbAtivar = Nothing
+        InvertSelectionToolStripMenuItem = Nothing
+
+    End Sub
+
 
     Private Sub FormChild2_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
@@ -731,7 +1015,6 @@ Public Class FormFlowsheet
             Else
 
                 Me.m_overrideCloseQuestion = True
-                Me.Close()
 
             End If
 
@@ -902,6 +1185,10 @@ Public Class FormFlowsheet
 
                                       Message = texto
 
+                                      If Options.SaveFlowsheetMessagesInFile Then
+                                          MessagesLog.Add("[" + Date.Now.ToString() + "] " + Message)
+                                      End If
+
                                       RaiseEvent NewMessageSent(texto)
 
                                       If frsht.Visible Then
@@ -953,6 +1240,8 @@ Public Class FormFlowsheet
                                                   frlog.Grid1.Rows.Clear()
                                               End If
 
+                                              texto = texto.Split(Environment.NewLine)(0)
+
                                               frlog.Grid1.Rows.Add(New Object() {img, frlog.Grid1.Rows.Count, Date.Now, strtipo, texto})
 
                                               frlog.Grid1.Sort(frlog.Grid1.Columns(1), ListSortDirection.Descending)
@@ -963,6 +1252,8 @@ Public Class FormFlowsheet
                                                   frlog.Grid1.ClearSelection()
                                                   frlog.Grid1.Rows(0).Selected = True
                                               End If
+
+                                              lblLastMessage.AutoEllipsis = True
 
                                               lblLastMessage.Text = "[" + Date.Now.ToString() + "] " + texto
                                               lblLastMessage.LinkArea = New LinkArea(0, lblLastMessage.Text.Length)
@@ -1140,6 +1431,8 @@ Public Class FormFlowsheet
 
     Private Sub InspetorDeSolucoesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InspectorTSMI.Click
 
+        My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Results Viewing", "Opened Solution Inspector", Nothing)
+
         RaiseEvent ToolOpened("Solution Inspector", New EventArgs())
 
         Dim iform As New Inspector.Window
@@ -1156,14 +1449,26 @@ Public Class FormFlowsheet
             FrmStSim1.CurrentFlowsheet = Me
             Me.FrmStSim1.Show(Me.dckPanel)
         End If
+        DisableUndoRedo()
     End Sub
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles tsbCalc.Click
 
-        If Not DynamicMode Then
+        RequestFlowsheetCalculation(Nothing, False)
+
+    End Sub
+
+    Private Sub RequestFlowsheetCalculation(obj As ISimulationObject, wait As Boolean)
+
+        If Settings.CalculatorBusy Then
+            UIThreadInvoke(Sub() ShowMessage(DWSIM.App.GetLocalString("The calculator is busy, please wait..."), IFlowsheet.MessageType.Warning))
+        End If
+
+        If Not DynamicMode And Not Settings.CalculatorBusy Then
 
             UIThreadInvoke(Sub()
                                Me.FormLog.Grid1.Rows.Clear()
+                               pbSolver.Visible = True
                            End Sub)
 
 
@@ -1173,7 +1478,7 @@ Public Class FormFlowsheet
             data.Add("Reactions", Me.Reactions.Count)
             data.Add("Property Packages", Me.PropertyPackages.Count)
 
-            FormMain.AnalyticsProvider?.RegisterEvent("Requested Flowsheet Solving", "", data)
+            My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Requested Flowsheet Solving", "", data)
 
             RaiseEvent ToolOpened("Solve Flowsheet", New EventArgs())
             Settings.TaskCancellationTokenSource = Nothing
@@ -1184,7 +1489,10 @@ Public Class FormFlowsheet
                                                          If ExternalFlowsheetSolver IsNot Nothing Then
                                                              Return ExternalFlowsheetSolver.SolveFlowsheet(Me)
                                                          Else
-                                                             Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, Settings.TaskCancellationTokenSource, False, False, Nothing, Nothing,
+                                                             If obj IsNot Nothing Then
+                                                                 Return FlowsheetSolver.FlowsheetSolver.CalculateObject(Me, obj.Name)
+                                                             Else
+                                                                 Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, Settings.TaskCancellationTokenSource, False, False, Nothing, Nothing,
                                                                 Sub()
                                                                     If My.Settings.ObjectEditor = 1 Then
                                                                         Me.UIThread(Sub()
@@ -1193,18 +1501,21 @@ Public Class FormFlowsheet
                                                                                     End Sub)
                                                                     End If
                                                                 End Sub, My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown)
+                                                             End If
                                                          End If
                                                      End Function)
             t.ContinueWith(Sub(tres)
                                RaiseEvent FinishedSolving(Me, New EventArgs())
-                               'For Each item In tres.Result
-                               '    ShowMessage(item.Message, IFlowsheet.MessageType.GeneralError)
-                               'Next
+                               Me.UIThread(Sub()
+                                               pbSolver.Visible = False
+                                           End Sub)
                            End Sub)
             t.Start()
+            If wait Then t.Wait()
         Else
             ShowMessage(DWSIM.App.GetLocalString("DynEnabled"), IFlowsheet.MessageType.Warning)
         End If
+
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs)
@@ -1225,18 +1536,23 @@ Public Class FormFlowsheet
                 With tsmi
                     .Text = obj.GraphicObject.Tag & " / " & attchu.Name
                     .Image = My.Resources.cog
+                    .Tag = attchu
                 End With
-                AddHandler tsmi.Click, Sub()
-                                           Dim f = DirectCast(attchu, DockContent)
-                                           If f.Visible Then
-                                               f.Select()
-                                           Else
-                                               obj.GetFlowsheet.DisplayForm(f)
-                                           End If
-                                       End Sub
+                AddHandler tsmi.Click, AddressOf UtilitiesTSMIHandler
                 UtilitiesTSMI.DropDownItems.Add(tsmi)
             Next
         Next
+
+    End Sub
+
+    Private Sub UtilitiesTSMIHandler(sender As Object, e As EventArgs)
+
+        Dim f = DirectCast(sender.Tag, DockContent)
+        If f.Visible Then
+            f.Select()
+        Else
+            DisplayForm(f)
+        End If
 
     End Sub
 
@@ -1356,11 +1672,11 @@ Public Class FormFlowsheet
     End Sub
 
     Public Sub tsmiUndo_Click(sender As Object, e As EventArgs) Handles tsmiUndo.Click
-        tsbUndo_Click(sender, e)
+        tsbUndo_Click_1(sender, e)
     End Sub
 
     Public Sub tsmiRedo_Click(sender As Object, e As EventArgs) Handles tsmiRedo.Click
-        tsbRedo_Click(sender, e)
+        tsbRedo_Click_1(sender, e)
     End Sub
 
     Public Sub tsmiCut_Click(sender As Object, e As EventArgs) Handles tsmiCut.Click
@@ -1376,9 +1692,14 @@ Public Class FormFlowsheet
     End Sub
 
     Public Sub tsmiRemoveSelected_Click(sender As Object, e As EventArgs) Handles tsmiRemoveSelected.Click
+
         Dim n As Integer = Me.FormSurface.FlowsheetSurface.SelectedObjects.Count
+
         If n > 1 Then
             If MessageBox.Show("Delete " & n & " objects?", "Mass delete", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+
+                RegisterSnapshot(SnapshotType.ObjectAddedOrRemoved)
+
                 Dim indexes As New ArrayList
                 For Each gobj As GraphicObject In Me.FormSurface.FlowsheetSurface.SelectedObjects.Values
                     indexes.Add(gobj.Tag)
@@ -1392,13 +1713,24 @@ Public Class FormFlowsheet
                     End If
                 Next
             End If
+
         ElseIf n = 1 Then
+
             DeleteSelectedObject(sender, e, Me.FormSurface.FlowsheetSurface.SelectedObject)
+
         End If
+
     End Sub
 
     Public Sub tsmiCloneSelected_Click(sender As Object, e As EventArgs) Handles tsmiCloneSelected.Click
-        FormSurface.CloneObject(FormSurface.FlowsheetSurface.SelectedObject)
+        For Each obj In FormSurface.FlowsheetSurface.SelectedObjects.Values
+            If TypeOf obj.Owner Is ISimulationObject Then
+                Try
+                    FormSurface.CloneObject(obj)
+                Catch ex As Exception
+                End Try
+            End If
+        Next
     End Sub
 
     Public Sub tsmiRecalc_Click(sender As Object, e As EventArgs) Handles tsmiRecalc.Click
@@ -1419,8 +1751,13 @@ Public Class FormFlowsheet
 
             CalculationQueue.Enqueue(objargs)
 
+            pbSolver.Visible = True
+
             Task.Factory.StartNew(Sub()
-                                      FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, , True)
+                                      FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, , True,,,,
+                                                                                     Sub()
+                                                                                         UIThread(Sub() pbSolver.Visible = False)
+                                                                                     End Sub)
                                   End Sub)
 
         End If
@@ -1428,6 +1765,9 @@ Public Class FormFlowsheet
     End Sub
 
     Public Sub tsmiExportData_Click(sender As Object, e As EventArgs) Handles tsmiExportData.Click
+
+        My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Results Viewing", "Exported Object Data to Clipboard", Nothing)
+
         'copy all simulation properties from the selected object to clipboard
         Try
             Select Case Me.FormSurface.FlowsheetSurface.SelectedObject.ObjectType
@@ -1546,6 +1886,7 @@ Public Class FormFlowsheet
 
     Private Sub GerarRelatorioToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles GerarRelatorioToolStripMenuItem.Click
         RaiseEvent ToolOpened("Report Tool", New EventArgs())
+        My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Results Viewing", "Opened Reporting Tool", Nothing)
         FrmReport = New FormReportConfig
         Me.FrmReport.Show(Me)
     End Sub
@@ -1583,17 +1924,12 @@ Public Class FormFlowsheet
 
     End Sub
 
-
-
     Private Sub GerenciadorDeAmostrasDePetroleoToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles GerenciadorDeAmostrasDePetroleoToolStripMenuItem.Click
+
         RaiseEvent ToolOpened("Assay Manager", New EventArgs())
         Dim frmam As New FormAssayManager
         frmam.ShowDialog(Me)
-        Try
-            frmam.Close()
-        Catch ex As Exception
 
-        End Try
     End Sub
 
     Sub ChangeEditMenuStatus(status As Boolean)
@@ -1672,6 +2008,8 @@ Public Class FormFlowsheet
                 End If
                 If msgresult = MsgBoxResult.Yes Then
 
+                    RegisterSnapshot(SnapshotType.ObjectAddedOrRemoved)
+
                     'close opened editor
 
                     If SelectedObj.Editor IsNot Nothing Then
@@ -1691,10 +2029,6 @@ Public Class FormFlowsheet
                         Next
                         gobj = SelectedObj
 
-                        If My.Application.PushUndoRedoAction Then AddUndoRedoAction(New UndoRedoAction() With {.AType = UndoRedoActionType.ObjectRemoved,
-                                             .NewValue = gobj,
-                                             .OldValue = Me.Collections.FlowsheetObjectCollection(namesel).SaveData(),
-                                             .Name = String.Format(DWSIM.App.GetLocalString("UndoRedo_ObjectRemoved"), gobj.Tag)})
                         'DWSIM
                         Me.Collections.FlowsheetObjectCollection(namesel).CloseEditForm()
                         Me.Collections.FlowsheetObjectCollection(namesel).Dispose()
@@ -1789,14 +2123,6 @@ Public Class FormFlowsheet
                                 End If
                             End If
 
-                            Try
-                                If My.Application.PushUndoRedoAction Then AddUndoRedoAction(New UndoRedoAction() With {.AType = UndoRedoActionType.ObjectRemoved,
-                                                                         .NewValue = gobj,
-                                                                         .OldValue = Me.Collections.FlowsheetObjectCollection(namesel).SaveData(),
-                                                                         .Name = String.Format(DWSIM.App.GetLocalString("UndoRedo_ObjectRemoved"), gobj.Tag)})
-                            Catch ex As Exception
-                            End Try
-
                             'DWSIM
                             If Me.Collections.FlowsheetObjectCollection.ContainsKey(namesel) Then
                                 Me.Collections.FlowsheetObjectCollection(namesel).CloseEditForm()
@@ -1841,7 +2167,7 @@ Public Class FormFlowsheet
 
     Public Sub DisconnectObject(ByRef gObjFrom As GraphicObject, ByRef gObjTo As GraphicObject, Optional ByVal triggercalc As Boolean = False)
 
-        'Me.WriteToLog(DWSIM.App.GetLocalTipString("FLSH007"), Color.Black, SharedClasses.DWSIM.Flowsheet.MessageType.Tip)
+        RegisterSnapshot(SnapshotType.ObjectAddedOrRemoved)
 
         Dim conObj As ConnectorGraphic = Nothing
         Dim SelObj As GraphicObject = gObjFrom
@@ -1899,20 +2225,13 @@ Public Class FormFlowsheet
             End If
         End If
 
-        If My.Application.PushUndoRedoAction Then AddUndoRedoAction(New UndoRedoAction() With {.AType = UndoRedoActionType.FlowsheetObjectDisconnected,
-                                     .ObjID = gobj1.Name,
-                                     .ObjID2 = gobj2.Name,
-                                     .OldValue = i1,
-                                     .NewValue = i2,
-                                     .Name = String.Format(DWSIM.App.GetLocalString("UndoRedo_ObjectDisconnected"), gobj1.Tag, gobj2.Tag)})
-
-        'If triggercalc Then ProcessCalculationQueue(Me, Nothing, False, False) Else Me.CalculationQueue.Clear()
-
     End Sub
 
     Public Sub ConnectObject(ByRef gObjFrom As GraphicObject, ByRef gObjTo As GraphicObject, Optional ByVal fidx As Integer = -1, Optional ByVal tidx As Integer = -1)
 
         'Me.WriteToLog(DWSIM.App.GetLocalTipString("FLSH007"), Color.Black, SharedClasses.DWSIM.Flowsheet.MessageType.Tip)
+
+        RegisterSnapshot(SnapshotType.ObjectAddedOrRemoved)
 
         Me.FormSurface.FlowsheetSurface.ConnectObject(gObjFrom, gObjTo, fidx, tidx)
 
@@ -2160,96 +2479,97 @@ Public Class FormFlowsheet
 
         CopyObjects()
 
-        My.Application.PushUndoRedoAction = False
+        Try
 
-        If addundo Then AddUndoRedoAction(New UndoRedoAction() With {.AType = UndoRedoActionType.CutObjects,
-                                     .NewValue = Clipboard.GetText,
-                                     .OldValue = Me.FormSurface.FlowsheetSurface.SelectedObjects.Values.ToList,
-                                     .Name = DWSIM.App.GetLocalString("UndoRedo_Cut")})
+            Dim indexes As New ArrayList
+            For Each gobj As GraphicObject In Me.FormSurface.FlowsheetSurface.SelectedObjects.Values
+                indexes.Add(gobj.Tag)
+            Next
+            For Each s As String In indexes
+                Dim gobj As GraphicObject
+                gobj = Me.GetFlowsheetGraphicObject(s)
+                If Not gobj Is Nothing Then
+                    Me.DeleteSelectedObject(Me, New EventArgs(), gobj, False)
+                    Me.FormSurface.FlowsheetSurface.SelectedObjects.Remove(gobj.Name)
+                End If
+            Next
 
-        Dim indexes As New ArrayList
-        For Each gobj As GraphicObject In Me.FormSurface.FlowsheetSurface.SelectedObjects.Values
-            indexes.Add(gobj.Tag)
-        Next
-        For Each s As String In indexes
-            Dim gobj As GraphicObject
-            gobj = Me.GetFlowsheetGraphicObject(s)
-            If Not gobj Is Nothing Then
-                Me.DeleteSelectedObject(Me, New EventArgs(), gobj, False)
-                Me.FormSurface.FlowsheetSurface.SelectedObjects.Remove(gobj.Name)
-            End If
-        Next
+        Catch ex As Exception
 
-        My.Application.PushUndoRedoAction = True
+        End Try
 
     End Sub
 
     Sub CopyObjects()
 
-        Dim xdoc As New XDocument()
-        Dim xel As XElement
+        Try
 
-        Dim ppackages As New List(Of String)
+            Dim xdoc As New XDocument()
+            Dim xel As XElement
 
-        Dim ci As CultureInfo = CultureInfo.InvariantCulture
+            Dim ppackages As New List(Of String)
 
-        xdoc.Add(New XElement("DWSIM_Simulation_Data"))
+            Dim ci As CultureInfo = CultureInfo.InvariantCulture
 
-        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("SimulationObjects"))
-        xel = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects")
+            xdoc.Add(New XElement("DWSIM_Simulation_Data"))
 
-        For Each so As SharedClasses.UnitOperations.BaseClass In Collections.FlowsheetObjectCollection.Values
-            If so.GraphicObject.Selected Then
-                xel.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
-                If TypeOf so Is Streams.MaterialStream Then
-                    If Not ppackages.Contains(DirectCast(so, Streams.MaterialStream).PropertyPackage.Name) Then
-                        ppackages.Add(DirectCast(so, Streams.MaterialStream).PropertyPackage.Name)
-                    End If
-                ElseIf TypeOf so Is UnitOpBaseClass Then
-                    If Not ppackages.Contains(DirectCast(so, UnitOpBaseClass).PropertyPackage.Name) Then
-                        ppackages.Add(DirectCast(so, UnitOpBaseClass).PropertyPackage.Name)
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("SimulationObjects"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects")
+
+            For Each so As SharedClasses.UnitOperations.BaseClass In Collections.FlowsheetObjectCollection.Values
+                If so.GraphicObject.Selected Then
+                    xel.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
+                    If TypeOf so Is Streams.MaterialStream Then
+                        If Not ppackages.Contains(DirectCast(so, Streams.MaterialStream).PropertyPackage.Name) Then
+                            ppackages.Add(DirectCast(so, Streams.MaterialStream).PropertyPackage.Name)
+                        End If
+                    ElseIf TypeOf so Is UnitOpBaseClass Then
+                        If Not ppackages.Contains(DirectCast(so, UnitOpBaseClass).PropertyPackage.Name) Then
+                            ppackages.Add(DirectCast(so, UnitOpBaseClass).PropertyPackage.Name)
+                        End If
                     End If
                 End If
-            End If
-        Next
+            Next
 
-        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
-        xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
 
-        For Each go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects
-            If Not go.IsConnector And go.Selected Then xel.Add(New XElement("GraphicObject", go.SaveData().ToArray()))
-        Next
+            For Each go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects
+                If Not go.IsConnector And go.Selected Then xel.Add(New XElement("GraphicObject", go.SaveData().ToArray()))
+            Next
 
-        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("PropertyPackages"))
-        xel = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages")
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("PropertyPackages"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages")
 
-        For Each pp In Options.PropertyPackages
-            Dim createdms As Boolean = False
-            If pp.Value.CurrentMaterialStream Is Nothing Then
-                Dim ms As New Streams.MaterialStream("", "", Me, pp.Value)
-                AddComponentsRows(ms)
-                pp.Value.CurrentMaterialStream = ms
-                createdms = True
-            End If
-            xel.Add(New XElement("PropertyPackage", {New XElement("ID", pp.Key),
-                                                        pp.Value.SaveData().ToArray()}))
-            If createdms Then pp.Value.CurrentMaterialStream = Nothing
-        Next
+            For Each pp In Options.PropertyPackages
+                Dim createdms As Boolean = False
+                If pp.Value.CurrentMaterialStream Is Nothing Then
+                    Dim ms As New Streams.MaterialStream("", "", Me, pp.Value)
+                    AddComponentsRows(ms)
+                    pp.Value.CurrentMaterialStream = ms
+                    createdms = True
+                End If
+                xel.Add(New XElement("PropertyPackage", {New XElement("ID", pp.Key),
+                                                            pp.Value.SaveData().ToArray()}))
+                If createdms Then pp.Value.CurrentMaterialStream = Nothing
+            Next
 
-        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Compounds"))
-        xel = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds")
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Compounds"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds")
 
-        For Each cp As ConstantProperties In Options.SelectedComponents.Values
-            xel.Add(New XElement("Compound", cp.SaveData().ToArray()))
-        Next
+            For Each cp As ConstantProperties In Options.SelectedComponents.Values
+                xel.Add(New XElement("Compound", cp.SaveData().ToArray()))
+            Next
 
-        Clipboard.SetText(xdoc.ToString)
+            Clipboard.SetText(xdoc.ToString)
+
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 
     Sub PasteObjects(Optional ByVal addundo As Boolean = True)
-
-        My.Application.PushUndoRedoAction = False
 
         Dim pkey As String = New Random().Next().ToString & "_"
 
@@ -2257,149 +2577,148 @@ Public Class FormFlowsheet
 
         Dim excs As New Concurrent.ConcurrentBag(Of Exception)
 
-        Dim xdoc As XDocument = XDocument.Parse(Clipboard.GetText())
+        Try
 
-        Dim data As List(Of XElement) = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects").Elements.ToList
+            Dim xdoc As XDocument = XDocument.Parse(Clipboard.GetText())
 
-        My.Application.MainWindowForm.AddGraphicObjects(Me, data, excs, pkey, 40, True)
+            Dim data As List(Of XElement) = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects").Elements.ToList
 
-        Dim pp As New PropertyPackages.RaoultPropertyPackage()
+            My.Application.MainWindowForm.AddGraphicObjects(Me, data, excs, pkey, 40, True)
 
-        If My.Settings.ClipboardCopyMode_Compounds = 1 Then
+            Dim pp As New PropertyPackages.RaoultPropertyPackage()
 
-            data = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds").Elements.ToList
+            If My.Settings.ClipboardCopyMode_Compounds = 1 Then
 
-            Dim complist As New List(Of ConstantProperties)
+                data = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds").Elements.ToList
 
-            For Each xel As XElement In data
-                Dim obj As New ConstantProperties
-                obj.LoadData(xel.Elements.ToList)
-                complist.Add(obj)
-            Next
+                Dim complist As New List(Of ConstantProperties)
 
-            Dim idx As Integer
-
-            FrmStSim1.Init()
-
-            For Each comp In complist
-                If Not Me.Options.SelectedComponents.ContainsKey(comp.Name) Then
-                    If Not Me.Options.NotSelectedComponents.ContainsKey(comp.Name) Then
-                        idx = Me.FrmStSim1.AddCompToGrid(comp)
-                    Else
-                        For Each r As DataGridViewRow In Me.FrmStSim1.ogc1.Rows
-                            If r.Cells(0).Value = comp.Name Then
-                                idx = r.Index
-                                Exit For
-                            End If
-                        Next
-                    End If
-                    Me.FrmStSim1.AddCompToSimulation(comp.Name)
-                End If
-            Next
-
-        End If
-
-        If My.Settings.ClipboardCopyMode_PropertyPackages = 1 Then
-
-            data = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages").Elements.ToList
-
-            For Each xel As XElement In data
-                Try
-                    Dim obj As Thermodynamics.PropertyPackages.PropertyPackage = pp.ReturnInstance(xel.Element("Type").Value)
+                For Each xel As XElement In data
+                    Dim obj As New ConstantProperties
                     obj.LoadData(xel.Elements.ToList)
-                    obj.UniqueID = pkey & obj.UniqueID
-                    obj.Tag = obj.Tag & " (C)"
-                    obj.Flowsheet = Me
-                    Me.Options.PropertyPackages.Add(obj.UniqueID, obj)
-                Catch ex As Exception
-                    excs.Add(New Exception("Error Loading Property Package Information", ex))
-                End Try
-            Next
+                    complist.Add(obj)
+                Next
 
-            FrmStSim1.Init()
+                Dim idx As Integer
 
-        End If
+                FrmStSim1.Init()
 
-        data = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.ToList
-
-        FormSurface.FlowsheetSurface.SelectedObject = Nothing
-        FormSurface.FlowsheetSurface.SelectedObjects.Clear()
-
-        Dim objlist As New Concurrent.ConcurrentBag(Of SharedClasses.UnitOperations.BaseClass)
-
-        Dim compoundstoremove As New List(Of String)
-
-        For Each xel As XElement In data
-            Dim id As String = pkey & xel.<Name>.Value
-            Dim obj As SharedClasses.UnitOperations.BaseClass = Nothing
-            If xel.Element("Type").Value.Contains("MaterialStream") Then
-                obj = pp.ReturnInstance(xel.Element("Type").Value)
-            Else
-                obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
-            End If
-            Dim gobj As GraphicObject = (From go As GraphicObject In
-                                FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
-            obj.GraphicObject = gobj
-            gobj.Owner = obj
-            obj.SetFlowsheet(Me)
-            If Not gobj Is Nothing Then
-                obj.LoadData(xel.Elements.ToList)
-                If TypeOf obj Is Streams.MaterialStream Then
-                    If My.Settings.ClipboardCopyMode_Compounds = 0 Then
-                        For Each subst As Compound In DirectCast(obj, Streams.MaterialStream).Phases(0).Compounds.Values
-                            If Not Options.SelectedComponents.ContainsKey(subst.Name) And Not compoundstoremove.Contains(subst.Name) Then compoundstoremove.Add(subst.Name)
-                        Next
+                For Each comp In complist
+                    If Not Me.Options.SelectedComponents.ContainsKey(comp.Name) Then
+                        If Not Me.Options.NotSelectedComponents.ContainsKey(comp.Name) Then
+                            idx = Me.FrmStSim1.AddCompToGrid(comp)
+                        Else
+                            For Each r As DataGridViewRow In Me.FrmStSim1.ogc1.Rows
+                                If r.Cells(0).Value = comp.Name Then
+                                    idx = r.Index
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        Me.FrmStSim1.AddCompToSimulation(comp.Name)
                     End If
-                    For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
-                        For Each c As ConstantProperties In Options.SelectedComponents.Values
-                            If Not phase.Compounds.ContainsKey(c.Name) Then phase.Compounds.Add(c.Name, New Compound(c.Name, "") With {.ConstantProperties = c})
-                            phase.Compounds(c.Name).ConstantProperties = c
-                        Next
-                    Next
-                End If
+                Next
+
             End If
+
             If My.Settings.ClipboardCopyMode_PropertyPackages = 1 Then
-                If TypeOf obj Is Streams.MaterialStream Then
-                    DirectCast(obj, Streams.MaterialStream).PropertyPackage = Me.Options.PropertyPackages(pkey & DirectCast(obj, Streams.MaterialStream)._ppid)
-                ElseIf TypeOf obj Is UnitOpBaseClass Then
-                    If DirectCast(obj, UnitOpBaseClass)._ppid <> "" Then
-                        DirectCast(obj, UnitOpBaseClass).PropertyPackage = Me.Options.PropertyPackages(pkey & DirectCast(obj, UnitOpBaseClass)._ppid)
+
+                data = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages").Elements.ToList
+
+                For Each xel As XElement In data
+                    Try
+                        Dim obj As Thermodynamics.PropertyPackages.PropertyPackage = pp.ReturnInstance(xel.Element("Type").Value)
+                        obj.LoadData(xel.Elements.ToList)
+                        obj.UniqueID = pkey & obj.UniqueID
+                        obj.Tag = obj.Tag & " (C)"
+                        obj.Flowsheet = Me
+                        Me.Options.PropertyPackages.Add(obj.UniqueID, obj)
+                    Catch ex As Exception
+                        excs.Add(New Exception("Error Loading Property Package Information", ex))
+                    End Try
+                Next
+
+                FrmStSim1.Init()
+
+            End If
+
+            data = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.ToList
+
+            FormSurface.FlowsheetSurface.SelectedObject = Nothing
+            FormSurface.FlowsheetSurface.SelectedObjects.Clear()
+
+            Dim objlist As New Concurrent.ConcurrentBag(Of SharedClasses.UnitOperations.BaseClass)
+
+            Dim compoundstoremove As New List(Of String)
+
+            For Each xel As XElement In data
+                Dim id As String = pkey & xel.<Name>.Value
+                Dim obj As SharedClasses.UnitOperations.BaseClass = Nothing
+                If xel.Element("Type").Value.Contains("MaterialStream") Then
+                    obj = pp.ReturnInstance(xel.Element("Type").Value)
+                Else
+                    obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                End If
+                Dim gobj As GraphicObject = (From go As GraphicObject In
+                                    FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                obj.GraphicObject = gobj
+                gobj.Owner = obj
+                obj.SetFlowsheet(Me)
+                If Not gobj Is Nothing Then
+                    obj.LoadData(xel.Elements.ToList)
+                    If TypeOf obj Is Streams.MaterialStream Then
+                        If My.Settings.ClipboardCopyMode_Compounds = 0 Then
+                            For Each subst As Compound In DirectCast(obj, Streams.MaterialStream).Phases(0).Compounds.Values
+                                If Not Options.SelectedComponents.ContainsKey(subst.Name) And Not compoundstoremove.Contains(subst.Name) Then compoundstoremove.Add(subst.Name)
+                            Next
+                        End If
+                        For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
+                            For Each c As ConstantProperties In Options.SelectedComponents.Values
+                                If Not phase.Compounds.ContainsKey(c.Name) Then phase.Compounds.Add(c.Name, New Compound(c.Name, "") With {.ConstantProperties = c})
+                                phase.Compounds(c.Name).ConstantProperties = c
+                            Next
+                        Next
                     End If
                 End If
-            End If
-            objlist.Add(obj)
-        Next
-
-        If My.Settings.ClipboardCopyMode_Compounds = 0 Then
-
-            For Each obj As SharedClasses.UnitOperations.BaseClass In objlist
-                If TypeOf obj Is Streams.MaterialStream Then
-                    For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
-                        For Each comp In compoundstoremove
-                            phase.Compounds.Remove(comp)
-                        Next
-                    Next
+                If My.Settings.ClipboardCopyMode_PropertyPackages = 1 Then
+                    If TypeOf obj Is Streams.MaterialStream Then
+                        DirectCast(obj, Streams.MaterialStream).PropertyPackage = Me.Options.PropertyPackages(pkey & DirectCast(obj, Streams.MaterialStream)._ppid)
+                    ElseIf TypeOf obj Is UnitOpBaseClass Then
+                        If DirectCast(obj, UnitOpBaseClass)._ppid <> "" Then
+                            DirectCast(obj, UnitOpBaseClass).PropertyPackage = Me.Options.PropertyPackages(pkey & DirectCast(obj, UnitOpBaseClass)._ppid)
+                        End If
+                    End If
                 End If
+                objlist.Add(obj)
             Next
 
-        End If
+            If My.Settings.ClipboardCopyMode_Compounds = 0 Then
 
-        pp.Dispose()
-        pp = Nothing
+                For Each obj As SharedClasses.UnitOperations.BaseClass In objlist
+                    If TypeOf obj Is Streams.MaterialStream Then
+                        For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
+                            For Each comp In compoundstoremove
+                                phase.Compounds.Remove(comp)
+                            Next
+                        Next
+                    End If
+                Next
 
-        My.Application.MainWindowForm.AddSimulationObjects(Me, objlist, excs, pkey)
+            End If
 
-        For Each obj In objlist
-            If FormSurface.FlowsheetSurface.SelectedObject Is Nothing Then FormSurface.FlowsheetSurface.SelectedObject = obj.GraphicObject
-            FormSurface.FlowsheetSurface.SelectedObjects.Add(obj.Name, obj.GraphicObject)
-        Next
+            pp.Dispose()
+            pp = Nothing
 
-        If addundo Then AddUndoRedoAction(New UndoRedoAction() With {.AType = UndoRedoActionType.PasteObjects,
-                                     .OldValue = Clipboard.GetText,
-                                     .NewValue = Me.FormSurface.FlowsheetSurface.SelectedObjects.Values.ToList,
-                                     .Name = DWSIM.App.GetLocalString("UndoRedo_Paste")})
+            My.Application.MainWindowForm.AddSimulationObjects(Me, objlist, excs, pkey)
 
-        My.Application.PushUndoRedoAction = True
+            For Each obj In objlist
+                If FormSurface.FlowsheetSurface.SelectedObject Is Nothing Then FormSurface.FlowsheetSurface.SelectedObject = obj.GraphicObject
+                FormSurface.FlowsheetSurface.SelectedObjects.Add(obj.Name, obj.GraphicObject)
+            Next
+
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 
@@ -2407,278 +2726,29 @@ Public Class FormFlowsheet
 
 #Region "    Undo/Redo Handlers"
 
-    Sub ProcessAction(act As UndoRedoAction, undo As Boolean)
+    Sub EnableUndoRedo()
+        If UndoStack.Count > 0 Then
+            tsmiUndo.Enabled = False
+            tsbUndo.Enabled = False
+        End If
+        If RedoStack.Count > 0 Then
+            tsmiRedo.Enabled = False
+            tsbRedo.Enabled = False
+        End If
+    End Sub
 
-        Try
-
-            Dim pval As Object = Nothing
-
-            If undo Then pval = act.OldValue Else pval = act.NewValue
-
-            Select Case act.AType
-
-                Case UndoRedoActionType.SimulationObjectPropertyChanged
-
-                    Dim fobj = Me.Collections.FlowsheetObjectCollection(act.ObjID)
-
-                    If fobj.GetProperties(Interfaces.Enums.PropertyType.ALL).Contains(act.PropertyName) Then
-                        'Property is listed, set using SetProperty
-                        fobj.SetPropertyValue(act.PropertyName, pval, act.Tag)
-                    Else
-                        'Property not listed, set using Reflection
-                        Dim method As FieldInfo = fobj.GetType().GetField(act.PropertyName)
-                        If Not method Is Nothing Then
-                            method.SetValue(fobj, pval)
-                        Else
-                            fobj.GetType().GetProperty(act.PropertyName).SetValue(fobj, pval, Nothing)
-                        End If
-                    End If
-
-                Case UndoRedoActionType.FlowsheetObjectPropertyChanged
-
-                    Dim gobj = FormFlowsheet.SearchSurfaceObjectsByName(act.ObjID, FormSurface.FlowsheetSurface)
-
-                    'Property not listed, set using Reflection
-                    Dim method As FieldInfo = gobj.GetType().GetField(act.PropertyName)
-                    If Not method Is Nothing Then
-                        method.SetValue(gobj, pval)
-                    Else
-                        gobj.GetType().GetProperty(act.PropertyName).SetValue(gobj, pval, Nothing)
-                    End If
-
-                Case UndoRedoActionType.CompoundAdded
-
-                    If undo Then
-                        Me.FrmStSim1.RemoveCompFromSimulation(act.ObjID)
-                    Else
-                        Me.FrmStSim1.AddCompToSimulation(act.ObjID)
-                    End If
-
-                Case UndoRedoActionType.CompoundRemoved
-
-                    If undo Then
-                        Me.FrmStSim1.AddCompToSimulation(act.ObjID)
-                    Else
-                        Me.FrmStSim1.RemoveCompFromSimulation(act.ObjID)
-                    End If
-
-                Case UndoRedoActionType.ObjectAdded
-
-                    Dim gobj1 = DirectCast(act.NewValue, GraphicObject)
-
-                    If undo Then
-                        DeleteObject(gobj1.Tag, False)
-                    Else
-                        FormSurface.AddObjectToSurface(gobj1.ObjectType, gobj1.X, gobj1.Y, gobj1.Tag, gobj1.Name)
-                    End If
-
-                Case UndoRedoActionType.ObjectRemoved
-
-                    Dim gobj1 = DirectCast(act.NewValue, GraphicObject)
-
-                    If undo Then
-                        Collections.FlowsheetObjectCollection(FormSurface.AddObjectToSurface(gobj1.ObjectType, gobj1.X, gobj1.Y, gobj1.Tag, gobj1.Name)).LoadData(act.OldValue)
-                        FormFlowsheet.SearchSurfaceObjectsByName(gobj1.Name, Me.FormSurface.FlowsheetSurface).LoadData(gobj1.SaveData)
-                        If gobj1.ObjectType = ObjectType.MaterialStream Then
-                            For Each phase As BaseClasses.Phase In DirectCast(Collections.FlowsheetObjectCollection(gobj1.Name), Streams.MaterialStream).Phases.Values
-                                For Each c As ConstantProperties In Options.SelectedComponents.Values
-                                    phase.Compounds(c.Name).ConstantProperties = c
-                                Next
-                            Next
-                        End If
-                    Else
-                        DeleteObject(gobj1.Tag, False)
-                    End If
-
-                Case UndoRedoActionType.FlowsheetObjectConnected
-
-                    Dim gobj1 = FormFlowsheet.SearchSurfaceObjectsByName(act.ObjID, FormSurface.FlowsheetSurface)
-                    Dim gobj2 = FormFlowsheet.SearchSurfaceObjectsByName(act.ObjID2, FormSurface.FlowsheetSurface)
-
-                    If undo Then
-                        DisconnectObject(gobj1, gobj2)
-                    Else
-                        ConnectObject(gobj1, gobj2, act.OldValue, act.NewValue)
-                    End If
-
-                Case UndoRedoActionType.FlowsheetObjectDisconnected
-
-                    Dim gobj1 = FormFlowsheet.SearchSurfaceObjectsByName(act.ObjID, FormSurface.FlowsheetSurface)
-                    Dim gobj2 = FormFlowsheet.SearchSurfaceObjectsByName(act.ObjID2, FormSurface.FlowsheetSurface)
-
-                    If undo Then
-                        ConnectObject(gobj1, gobj2, act.OldValue, act.NewValue)
-                    Else
-                        DisconnectObject(gobj1, gobj2)
-                    End If
-
-                Case UndoRedoActionType.PropertyPackageAdded
-
-                    If undo Then
-                        Me.Options.PropertyPackages.Remove(act.ObjID)
-                    Else
-                        Dim pp As Thermodynamics.PropertyPackages.PropertyPackage = DirectCast(act.NewValue, Thermodynamics.PropertyPackages.PropertyPackage)
-                        Me.Options.PropertyPackages.Add(pp.UniqueID, pp)
-                    End If
-
-                Case UndoRedoActionType.PropertyPackageRemoved
-
-                    If undo Then
-                        Dim pp As Thermodynamics.PropertyPackages.PropertyPackage = DirectCast(act.NewValue, Thermodynamics.PropertyPackages.PropertyPackage)
-                        Me.Options.PropertyPackages.Add(pp.UniqueID, pp)
-                    Else
-                        Me.Options.PropertyPackages.Remove(act.ObjID)
-                    End If
-
-                Case UndoRedoActionType.PropertyPackagePropertyChanged
-
-                    Dim pp As Thermodynamics.PropertyPackages.PropertyPackage = DirectCast(act.Tag, Thermodynamics.PropertyPackages.PropertyPackage)
-
-                    If act.PropertyName = "PR_IP" Then
-                        Dim prip As PengRobinson = pp.GetType.GetField("m_pr").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kij = pval
-                    ElseIf act.PropertyName = "PRSV2_KIJ" Then
-                        Dim prip As PRSV2 = pp.GetType.GetField("m_pr").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kij = pval
-                    ElseIf act.PropertyName = "PRSV2_KJI Then" Then
-                        Dim prip As PRSV2 = pp.GetType.GetField("m_pr").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kji = pval
-                    ElseIf act.PropertyName = "PRSV2VL_KIJ" Then
-                        Dim prip As PRSV2VL = pp.GetType.GetField("m_pr").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kij = pval
-                    ElseIf act.PropertyName = "PRSV2VL_KJI Then" Then
-                        Dim prip As PRSV2VL = pp.GetType.GetField("m_pr").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kji = pval
-                    ElseIf act.PropertyName = "LK_IP" Then
-                        Dim prip As LeeKeslerPlocker = pp.GetType.GetField("m_lk").GetValue(pp)
-                        prip.InteractionParameters(act.ObjID)(act.ObjID2).kij = pval
-                    ElseIf act.PropertyName.Contains("NRTL") Then
-                        Dim nrtlip As NRTL = pp.GetType.GetProperty("m_uni").GetValue(pp, Nothing)
-                        Select Case act.PropertyName
-                            Case "NRTL_A12"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).A12 = pval
-                            Case "NRTL_A21"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).A21 = pval
-                            Case "NRTL_B12"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).B12 = pval
-                            Case "NRTL_B21"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).B21 = pval
-                            Case "NRTL_C12"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).C12 = pval
-                            Case "NRTL_C21"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).C21 = pval
-                            Case "NRTL_alpha12"
-                                nrtlip.InteractionParameters(act.ObjID)(act.ObjID2).alpha12 = pval
-                        End Select
-                    ElseIf act.PropertyName.Contains("UNIQUAC") Then
-                        Dim uniquacip As UNIQUAC = pp.GetType.GetProperty("m_uni").GetValue(pp, Nothing)
-                        Select Case act.PropertyName
-                            Case "UNIQUAC_A12"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).A12 = pval
-                            Case "UNIQUAC_A21"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).A21 = pval
-                            Case "UNIQUAC_B12"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).B12 = pval
-                            Case "UNIQUAC_B21"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).B21 = pval
-                            Case "UNIQUAC_C12"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).C12 = pval
-                            Case "UNIQUAC_C21"
-                                uniquacip.InteractionParameters(act.ObjID)(act.ObjID2).C21 = pval
-                        End Select
-                    End If
-
-                Case UndoRedoActionType.SystemOfUnitsAdded
-
-                    Dim su = DirectCast(act.NewValue, SystemsOfUnits.Units)
-
-                    If undo Then
-                        Me.FrmStSim1.ComboBox2.SelectedIndex = 0
-                        Me.Options.AvailableUnitSystems.Remove(su.Name)
-                    Else
-                        Me.Options.AvailableUnitSystems.Add(su.Name, su)
-                    End If
-
-                Case UndoRedoActionType.SystemOfUnitsRemoved
-
-                    Dim su = DirectCast(act.NewValue, SystemsOfUnits.Units)
-
-                    If undo Then
-                        Me.Options.AvailableUnitSystems.Add(su.Name, su)
-                    Else
-                        Me.FrmStSim1.ComboBox2.SelectedIndex = 0
-                        Me.Options.AvailableUnitSystems.Remove(su.Name)
-                    End If
-
-                Case UndoRedoActionType.SystemOfUnitsChanged
-
-                    Dim sobj = My.Application.MainWindowForm.AvailableUnitSystems(act.ObjID)
-
-                    'Property not listed, set using Reflection
-                    Dim method As FieldInfo = sobj.GetType().GetField(act.ObjID2)
-                    method.SetValue(sobj, pval)
-
-                    FrmStSim1.ComboBox2_SelectedIndexChanged(Me, New EventArgs)
-
-                Case UndoRedoActionType.CutObjects
-
-                    Dim xmldata As String, objlist As List(Of GraphicObject)
-                    If undo Then
-                        xmldata = act.NewValue
-                        Clipboard.SetText(xmldata)
-                        PasteObjects(False)
-                    Else
-                        objlist = act.OldValue
-                        For Each obj In objlist
-                            DeleteSelectedObject(Me, New EventArgs, obj, False)
-                        Next
-                    End If
-
-                Case UndoRedoActionType.PasteObjects
-
-                    Dim xmldata As String, objlist As List(Of GraphicObject)
-                    If undo Then
-                        objlist = act.NewValue
-                        For Each obj In objlist
-                            DeleteSelectedObject(Me, New EventArgs, obj, False)
-                        Next
-                    Else
-                        xmldata = act.OldValue
-                        Clipboard.SetText(xmldata)
-                        PasteObjects(False)
-                    End If
-
-                Case UndoRedoActionType.SpreadsheetCellChanged
-
-                    Dim cell = FormSpreadsheet.GetCellValue(act.ObjID)
-                    If undo Then
-                        cell.Data = act.OldValue(0)
-                        cell.Tag = act.OldValue(1)
-                    Else
-                        cell.Data = act.NewValue(0)
-                        cell.Tag = act.NewValue(1)
-                    End If
-                    FormSpreadsheet.Spreadsheet.Worksheets(0).Recalculate()
-
-            End Select
-
-            Me.FormSurface.UpdateSelectedObject()
-
-        Catch ex As Exception
-
-            WriteToLog(ex.ToString(), Color.Red, SharedClasses.DWSIM.Flowsheet.MessageType.GeneralError)
-
-        End Try
-
+    Sub DisableUndoRedo()
+        tsmiUndo.Enabled = False
+        tsbUndo.Enabled = False
+        tsmiRedo.Enabled = False
+        tsbRedo.Enabled = False
     End Sub
 
     Sub AddUndoRedoAction(act As Interfaces.IUndoRedoAction) Implements Interfaces.IFlowsheet.AddUndoRedoAction
 
-        If Me.MasterFlowsheet Is Nothing Then
+        If Options.EnabledUndoRedo AndAlso Me.MasterFlowsheet Is Nothing Then
 
-            act.ID = Guid.NewGuid().ToString
-
-            UndoStack.Push(act)
+            UndoStack.Push(New Tuple(Of SnapshotType, XDocument)(SnapshotType.All, GetSnapshot(SnapshotType.All)))
 
             RedoStack.Clear()
 
@@ -2686,35 +2756,45 @@ Public Class FormFlowsheet
             tsmiUndo.Enabled = True
             tsbRedo.Enabled = False
             tsmiRedo.Enabled = False
-            tsbRedo.Text = DWSIM.App.GetLocalString("Redo")
-            tsmiRedo.Text = DWSIM.App.GetLocalString("Redo")
-
-            PopulateUndoRedoItems()
 
         End If
 
     End Sub
 
-    Public Sub tsbUndo_Click(sender As Object, e As EventArgs)
+    Private Sub tsbUndo_Click_1(sender As Object, e As EventArgs) Handles tsbUndo.Click
 
-        UndoActions(tsbUndo.DropDownItems(0), e)
+        FormMain.AnalyticsProvider?.RegisterEvent("Triggered Undo", "", Nothing)
+
+        ProcessUndo()
 
     End Sub
 
-    Public Sub tsbRedo_Click(sender As Object, e As EventArgs)
+    Private Sub tsbRedo_Click_1(sender As Object, e As EventArgs) Handles tsbRedo.Click
 
-        RedoActions(tsbRedo.DropDownItems(0), e)
+        FormMain.AnalyticsProvider?.RegisterEvent("Triggered Redo", "", Nothing)
+
+        ProcessRedo()
 
     End Sub
 
     Public Sub ProcessUndo()
 
         If UndoStack.Count > 0 Then
-            Dim act = UndoStack.Pop()
-            My.Application.PushUndoRedoAction = False
-            ProcessAction(act, True)
-            My.Application.PushUndoRedoAction = True
-            RedoStack.Push(act)
+            Dim xdata = UndoStack.Pop()
+            Options.EnabledUndoRedo = False
+            Dim current As XDocument = Nothing
+            If xdata.Item1 = SnapshotType.ObjectData Then
+                Dim objID = GetSnapshotObjectID(xdata.Item2)
+                current = GetSnapshot(SnapshotType.ObjectData, SimulationObjects(objID))
+            Else
+                current = GetSnapshot(xdata.Item1)
+            End If
+            If xdata.Item1 = SnapshotType.ObjectAddedOrRemoved Or xdata.Item1 = SnapshotType.All Then CloseOpenEditForms()
+            RestoreSnapshot(xdata.Item2, xdata.Item1)
+            UpdateInterface()
+            UpdateOpenEditForms()
+            Options.EnabledUndoRedo = True
+            RedoStack.Push(New Tuple(Of SnapshotType, XDocument)(xdata.Item1, current))
             tsbRedo.Enabled = True
             tsmiRedo.Enabled = True
         End If
@@ -2722,8 +2802,6 @@ Public Class FormFlowsheet
         If UndoStack.Count = 0 Then
             tsbUndo.Enabled = False
             tsmiUndo.Enabled = False
-            tsbUndo.Text = DWSIM.App.GetLocalString("Undo")
-            tsmiUndo.Text = DWSIM.App.GetLocalString("Undo")
         End If
 
     End Sub
@@ -2731,11 +2809,21 @@ Public Class FormFlowsheet
     Public Sub ProcessRedo()
 
         If RedoStack.Count > 0 Then
-            Dim act = RedoStack.Pop()
-            My.Application.PushUndoRedoAction = False
-            ProcessAction(act, False)
-            My.Application.PushUndoRedoAction = True
-            UndoStack.Push(act)
+            Dim xdata = RedoStack.Pop()
+            Options.EnabledUndoRedo = False
+            Dim current As XDocument = Nothing
+            If xdata.Item1 = SnapshotType.ObjectData Then
+                Dim objID = GetSnapshotObjectID(xdata.Item2)
+                current = GetSnapshot(SnapshotType.ObjectData, SimulationObjects(objID))
+            Else
+                current = GetSnapshot(xdata.Item1)
+            End If
+            If xdata.Item1 = SnapshotType.ObjectAddedOrRemoved Or xdata.Item1 = SnapshotType.All Then CloseOpenEditForms()
+            RestoreSnapshot(xdata.Item2, xdata.Item1)
+            UpdateInterface()
+            UpdateOpenEditForms()
+            Options.EnabledUndoRedo = True
+            UndoStack.Push(New Tuple(Of SnapshotType, XDocument)(xdata.Item1, current))
             tsbUndo.Enabled = True
             tsmiUndo.Enabled = True
         End If
@@ -2743,107 +2831,861 @@ Public Class FormFlowsheet
         If RedoStack.Count = 0 Then
             tsbRedo.Enabled = False
             tsmiRedo.Enabled = False
-            tsbRedo.Text = DWSIM.App.GetLocalString("Redo")
-            tsmiRedo.Text = DWSIM.App.GetLocalString("Redo")
         End If
 
     End Sub
 
-    Private Sub PopulateUndoRedoItems()
+#End Region
 
-        Dim count As Integer
+#Region "    Snapshots/Cloning"
 
-        tsbUndo.DropDownItems.Clear()
-        count = 0
-        For Each act In UndoStack
-            If count = 0 Then
-                tsmiUndo.Text = DWSIM.App.GetLocalString("Undo") & " " & act.Name
-                tsbUndo.Text = DWSIM.App.GetLocalString("Undo") & " " & act.Name
+    Public Function Clone() As IFlowsheet Implements IFlowsheet.Clone
+
+        Dim tmpfile = SharedClasses.Utility.GetTempFileName()
+
+        SaveToXML(tmpfile)
+
+        Dim fs = FormMain.LoadXML(New WindowsFile(tmpfile), Nothing, "", True)
+
+        My.Application.ActiveSimulation = Me
+
+        File.Delete(tmpfile)
+
+        Return fs
+
+    End Function
+
+    Public Sub RegisterSnapshot(stype As SnapshotType, Optional obj As ISimulationObject = Nothing) Implements IFlowsheet.RegisterSnapshot
+
+        If Options.EnabledUndoRedo Then
+
+            Dim sdata = GetSnapshot(stype, obj)
+            UndoStack.Push(New Tuple(Of SnapshotType, XDocument)(stype, sdata))
+            RedoStack.Clear()
+            tsbUndo.Enabled = True
+            tsmiUndo.Enabled = True
+            tsbRedo.Enabled = False
+            tsmiRedo.Enabled = False
+
+        End If
+
+    End Sub
+
+    Public Function GetSnapshot(stype As SnapshotType, Optional obj As ISimulationObject = Nothing) As XDocument Implements IFlowsheet.GetSnapshot
+
+        Dim xdoc As New XDocument()
+        Dim xel As XElement
+
+        Dim ci As CultureInfo = CultureInfo.InvariantCulture
+
+        Dim IncludeObjectData, IncludeObjectLayout, RestoreObjects, IncludeCompounds, IncludeReactionSubsystem, IncludePropertyPackages,
+            IncludeSpreadsheet, IncludeSimulationSettings, IncludeWindowLayout As Boolean
+
+        Select Case stype
+            Case SnapshotType.All
+                IncludeCompounds = True
+                IncludeObjectData = True
+                IncludeObjectLayout = True
+                IncludePropertyPackages = True
+                IncludeReactionSubsystem = True
+                IncludeSimulationSettings = True
+                IncludeSpreadsheet = True
+                IncludeWindowLayout = True
+                RestoreObjects = True
+            Case SnapshotType.Compounds
+                IncludeCompounds = True
+            Case SnapshotType.ObjectAddedOrRemoved
+                RestoreObjects = True
+            Case SnapshotType.ObjectData
+                IncludeObjectData = True
+            Case SnapshotType.ObjectLayout
+                IncludeObjectLayout = True
+            Case SnapshotType.PropertyPackages
+                IncludePropertyPackages = True
+            Case SnapshotType.ReactionSubsystem
+                IncludeReactionSubsystem = True
+            Case SnapshotType.SimulationSettings
+                IncludeSimulationSettings = True
+            Case SnapshotType.Spreadsheet
+                IncludeSpreadsheet = True
+            Case SnapshotType.WindowLayout
+                IncludeWindowLayout = True
+        End Select
+
+        xdoc.Add(New XElement("DWSIM_Simulation_Data"))
+
+        If IncludeObjectData Or IncludeObjectLayout Then
+
+            If IncludeObjectData Then
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("SimulationObjects"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects")
+
+                If obj Is Nothing Then
+
+                    For Each obj In Collections.FlowsheetObjectCollection.Values
+                        obj.SetFlowsheet(Me)
+                        xel.Add(New XElement("SimulationObject", {obj.SaveData().ToArray()}))
+                    Next
+
+                Else
+
+                    Collections.FlowsheetObjectCollection(obj.Name).SetFlowsheet(Me)
+                    xel.Add(New XElement("SimulationObject", {Collections.FlowsheetObjectCollection(obj.Name).SaveData().ToArray()}))
+
+                End If
+
+            Else 'includeobjectlayout
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
+
+                For Each go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects
+                    If Not go.IsConnector And Not go.ObjectType = ObjectType.GO_FloatingTable Then xel.Add(New XElement("GraphicObject", go.SaveData().ToArray()))
+                Next
+
             End If
-            Dim tsmi As New ToolStripMenuItem(act.Name, My.Resources.undo_161, AddressOf UndoActions) With {.Tag = act.ID}
-            AddHandler tsmi.MouseEnter, AddressOf tsbUndo_MouseEnter
-            tsbUndo.DropDownItems.Add(tsmi)
-            count += 1
-            If count > 15 Then Exit For
-        Next
 
-        tsbRedo.DropDownItems.Clear()
-        count = 0
-        For Each act In RedoStack
-            If count = 0 Then
-                tsmiRedo.Text = DWSIM.App.GetLocalString("Redo") & " " & act.Name
-                tsbRedo.Text = DWSIM.App.GetLocalString("Redo") & " " & act.Name
+        Else
+
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Settings"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("Settings")
+            xel.Add(Options.SaveData().ToArray())
+
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("DynamicProperties"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicProperties")
+
+            Dim extraprops = DirectCast(ExtraProperties, IDictionary(Of String, Object))
+            For Each item In extraprops
+                Try
+                    xel.Add(New XElement("Property", {New XElement("Name", item.Key),
+                                                                           New XElement("PropertyType", item.Value.GetType.ToString),
+                                                                           New XElement("Data", Newtonsoft.Json.JsonConvert.SerializeObject(item.Value))}))
+                Catch ex As Exception
+                End Try
+            Next
+
+            If RestoreObjects Then
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
+
+                For Each go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects
+                    If Not go.IsConnector And Not go.ObjectType = ObjectType.GO_FloatingTable Then xel.Add(New XElement("GraphicObject", go.SaveData().ToArray()))
+                Next
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("SimulationObjects"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects")
+
+                For Each so As SharedClasses.UnitOperations.BaseClass In Collections.FlowsheetObjectCollection.Values
+                    so.SetFlowsheet(Me)
+                    xel.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
+                Next
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("DynamicsManager"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicsManager")
+
+                xel.Add(DirectCast(DynamicsManager, ICustomXMLSerialization).SaveData().ToArray())
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("ScriptItems"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("ScriptItems")
+
+                For Each scr As Script In ScriptCollection.Values
+                    xel.Add(New XElement("ScriptItem", scr.SaveData().ToArray()))
+                Next
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("ChartItems"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("ChartItems")
+
+                For Each ch As SharedClasses.Charts.Chart In ChartCollection.Values
+                    xel.Add(New XElement("ChartItem", ch.SaveData().ToArray()))
+                Next
+
             End If
-            Dim tsmi As New ToolStripMenuItem(act.Name, My.Resources.redo_16, AddressOf RedoActions) With {.Tag = act.ID}
-            AddHandler tsmi.MouseEnter, AddressOf tsbRedo_MouseEnter
-            tsbRedo.DropDownItems.Add(tsmi)
-            count += 1
-            If count > 15 Then Exit For
-        Next
 
-    End Sub
+            If IncludePropertyPackages Then
 
-    Sub UndoActions(sender As Object, e As EventArgs)
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("PropertyPackages"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages")
 
-        Dim actID = DirectCast(sender, ToolStripMenuItem).Tag
-        Dim act As UndoRedoAction
-        Do
-            If UndoStack.Count = 0 Then Exit Do
-            act = UndoStack.Peek
-            ProcessUndo()
-        Loop Until actID = act.ID
+                For Each pp In Options.PropertyPackages
+                    Dim createdms As Boolean = False
+                    If pp.Value.CurrentMaterialStream Is Nothing Then
+                        Dim ms As New Streams.MaterialStream("", "", Me, pp.Value)
+                        AddComponentsRows(ms)
+                        pp.Value.CurrentMaterialStream = ms
+                        createdms = True
+                    End If
+                    xel.Add(New XElement("PropertyPackage", {New XElement("ID", pp.Key),
+                                                             DirectCast(pp.Value, Interfaces.ICustomXMLSerialization).SaveData().ToArray()}))
+                    If createdms Then pp.Value.CurrentMaterialStream = Nothing
+                Next
 
-        PopulateUndoRedoItems()
+            End If
 
-        If My.Settings.UndoRedo_RecalculateFlowsheet Then FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode)
+            If IncludeCompounds Then
 
-    End Sub
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Compounds"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds")
 
-    Sub RedoActions(sender As Object, e As EventArgs)
+                For Each cp As ConstantProperties In Options.SelectedComponents.Values
+                    xel.Add(New XElement("Compound", cp.SaveData().ToArray()))
+                Next
 
-        Dim actID = DirectCast(sender, ToolStripMenuItem).Tag
-        Dim act As UndoRedoAction
-        Do
-            If RedoStack.Count = 0 Then Exit Do
-            act = RedoStack.Peek
-            ProcessRedo()
-        Loop Until actID = act.ID
+            End If
 
-        PopulateUndoRedoItems()
+            If IncludeReactionSubsystem Then
 
-        If My.Settings.UndoRedo_RecalculateFlowsheet Then FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode)
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("ReactionSets"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("ReactionSets")
 
-    End Sub
+                For Each pp As KeyValuePair(Of String, Interfaces.IReactionSet) In Options.ReactionSets
+                    xel.Add(New XElement("ReactionSet", DirectCast(pp.Value, Interfaces.ICustomXMLSerialization).SaveData().ToArray()))
+                Next
 
-    Private Sub tsbUndo_MouseEnter(sender As Object, e As EventArgs)
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Reactions"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("Reactions")
 
-        If TypeOf sender Is ToolStripMenuItem Then
-            Dim hovereditem As ToolStripMenuItem = DirectCast(sender, ToolStripMenuItem)
-            For Each tsmi As ToolStripMenuItem In tsbUndo.DropDownItems
-                tsmi.Checked = False
+                For Each pp As KeyValuePair(Of String, Interfaces.IReaction) In Options.Reactions
+                    xel.Add(New XElement("Reaction", {DirectCast(pp.Value, Interfaces.ICustomXMLSerialization).SaveData().ToArray()}))
+                Next
+
+            End If
+
+            If IncludeSpreadsheet Then
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("Spreadsheet"))
+                xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet").Add(New XElement("RGFData"))
+                Dim sdict As New Dictionary(Of String, String)
+                For Each sheet In FormSpreadsheet.Spreadsheet.Worksheets
+                    Dim tmpfile = SharedClasses.Utility.GetTempFileName()
+                    sheet.SaveRGF(tmpfile)
+                    Dim xmldoc = New XmlDocument()
+                    xmldoc.Load(tmpfile)
+                    sdict.Add(sheet.Name, Newtonsoft.Json.JsonConvert.SerializeXmlNode(xmldoc))
+                    File.Delete(tmpfile)
+                Next
+                xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet").Element("RGFData").Value = Newtonsoft.Json.JsonConvert.SerializeObject(sdict)
+
+            End If
+
+            If IncludeWindowLayout Then
+
+                xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("PanelLayout"))
+                xel = xdoc.Element("DWSIM_Simulation_Data").Element("PanelLayout")
+
+                Dim myfile As String = SharedClasses.Utility.GetTempFileName()
+                dckPanel.SaveAsXml(myfile, System.Text.Encoding.UTF8)
+                xel.Add(File.ReadAllText(myfile).ToString)
+                File.Delete(myfile)
+
+            End If
+
+            xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("MessagesLog"))
+            xel = xdoc.Element("DWSIM_Simulation_Data").Element("MessagesLog")
+
+            Dim inner_elements As New List(Of XElement)
+            For Each item In MessagesLog
+                inner_elements.Add(New XElement("Message", item))
             Next
-            For Each tsmi As ToolStripMenuItem In tsbUndo.DropDownItems
-                tsmi.Checked = True
-                If tsmi Is hovereditem Then Exit For
-            Next
+            xel.Add(inner_elements)
+
+        End If
+
+        Return xdoc
+
+    End Function
+
+    Public Sub RestoreSnapshot(xdata As XDocument, stype As SnapshotType) Implements IFlowsheet.RestoreSnapshot
+
+        Dim ci As CultureInfo = CultureInfo.InvariantCulture
+
+        Dim excs As New Concurrent.ConcurrentBag(Of Exception)
+
+        Dim xdoc As XDocument = xdata
+
+        Dim data As List(Of XElement) = Nothing
+
+        Select Case stype
+
+            Case SnapshotType.ObjectData, SnapshotType.ObjectLayout
+
+                If stype = SnapshotType.ObjectData Then
+
+                    If xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects") IsNot Nothing Then
+
+                        data = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.ToList
+
+                        For Each xel In data
+                            Dim id As String = xel.<Name>.Value
+                            Dim obj As ISimulationObject = SimulationObjects(id)
+                            obj.LoadData(xel.Elements.ToList)
+                            obj.GraphicObject = GraphicObjects(id)
+                            obj.SetFlowsheet(Me)
+                            If TypeOf obj Is Streams.MaterialStream Then
+                                For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
+                                    For Each c As ConstantProperties In Options.SelectedComponents.Values
+                                        phase.Compounds(c.Name).ConstantProperties = c
+                                    Next
+                                Next
+                            ElseIf TypeOf obj Is CapeOpenUO Then
+                                If DirectCast(obj, CapeOpenUO)._seluo.Name.ToLower.Contains("chemsep") Then
+                                    DirectCast(obj.GraphicObject, Shapes.CAPEOPENGraphic).ChemSep = True
+                                    If obj.GraphicObject.Height = 40 And obj.GraphicObject.Width = 40 Then
+                                        obj.GraphicObject.Width = 144
+                                        obj.GraphicObject.Height = 180
+                                    End If
+                                End If
+                            ElseIf TypeOf obj Is Input Then
+                                GraphicObjectControlPanelModeEditors.SetInputDelegate(obj.GraphicObject, obj)
+                            ElseIf TypeOf obj Is PIDController Then
+                                GraphicObjectControlPanelModeEditors.SetPIDDelegate(obj.GraphicObject, obj)
+                            End If
+                        Next
+
+                        ResetCalculationStatus()
+
+                    End If
+
+                Else
+
+                    If xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects") IsNot Nothing Then
+
+                        data = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects").Elements.ToList
+
+                        'graphic objects
+
+                        For Each xel As XElement In data
+                            Dim id As String = xel.<Name>.Value
+                            Dim obj As GraphicObject = GraphicObjects(id)
+                            obj.LoadData(xel.Elements.ToList)
+                            If SimulationObjects.ContainsKey(id) Then
+                                obj.Owner = SimulationObjects(id)
+                            End If
+                            obj.Flowsheet = Me
+                        Next
+
+                    End If
+
+                End If
+
+            Case Else
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("Settings") IsNot Nothing Then
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("Settings").Elements.ToList
+
+                    Try
+                        Options.LoadData(data)
+                        Options.EnabledUndoRedo = False
+                    Catch ex As Exception
+                        excs.Add(New Exception("Error Loading Flowsheet Settings", ex))
+                    End Try
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects") IsNot Nothing Then
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects").Elements.ToList
+
+                    'graphic objects
+
+                    Collections.GraphicObjectCollection.Clear()
+                    FormSurface.FlowsheetSurface.DrawingObjects.Clear()
+
+                    For Each xel As XElement In data
+                        Try
+                            xel.Element("Type").Value = xel.Element("Type").Value.Replace("Microsoft.MSDN.Samples.GraphicObjects", "DWSIM.DrawingTools.GraphicObjects")
+                            xel.Element("ObjectType").Value = xel.Element("ObjectType").Value.Replace("OT_Ajuste", "OT_Adjust")
+                            xel.Element("ObjectType").Value = xel.Element("ObjectType").Value.Replace("OT_Especificacao", "OT_Spec")
+                            xel.Element("ObjectType").Value = xel.Element("ObjectType").Value.Replace("OT_Reciclo", "OT_Recycle")
+                            xel.Element("ObjectType").Value = xel.Element("ObjectType").Value.Replace("GO_Texto", "GO_Text")
+                            xel.Element("ObjectType").Value = xel.Element("ObjectType").Value.Replace("GO_Figura", "GO_Image")
+                            Dim obj As GraphicObject = Nothing
+                            Dim t As Type = Type.GetType(xel.Element("Type").Value, False)
+                            If Not t Is Nothing Then obj = Activator.CreateInstance(t)
+                            If obj Is Nothing Then
+                                If xel.Element("Type").Value.Contains("OxyPlotGraphic") Then
+                                    obj = CType(Drawing.SkiaSharp.Extended.Shared.ReturnInstance(xel.Element("Type").Value.Replace("Shapes", "Charts")), GraphicObject)
+                                Else
+                                    obj = CType(GraphicObject.ReturnInstance(xel.Element("Type").Value), GraphicObject)
+                                End If
+                            End If
+                            If Not obj Is Nothing Then
+                                obj.LoadData(xel.Elements.ToList)
+                                If TypeOf obj Is TableGraphic Then
+                                    DirectCast(obj, TableGraphic).Flowsheet = Me
+                                ElseIf TypeOf obj Is MasterTableGraphic Then
+                                    DirectCast(obj, MasterTableGraphic).Flowsheet = Me
+                                ElseIf TypeOf obj Is SpreadsheetTableGraphic Then
+                                    DirectCast(obj, SpreadsheetTableGraphic).Flowsheet = Me
+                                ElseIf TypeOf obj Is Charts.OxyPlotGraphic Then
+                                    DirectCast(obj, Charts.OxyPlotGraphic).Flowsheet = Me
+                                ElseIf TypeOf obj Is Shapes.RigorousColumnGraphic Or TypeOf obj Is Shapes.AbsorptionColumnGraphic Or TypeOf obj Is Shapes.CAPEOPENGraphic Then
+                                    obj.CreateConnectors(xel.Element("InputConnectors").Elements.Count, xel.Element("OutputConnectors").Elements.Count)
+                                    obj.PositionConnectors()
+                                ElseIf TypeOf obj Is Shapes.ExternalUnitOperationGraphic Then
+                                    Dim euo = AvailableExternalUnitOperations.Values.Where(Function(x) x.Description = obj.Description).FirstOrDefault
+                                    If euo IsNot Nothing Then
+                                        obj.Owner = euo
+                                        DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = obj
+                                        obj.CreateConnectors(0, 0)
+                                        obj.Owner = Nothing
+                                        DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = Nothing
+                                    End If
+                                Else
+                                    If obj.Name = "" Then obj.Name = obj.Tag
+                                    obj.CreateConnectors(0, 0)
+                                End If
+                                obj.Flowsheet = Me
+                                FormSurface.FlowsheetSurface.DrawingObjects.Add(obj)
+                                Collections.GraphicObjectCollection.Add(obj.Name, obj)
+                            End If
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Flowsheet Graphic Objects", ex))
+                        End Try
+                    Next
+
+                    For Each xel As XElement In data
+                        Try
+                            Dim id As String = xel.Element("Name").Value
+                            If id <> "" Then
+                                Dim obj As GraphicObject = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                                If obj Is Nothing Then obj = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = xel.Element("Name").Value).SingleOrDefault
+                                If obj IsNot Nothing Then
+                                    If xel.Element("InputConnectors") IsNot Nothing Then
+                                        Dim i As Integer = 0
+                                        For Each xel2 As XElement In xel.Element("InputConnectors").Elements
+                                            If xel2.@IsAttached = True Then
+                                                obj.InputConnectors(i).ConnectorName = xel2.@AttachedFromObjID & "|" & xel2.@AttachedFromConnIndex
+                                                obj.InputConnectors(i).Type = [Enum].Parse(obj.InputConnectors(i).Type.GetType, xel2.@ConnType)
+                                            End If
+                                            i += 1
+                                        Next
+                                    End If
+                                End If
+                            End If
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Flowsheet Object Connection Information", ex))
+                        End Try
+                    Next
+
+                    For Each xel As XElement In data
+                        Try
+                            Dim id As String = xel.Element("Name").Value
+                            If id <> "" Then
+                                Dim obj As GraphicObject = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                                If obj IsNot Nothing Then
+                                    If xel.Element("OutputConnectors") IsNot Nothing Then
+                                        For Each xel2 As XElement In xel.Element("OutputConnectors").Elements
+                                            If xel2.@IsAttached = True Then
+                                                Dim objToID = xel2.@AttachedToObjID
+                                                If objToID <> "" Then
+                                                    Dim objTo As GraphicObject = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = objToID).SingleOrDefault
+                                                    If objTo Is Nothing Then
+                                                        objTo = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedToObjID).SingleOrDefault
+                                                    End If
+                                                    Dim fromidx As Integer = -1
+                                                    Dim cp As ConnectionPoint = (From cp2 As ConnectionPoint In objTo.InputConnectors Select cp2 Where cp2.ConnectorName.Split("|")(0) = obj.Name).SingleOrDefault
+                                                    If cp Is Nothing Then
+                                                        cp = (From cp2 As ConnectionPoint In objTo.InputConnectors Select cp2 Where cp2.ConnectorName.Split("|")(0) = xel2.@AttachedToObjID).SingleOrDefault
+                                                    End If
+                                                    If Not cp Is Nothing Then
+                                                        fromidx = cp.ConnectorName.Split("|")(1)
+                                                    End If
+                                                    If Not obj Is Nothing And Not objTo Is Nothing Then
+                                                        ConnectObject(obj, objTo, fromidx, xel2.@AttachedToConnIndex)
+                                                    End If
+                                                End If
+                                            End If
+                                        Next
+                                    End If
+                                    If xel.Element("EnergyConnector") IsNot Nothing Then
+                                        For Each xel2 As XElement In xel.Element("EnergyConnector").Elements
+                                            If xel2.@IsAttached = True Then
+                                                Dim objToID = xel2.@AttachedToObjID
+                                                If objToID <> "" Then
+                                                    Dim objTo As GraphicObject = (From go As GraphicObject In
+                                                                                                FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = objToID).SingleOrDefault
+                                                    If objTo Is Nothing Then
+                                                        obj = (From go As GraphicObject In FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedToObjID).SingleOrDefault
+                                                    End If
+                                                    If Not obj Is Nothing And Not objTo Is Nothing Then
+                                                        ConnectObject(obj, objTo, -1, xel2.@AttachedToConnIndex)
+                                                    End If
+                                                End If
+                                            End If
+                                        Next
+                                    End If
+                                End If
+                            End If
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Flowsheet Object Connection Information", ex))
+                        End Try
+                    Next
+
+                    For Each obj In Collections.GraphicObjectCollection.Values
+                        If obj.ObjectType = ObjectType.GO_SpreadsheetTable Then
+                            DirectCast(obj, SpreadsheetTableGraphic).Flowsheet = Me
+                        End If
+                    Next
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("Compounds") IsNot Nothing Then
+
+                    'compounds
+
+                    Options.SelectedComponents.Clear()
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("Compounds").Elements.ToList
+
+                    For Each xel As XElement In data
+                        Dim obj As New ConstantProperties
+                        obj.Name = xel.Element("Name").Value
+                        If Not AvailableCompounds.ContainsKey(obj.Name) Then AvailableCompounds.Add(obj.Name, obj)
+                        Options.SelectedComponents.Add(obj.Name, obj)
+                    Next
+
+                    Parallel.ForEach(data, Sub(xel)
+                                               Try
+                                                   Options.SelectedComponents(xel.Element("Name").Value).LoadData(xel.Elements.ToList)
+                                               Catch ex As Exception
+                                                   excs.Add(New Exception("Error Loading Compound Information", ex))
+                                               End Try
+                                           End Sub)
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("DynamicProperties") IsNot Nothing Then
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicProperties").Elements.ToList
+
+                    Try
+
+                        ExtraProperties = New ExpandoObject
+
+                        If Not data Is Nothing Then
+                            For Each xel As XElement In data
+                                Try
+                                    Dim propname = xel.Element("Name").Value
+                                    Dim proptype = xel.Element("PropertyType").Value
+                                    Dim assembly1 As Assembly = Nothing
+                                    For Each assembly In My.Application.Info.LoadedAssemblies
+                                        If proptype.Contains(assembly.GetName().Name) Then
+                                            assembly1 = assembly
+                                            Exit For
+                                        End If
+                                    Next
+                                    If assembly1 IsNot Nothing Then
+                                        Dim ptype As Type = assembly1.GetType(proptype)
+                                        Dim propval = Newtonsoft.Json.JsonConvert.DeserializeObject(xel.Element("Data").Value, ptype)
+                                        DirectCast(ExtraProperties, IDictionary(Of String, Object))(propname) = propval
+                                    End If
+                                Catch ex As Exception
+                                End Try
+                            Next
+                        End If
+
+                    Catch ex As Exception
+
+                        excs.Add(New Exception("Error Loading Dynamic Properties", ex))
+
+                    End Try
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages") IsNot Nothing Then
+
+                    Options.PropertyPackages.Clear()
+
+                    Dim pp As New PropertyPackages.RaoultPropertyPackage
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages").Elements.ToList
+
+                    For Each xel As XElement In data
+                        Try
+                            xel.Element("Type").Value = xel.Element("Type").Value.Replace("DWSIM.DWSIM.SimulationObjects", "DWSIM.Thermodynamics")
+                            Dim obj As PropertyPackages.PropertyPackage = Nothing
+                            If xel.Element("Type").Value.Contains("ThermoC") Then
+                                Dim thermockey As String = "ThermoC Bridge"
+                                If AvailablePropertyPackages.ContainsKey(thermockey) Then
+                                    obj = AvailablePropertyPackages(thermockey).ReturnInstance(xel.Element("Type").Value)
+                                End If
+                            Else
+                                Dim ppkey As String = xel.Element("ComponentName").Value
+                                If ppkey = "" Then
+                                    obj = CType(New PropertyPackages.RaoultPropertyPackage().ReturnInstance(xel.Element("Type").Value), PropertyPackages.PropertyPackage)
+                                Else
+                                    Dim ptype = xel.Element("Type").Value
+                                    If ppkey.Contains("1978") And ptype.Contains("PengRobinsonPropertyPackage") Then
+                                        ptype = ptype.Replace("PengRobinson", "PengRobinson1978")
+                                    End If
+                                    If AvailablePropertyPackages.ContainsKey(ppkey) Then
+                                        obj = AvailablePropertyPackages(ppkey).ReturnInstance(ptype)
+                                    End If
+                                End If
+                            End If
+                            DirectCast(obj, Interfaces.ICustomXMLSerialization).LoadData(xel.Elements.ToList)
+                            Dim newID As String = Guid.NewGuid.ToString
+                            If Options.PropertyPackages.ContainsKey(obj.UniqueID) Then obj.UniqueID = newID
+                            obj.Flowsheet = Me
+                            Options.PropertyPackages.Add(obj.UniqueID, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Property Package Information", ex))
+                        End Try
+                    Next
+
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects") IsNot Nothing Then
+
+                    Collections.FlowsheetObjectCollection.Clear()
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.ToList
+
+                    Dim objlist As New Concurrent.ConcurrentBag(Of SharedClasses.UnitOperations.BaseClass)
+
+                    Dim fsuocount = (From go As GraphicObject In Collections.GraphicObjectCollection.Values Where go.ObjectType = ObjectType.FlowsheetUO).Count
+
+                    For Each xel In data
+                        Try
+                            Dim id As String = xel.<Name>.Value
+                            Dim obj As SharedClasses.UnitOperations.BaseClass = Nothing
+                            If xel.Element("Type").Value.Contains("Streams.MaterialStream") Then
+                                obj = New Streams.MaterialStream()
+                            Else
+                                Dim uokey As String = xel.Element("ComponentDescription").Value
+                                If AvailableExternalUnitOperations.ContainsKey(uokey) Then
+                                    obj = AvailableExternalUnitOperations(uokey).ReturnInstance(xel.Element("Type").Value)
+                                Else
+                                    obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                                End If
+                            End If
+                            Dim gobj As GraphicObject = (From go As GraphicObject In
+                                                FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                            obj.GraphicObject = gobj
+                            gobj.Owner = obj
+                            obj.SetFlowsheet(Me)
+                            If Not gobj Is Nothing Then
+                                obj.LoadData(xel.Elements.ToList)
+                                If TypeOf obj Is Streams.MaterialStream Then
+                                    For Each phase As BaseClasses.Phase In DirectCast(obj, Streams.MaterialStream).Phases.Values
+                                        For Each c As ConstantProperties In Options.SelectedComponents.Values
+                                            phase.Compounds(c.Name).ConstantProperties = c
+                                        Next
+                                    Next
+                                ElseIf TypeOf obj Is CapeOpenUO Then
+                                    If DirectCast(obj, CapeOpenUO)._seluo.Name.ToLower.Contains("chemsep") Then
+                                        DirectCast(gobj, Shapes.CAPEOPENGraphic).ChemSep = True
+                                        If gobj.Height = 40 And gobj.Width = 40 Then
+                                            gobj.Width = 144
+                                            gobj.Height = 180
+                                        End If
+                                    End If
+                                ElseIf TypeOf obj Is Input Then
+                                    GraphicObjectControlPanelModeEditors.SetInputDelegate(gobj, obj)
+                                ElseIf TypeOf obj Is PIDController Then
+                                    GraphicObjectControlPanelModeEditors.SetPIDDelegate(gobj, obj)
+                                End If
+                            End If
+                            objlist.Add(obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Unit Operation Information", ex))
+                        End Try
+                    Next
+
+                    'simulation objects
+
+                    For Each obj In objlist
+                        Try
+                            Dim id = obj.Name
+                            Collections.FlowsheetObjectCollection.Add(id, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Unit Operation Information", ex))
+                        End Try
+                    Next
+
+                    For Each so As SharedClasses.UnitOperations.BaseClass In Collections.FlowsheetObjectCollection.Values
+                        Try
+                            If TryCast(so, Adjust) IsNot Nothing Then
+                                Dim so2 As Adjust = so
+                                If Collections.FlowsheetObjectCollection.ContainsKey(so2.ManipulatedObjectData.ID) Then
+                                    so2.ManipulatedObject = Collections.FlowsheetObjectCollection(so2.ManipulatedObjectData.ID)
+                                    DirectCast(so2.GraphicObject, Shapes.AdjustGraphic).ConnectedToMv = so2.ManipulatedObject.GraphicObject
+                                End If
+                                If Collections.FlowsheetObjectCollection.ContainsKey(so2.ControlledObjectData.ID) Then
+                                    so2.ControlledObject = Collections.FlowsheetObjectCollection(so2.ControlledObjectData.ID)
+                                    DirectCast(so2.GraphicObject, Shapes.AdjustGraphic).ConnectedToCv = so2.ControlledObject.GraphicObject
+                                End If
+                                If Collections.FlowsheetObjectCollection.ContainsKey(so2.ReferencedObjectData.ID) Then
+                                    so2.ReferenceObject = Collections.FlowsheetObjectCollection(so2.ReferencedObjectData.ID)
+                                    DirectCast(so2.GraphicObject, Shapes.AdjustGraphic).ConnectedToRv = so2.ReferenceObject.GraphicObject
+                                End If
+                            End If
+                            If TryCast(so, Spec) IsNot Nothing Then
+                                Dim so2 As Spec = so
+                                If Collections.FlowsheetObjectCollection.ContainsKey(so2.TargetObjectData.ID) Then
+                                    so2.TargetObject = Collections.FlowsheetObjectCollection(so2.TargetObjectData.ID)
+                                    DirectCast(so2.GraphicObject, Shapes.SpecGraphic).ConnectedToTv = so2.TargetObject.GraphicObject
+                                End If
+                                If Collections.FlowsheetObjectCollection.ContainsKey(so2.SourceObjectData.ID) Then
+                                    so2.SourceObject = Collections.FlowsheetObjectCollection(so2.SourceObjectData.ID)
+                                    DirectCast(so2.GraphicObject, Shapes.SpecGraphic).ConnectedToSv = so2.SourceObject.GraphicObject
+                                End If
+                            End If
+                            If TryCast(so, CapeOpenUO) IsNot Nothing Then
+                                DirectCast(so, CapeOpenUO).UpdateConnectors2()
+                                DirectCast(so, CapeOpenUO).UpdatePortsFromConnectors()
+                            End If
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Unit Operation Connection Information", ex))
+                        End Try
+                    Next
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("ReactionSets") IsNot Nothing Then
+
+                    'reactions
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("ReactionSets").Elements.ToList
+
+                    Options.ReactionSets.Clear()
+
+                    For Each xel As XElement In data
+                        Try
+                            Dim obj As New ReactionSet()
+                            obj.LoadData(xel.Elements.ToList)
+                            Options.ReactionSets.Add(obj.ID, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Reaction Set Information", ex))
+                        End Try
+                    Next
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("Reactions").Elements.ToList
+
+                    Options.Reactions.Clear()
+
+                    For Each xel As XElement In data
+                        Try
+                            Dim obj As New Reaction()
+                            obj.LoadData(xel.Elements.ToList)
+                            Options.Reactions.Add(obj.ID, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Reaction Information", ex))
+                        End Try
+                    Next
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("DynamicsManager") IsNot Nothing Then
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicsManager").Elements.ToList
+
+                    Try
+                        DirectCast(DynamicsManager, ICustomXMLSerialization).LoadData(data)
+                    Catch ex As Exception
+                        excs.Add(New Exception("Error Loading Dynamics Manager Information", ex))
+                    End Try
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("ScriptItems") IsNot Nothing Then
+
+                    ScriptCollection = New Dictionary(Of String, Interfaces.IScript)
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("ScriptItems").Elements.ToList
+
+                    Dim i As Integer = 0
+                    For Each xel As XElement In data
+                        Try
+                            Dim obj As New Script()
+                            obj.LoadData(xel.Elements.ToList)
+                            ScriptCollection.Add(obj.ID, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Script Item Information", ex))
+                        End Try
+                        i += 1
+                    Next
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("ChartItems") IsNot Nothing Then
+
+                    ChartCollection = New Dictionary(Of String, Interfaces.IChart)
+
+                    data = xdoc.Element("DWSIM_Simulation_Data").Element("ChartItems").Elements.ToList
+
+                    Dim i As Integer = 0
+                    For Each xel As XElement In data
+                        Try
+                            Dim obj As New SharedClasses.Charts.Chart()
+                            obj.LoadData(xel.Elements.ToList)
+                            ChartCollection.Add(obj.ID, obj)
+                        Catch ex As Exception
+                            excs.Add(New Exception("Error Loading Chart Item Information", ex))
+                        End Try
+                        i += 1
+                    Next
+
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("MessagesLog") IsNot Nothing Then
+
+                    MessagesLog.Clear()
+
+                    Try
+                        data = xdoc.Element("DWSIM_Simulation_Data").Element("MessagesLog").Elements.ToList
+                        For Each xel As XElement In data
+                            MessagesLog.Add(xel.Value)
+                        Next
+                    Catch ex As Exception
+                    End Try
+                End If
+
+                If xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet") IsNot Nothing Then
+
+                    Try
+                        If (Not (xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet")) Is Nothing) Then
+                            Dim rgfdataelement = xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet").Element("RGFData")
+                            Dim rgfdata As String = xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet").Element("RGFData").Value
+                            rgfdata = rgfdata.Replace("Calibri", "Arial").Replace("10.25", "10")
+                            Dim sdict As New Dictionary(Of String, String)
+                            sdict = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(rgfdata)
+                            FormSpreadsheet.Spreadsheet.RemoveWorksheet(0)
+                            For Each item In sdict
+                                Dim tmpfile = SharedClasses.Utility.GetTempFileName()
+                                Dim sheet = FormSpreadsheet.Spreadsheet.NewWorksheet(item.Key)
+                                Dim xmldoc = Newtonsoft.Json.JsonConvert.DeserializeXmlNode(item.Value)
+                                xmldoc.Save(tmpfile)
+                                sheet.LoadRGF(tmpfile)
+                                File.Delete(tmpfile)
+                            Next
+                            If (FormSpreadsheet.Spreadsheet.Worksheets.Count > 0) Then
+                                FormSpreadsheet.Spreadsheet.CurrentWorksheet = FormSpreadsheet.Spreadsheet.Worksheets(0)
+                            End If
+                        End If
+                    Catch ex As Exception
+                        excs.Add(New Exception("Error Loading Spreadsheet Information", ex))
+                    End Try
+
+                End If
+
+        End Select
+
+        If excs.Count > 0 Then
+
         End If
 
     End Sub
 
-    Private Sub tsbRedo_MouseEnter(sender As Object, e As EventArgs)
+    Private Function GetSnapshotObjectID(xdoc As XDocument) As String
 
-        If TypeOf sender Is ToolStripMenuItem Then
-            Dim hovereditem As ToolStripMenuItem = DirectCast(sender, ToolStripMenuItem)
-            For Each tsmi As ToolStripMenuItem In tsbRedo.DropDownItems
-                tsmi.Checked = False
-            Next
-            For Each tsmi As ToolStripMenuItem In tsbRedo.DropDownItems
-                tsmi.Checked = True
-                If tsmi Is hovereditem Then Exit For
-            Next
-        End If
+        Return xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.FirstOrDefault().<Name>.Value
 
-    End Sub
+    End Function
 
 #End Region
 
@@ -2853,10 +3695,21 @@ Public Class FormFlowsheet
     Private Event NewMessageSent As NewMessageSentEventHandler
     Public Event StatusChanged()
 
+    Public Sub DisplayBrowserWindow(url As String) Implements IFlowsheet.DisplayBrowserWindow
+        Dim fb As New FormBrowser()
+        fb.Show()
+        fb.DisplayURL(url)
+    End Sub
+
+    Public Sub DisplayDockableBrowserWindow(url As String) Implements IFlowsheet.DisplayDockableBrowserWindow
+        Dim fb As New FormBrowserDockable()
+        fb.Show(dckPanel)
+        fb.DisplayURL(url)
+    End Sub
+
     Public Function GetFlowsheetSurfaceWidth() As Integer Implements IFlowsheet.GetFlowsheetSurfaceWidth
         Return FormSurface.SplitContainerHorizontal.Panel1.Width
     End Function
-
 
     Public Function GetFlowsheetSurfaceHeight() As Integer Implements IFlowsheet.GetFlowsheetSurfaceHeight
         Return FormSurface.SplitContainerHorizontal.Panel1.Height
@@ -2888,6 +3741,15 @@ Public Class FormFlowsheet
         End Get
         Set(value As List(Of IUnitsOfMeasure))
             Throw New NotImplementedException
+        End Set
+    End Property
+
+    Public Property AvailableExternalUnitOperations As Dictionary(Of String, IExternalUnitOperation) Implements IFlowsheet.AvailableExternalUnitOperations
+        Get
+            Return My.Application.MainWindowForm.ExternalUnitOperations
+        End Get
+        Set(value As Dictionary(Of String, IExternalUnitOperation))
+            My.Application.MainWindowForm.ExternalUnitOperations = value
         End Set
     End Property
 
@@ -2964,6 +3826,9 @@ Public Class FormFlowsheet
                 If val = unvell.ReoGrid.DataFormat.CellDataFormatFlag.Number Then
                     Dim args As unvell.ReoGrid.DataFormat.NumberDataFormatter.NumberFormatArgs = grid.Cells(i, j).DataFormatArgs
                     sublist.Add("N" + args.DecimalPlaces.ToString())
+                ElseIf val = unvell.ReoGrid.DataFormat.CellDataFormatFlag.Percent Then
+                    Dim args As unvell.ReoGrid.DataFormat.NumberDataFormatter.NumberFormatArgs = grid.Cells(i, j).DataFormatArgs
+                    sublist.Add("P" + args.DecimalPlaces.ToString())
                 Else
                     sublist.Add("")
                 End If
@@ -3220,33 +4085,29 @@ Public Class FormFlowsheet
 
     Public Sub RequestCalculation(Optional sender As ISimulationObject = Nothing, Optional changecalcorder As Boolean = False) Implements IFlowsheet.RequestCalculation
 
-        UIThreadInvoke(Sub()
-                           Me.FormLog.Grid1.Rows.Clear()
-                       End Sub)
+        RequestFlowsheetCalculation(sender, True)
 
-        If Not DynamicMode Then
-            Dim finishaction = Sub()
-                                   UpdateOpenEditForms()
-                               End Sub
-            If Not sender Is Nothing Then
-                If ExternalFlowsheetSolver IsNot Nothing Then
-                    ExternalFlowsheetSolver.SolveFlowsheet(Me)
-                Else
-                    FlowsheetSolver.FlowsheetSolver.CalculateObject(Me, sender.Name)
-                End If
-                UpdateOpenEditForms()
-            Else
-                If ExternalFlowsheetSolver IsNot Nothing Then
-                    ExternalFlowsheetSolver.SolveFlowsheet(Me)
-                Else
-                    FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, Settings.SolverMode,
-                                                                                         Nothing, False, False,
-                                                                                         Nothing, Nothing, finishaction)
-                End If
-                UpdateOpenEditForms()
-            End If
-            UpdateInterface()
-        End If
+    End Sub
+
+    Public Sub RequestCalculation2(Wait As Boolean) Implements IFlowsheet.RequestCalculation2
+
+        RequestFlowsheetCalculation(Nothing, Wait)
+
+    End Sub
+
+    Public Sub RequestCalculation3(obj As ISimulationObject, Wait As Boolean) Implements IFlowsheet.RequestCalculation3
+
+        RequestFlowsheetCalculation(obj, Wait)
+
+    End Sub
+
+    Public Sub ResetCalculationStatus() Implements IFlowsheet.ResetCalculationStatus
+
+        For Each obj In SimulationObjects.Values
+            obj.SetDirtyStatus(True)
+            obj.Calculated = False
+            obj.GraphicObject.Calculated = False
+        Next
 
     End Sub
 
@@ -3278,11 +4139,52 @@ Public Class FormFlowsheet
 
         Me.UIThread(Sub()
                         For Each obj In SimulationObjects.Values
-                            obj.UpdateEditForm()
-                            obj.UpdateDynamicsEditForm()
-                            obj.UpdateExtraPropertiesEditForm()
-                            EditorTooltips.Update(obj, Me)
-                            obj.AttachedUtilities.ForEach(Sub(x) x.Populate())
+                            Try
+                                obj.UpdateEditForm()
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                            Try
+                                obj.UpdateDynamicsEditForm()
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                            Try
+                                obj.UpdateExtraPropertiesEditForm()
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                            Try
+                                EditorTooltips.Update(obj, Me)
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                            Try
+                                obj.AttachedUtilities.ForEach(Sub(x) x.Populate())
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                        Next
+                    End Sub)
+
+        RaiseEvent EditingFormsUpdated(Me, New EventArgs())
+
+    End Sub
+
+    Public Sub CloseOpenEditForms() Implements IFlowsheet.CloseOpenEditForms
+
+        Me.UIThread(Sub()
+                        For Each obj In SimulationObjects.Values
+                            Try
+                                obj.CloseEditForm()
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
+                            Try
+                                obj.CloseDynamicsEditForm()
+                            Catch ex As Exception
+                                ShowMessage(ex.Message, IFlowsheet.MessageType.Warning)
+                            End Try
                         Next
                     End Sub)
 
@@ -3321,11 +4223,17 @@ Public Class FormFlowsheet
     Public Sub UpdateInterface() Implements IFlowsheetGUI.UpdateInterface, IFlowsheet.UpdateInterface
 
         If Not Invalidating Then
-            Me.UIThread(Sub()
-                            Invalidating = True
-                            FormSurface.FControl.Invalidate()
-                            Invalidating = False
-                        End Sub)
+            Invalidating = True
+            If InvokeRequired Then
+                Me.UIThreadInvoke(Sub()
+                                      FormSurface.FControl.Invalidate()
+                                      Invalidating = False
+                                  End Sub)
+            Else
+                FormSurface.FControl.Invalidate()
+                Invalidating = False
+            End If
+            RaiseEvent InterfaceUpdated(Me, New EventArgs())
         End If
 
     End Sub
@@ -3592,11 +4500,13 @@ Public Class FormFlowsheet
 
     Private Sub tsbDeleteSolution_Click(sender As Object, e As EventArgs) Handles tsbDeleteSolution.Click
 
-        If StoredSolutions.ContainsKey(tscbStoredSolutions.SelectedItem.ToString) Then
-            If MessageBox.Show(GetTranslatedString1("ConfirmOperation"), "DWSIM", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-                StoredSolutions.Remove(tscbStoredSolutions.SelectedItem.ToString)
-                tscbStoredSolutions.Items.Remove(tscbStoredSolutions.SelectedItem)
-                FormDynamics.UpdateSelectables()
+        If tscbStoredSolutions.SelectedItem IsNot Nothing Then
+            If StoredSolutions.ContainsKey(tscbStoredSolutions.SelectedItem.ToString) Then
+                If MessageBox.Show(GetTranslatedString1("ConfirmOperation"), "DWSIM", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                    StoredSolutions.Remove(tscbStoredSolutions.SelectedItem.ToString)
+                    tscbStoredSolutions.Items.Remove(tscbStoredSolutions.SelectedItem)
+                    FormDynamics.UpdateSelectables()
+                End If
             End If
         End If
 
@@ -3691,6 +4601,13 @@ Public Class FormFlowsheet
     Public Sub AutoLayout() Implements IFlowsheet.AutoLayout
         FormSurface.FlowsheetSurface.AutoArrange()
         FormSurface.Invalidate()
+    End Sub
+
+    Public Sub NaturalLayout() Implements IFlowsheet.NaturalLayout
+
+        FormSurface.FlowsheetSurface.ApplyNaturalLayout(FlowsheetSolver.FlowsheetSolver.GetSolvingList(Me, False)(0), 75)
+        FormSurface.Invalidate()
+
     End Sub
 
     Public Sub RefreshInterface() Implements IFlowsheet.RefreshInterface
@@ -3802,8 +4719,12 @@ Public Class FormFlowsheet
     End Sub
 
     Private Sub CriadorDeComponentesSolidosToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CriadorDeComponentesSolidosToolStripMenuItem.Click
+
+        My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Opened Solid Compound Creator", "", Nothing)
+
         Dim fqc As New FormCreateNewSolid()
         fqc.ShowDialog(Me)
+
     End Sub
 
     Public Sub ToggleFlowsheetAnimation() Implements IFlowsheet.ToggleFlowsheetAnimation
@@ -4124,12 +5045,6 @@ Public Class FormFlowsheet
         fba.Show()
     End Sub
 
-    Private Sub ConsoleInterativoIronPtyhonToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConsoleInterativoIronPtyhonToolStripMenuItem.Click
-
-        DisplayForm(Me.FormIPyConsole)
-
-    End Sub
-
     Public Async Sub DisplayHTML(title As String, htmlcontent As String)
 
         Dim fh As New FormHTMLView()
@@ -4151,11 +5066,349 @@ Public Class FormFlowsheet
 
     End Sub
 
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnOpenLogPanel.Click
+
+        If Not FormLog.Visible Then
+            FormLog.Show(dckPanel)
+        Else
+            FormLog.Hide()
+        End If
+
+    End Sub
+
+    Private Sub InvertSelectionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InvertSelectionToolStripMenuItem.Click
+
+        Dim surface = FormSurface.FlowsheetSurface
+
+        surface.MultiSelectMode = True
+
+        FormSurface.tsbMultiSelectMode.Checked = True
+
+        For Each obj In surface.DrawingObjects
+            If Not TypeOf obj Is ConnectorGraphic Then
+                If Not surface.SelectedObjects.ContainsKey(obj.Name) Then
+                    surface.SelectedObjects.Add(obj.Name, obj)
+                Else
+                    surface.SelectedObjects.Remove(obj.Name)
+                End If
+            End If
+        Next
+
+        UpdateInterface()
+
+    End Sub
+
     Public Sub SetDirtyStatus() Implements IFlowsheet.SetDirtyStatus
 
         For Each obj In SimulationObjects.Values
             obj.SetDirtyStatus(True)
         Next
+
+    End Sub
+
+    Public Function GetAvailableFlowsheetObjectTypeNames() As Array Implements IFlowsheet.GetAvailableFlowsheetObjectTypeNames
+
+        Dim list As New List(Of String)
+
+        list.AddRange({
+         "Controller Block",
+         "Specification Block",
+         "Recycle Block",
+         "Energy Recycle Block",
+         "Stream Mixer",
+         "Stream Splitter",
+         "Pump",
+         "Tank",
+         "Gas-Liquid Separator",
+         "Material Stream",
+         "Energy Stream",
+         "Compressor",
+         "Expander",
+         "Heater",
+         "Cooler",
+         "Pipe Segment",
+         "Valve",
+         "Conversion Reactor",
+         "Equilibrium Reactor",
+         "Gibbs Reactor",
+         "Plug-Flow Reactor (PFR)",
+         "Continuous Stirred Tank Reactor (CSTR)",
+         "Heat Exchanger",
+         "Shortcut Column",
+         "Distillation Column",
+         "Absorption Column", "Absorption/Extraction Column",
+         "Compound Separator",
+         "Solids Separator",
+         "Filter",
+         "Orifice Plate",
+         "Python Script",
+         "Spreadsheet",
+         "Flowsheet",
+         "CAPE-OPEN Unit Operation",
+         "Digital Gauge",
+         "Analog Gauge",
+         "Level Gauge",
+         "PID Controller",
+         "Python Controller",
+         "Input Box",
+         "Switch",
+         "Air Cooler 2",
+         "Gibbs Reactor (Reaktoro)",
+         "Wind Turbine",
+         "Hydroelectric Turbine",
+         "Solar Panel",
+         "Water Electrolyzer",
+         "PEM Fuel Cell (Amphlett)"})
+
+        list.Sort()
+
+        Return list.ToArray()
+
+    End Function
+
+    Public Function AddFlowsheetObject(typename As String, objname As String) As ISimulationObject Implements IFlowsheet.AddFlowsheetObject
+
+        Select Case typename
+
+            Case "Controller Block"
+
+                Return AddObject(ObjectType.OT_Adjust, 50, 50, objname)
+
+            Case "Specification Block"
+
+                Return AddObject(ObjectType.OT_Spec, 50, 50, objname)
+
+            Case "Recycle Block"
+
+                Return AddObject(ObjectType.OT_Recycle, 50, 50, objname)
+
+            Case "Energy Recycle Block"
+
+                Return AddObject(ObjectType.OT_EnergyRecycle, 50, 50, objname)
+
+            Case "Stream Mixer"
+
+                Return AddObject(ObjectType.NodeIn, 50, 50, objname)
+
+            Case "Stream Splitter"
+
+                Return AddObject(ObjectType.NodeOut, 50, 50, objname)
+
+            Case "Pump"
+
+                Return AddObject(ObjectType.Pump, 50, 50, objname)
+
+            Case "Tank"
+
+                Return AddObject(ObjectType.Tank, 50, 50, objname)
+
+            Case "Gas-Liquid Separator"
+
+                Return AddObject(ObjectType.Vessel, 50, 50, objname)
+
+            Case "Material Stream"
+
+                Return AddObject(ObjectType.MaterialStream, 50, 50, objname)
+
+            Case "Energy Stream"
+
+                Return AddObject(ObjectType.EnergyStream, 50, 50, objname)
+
+            Case "Compressor"
+
+                Return AddObject(ObjectType.Compressor, 50, 50, objname)
+
+            Case "Expander"
+
+                Return AddObject(ObjectType.Expander, 50, 50, objname)
+
+            Case "Heater"
+
+                Return AddObject(ObjectType.Heater, 50, 50, objname)
+
+            Case "Cooler"
+
+                Return AddObject(ObjectType.Cooler, 50, 50, objname)
+
+            Case "Pipe Segment"
+
+                Return AddObject(ObjectType.Pipe, 50, 50, objname)
+
+            Case "Valve"
+
+                Return AddObject(ObjectType.Valve, 50, 50, objname)
+
+            Case "Conversion Reactor"
+
+                Return AddObject(ObjectType.RCT_Conversion, 50, 50, objname)
+
+            Case "Equilibrium Reactor"
+
+                Return AddObject(ObjectType.RCT_Equilibrium, 50, 50, objname)
+
+            Case "Gibbs Reactor"
+
+                Return AddObject(ObjectType.RCT_Gibbs, 50, 50, objname)
+
+            Case "Plug-Flow Reactor (PFR)"
+
+                Return AddObject(ObjectType.RCT_PFR, 50, 50, objname)
+
+            Case "Continuous Stirred Tank Reactor (CSTR)"
+
+                Return AddObject(ObjectType.RCT_CSTR, 50, 50, objname)
+
+            Case "Heat Exchanger"
+
+                Return AddObject(ObjectType.HeatExchanger, 50, 50, objname)
+
+            Case "Shortcut Column"
+
+                Return AddObject(ObjectType.ShortcutColumn, 50, 50, objname)
+
+            Case "Distillation Column"
+
+                Return AddObject(ObjectType.DistillationColumn, 50, 50, objname)
+
+            Case "Absorption Column", "Absorption/Extraction Column"
+
+                Return AddObject(ObjectType.AbsorptionColumn, 50, 50, objname)
+
+            Case "Compound Separator"
+
+                Return AddObject(ObjectType.ComponentSeparator, 50, 50, objname)
+
+            Case "Solids Separator"
+
+                Return AddObject(ObjectType.SolidSeparator, 50, 50, objname)
+
+            Case "Filter"
+
+                Return AddObject(ObjectType.Filter, 50, 50, objname)
+
+            Case "Orifice Plate"
+
+                Return AddObject(ObjectType.OrificePlate, 50, 50, objname)
+
+            Case "Python Script"
+
+                Return AddObject(ObjectType.CustomUO, 50, 50, objname)
+
+            Case "Spreadsheet"
+
+                Return AddObject(ObjectType.ExcelUO, 50, 50, objname)
+
+            Case "Flowsheet"
+
+                Return AddObject(ObjectType.FlowsheetUO, 50, 50, objname)
+
+            Case "CAPE-OPEN Unit Operation"
+
+                Return AddObject(ObjectType.CapeOpenUO, 50, 50, objname)
+
+            Case "Digital Gauge"
+
+                Return AddObject(ObjectType.DigitalGauge, 50, 50, objname)
+
+            Case "Analog Gauge"
+
+                Return AddObject(ObjectType.AnalogGauge, 50, 50, objname)
+
+            Case "Level Gauge"
+
+                Return AddObject(ObjectType.LevelGauge, 50, 50, objname)
+
+            Case "PID Controller"
+
+                Return AddObject(ObjectType.Controller_PID, 50, 50, objname)
+
+            Case "Python Controller"
+
+                Return AddObject(ObjectType.Controller_Python, 50, 50, objname)
+
+            Case "Input Box"
+
+                Return AddObject(ObjectType.Input, 50, 50, objname)
+
+            Case "Switch"
+
+                Return AddObject(ObjectType.Switch, 50, 50, objname)
+
+            Case "Air Cooler 2"
+
+                Return AddObject(ObjectType.AirCooler2, 50, 50, objname)
+
+            Case "Gibbs Reactor (Reaktoro)"
+
+                Return AddObject(ObjectType.RCT_GibbsReaktoro, 50, 50, objname)
+
+            Case "Wind Turbine"
+
+                Return AddObject(ObjectType.WindTurbine, 50, 50, objname)
+
+            Case "Hydroelectric Turbine"
+
+                Return AddObject(ObjectType.HydroelectricTurbine, 50, 50, objname)
+
+            Case "Solar Panel"
+
+                Return AddObject(ObjectType.SolarPanel, 50, 50, objname)
+
+            Case "Water Electrolyzer"
+
+                Return AddObject(ObjectType.WaterElectrolyzer, 50, 50, objname)
+
+            Case "PEM Fuel Cell (Amphlett)"
+
+                Return AddObject(ObjectType.PEMFuelCell, 50, 50, objname)
+
+            Case Else
+
+                Return Nothing
+
+        End Select
+
+    End Function
+
+    Private Sub Button2_Click_1(sender As Object, e As EventArgs) Handles btnViewFullLog.Click
+
+        Dim flog As New FormTextBox
+
+        flog.TextBox1.ReadOnly = True
+        flog.TextBox1.BackColor = Color.White
+        flog.TextBox1.Font = New Font("Consolas", 9, System.Drawing.FontStyle.Regular)
+        flog.TextBox1.WordWrap = True
+        flog.TextBox1.ScrollBars = ScrollBars.Vertical
+
+        For Each m In MessagesLog
+            flog.TextBox1.AppendText(m)
+            flog.TextBox1.AppendText(vbCrLf)
+        Next
+
+        flog.Text = "Messages Log"
+        flog.Show()
+
+    End Sub
+
+    Private Sub MessagePumpTimer_Tick(sender As Object, e As EventArgs) Handles MessagePumpTimer.Tick
+
+        If Not SupressMessages Then
+
+            SyncLock MessagePump
+
+                If MessagePump.Count > 0 Then
+
+                    For Each item In MessagePump
+                        ShowMessageInternal(item.Item1, item.Item2, item.Item3)
+                    Next
+
+                    MessagePump.Clear()
+
+                End If
+
+            End SyncLock
+
+        End If
 
     End Sub
 

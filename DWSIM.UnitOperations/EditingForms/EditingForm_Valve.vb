@@ -23,6 +23,8 @@ Public Class EditingForm_Valve
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Private Sub SetupGrid()
@@ -50,6 +52,9 @@ Public Class EditingForm_Valve
             AddHandler .CellDataChanged,
                 Sub(sender, e)
                     If Loaded And Not Filling Then
+
+                        SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
                         SimObject.OpeningKvRelDataTableX.Clear()
                         SimObject.OpeningKvRelDataTableY.Clear()
                         For i = 0 To 99
@@ -206,7 +211,7 @@ Public Class EditingForm_Valve
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -230,6 +235,8 @@ Public Class EditingForm_Valve
     End Sub
 
     Private Sub cbCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCalcMode.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
         'Pressão na Saída
         'Variação da Pressão
@@ -358,7 +365,7 @@ Public Class EditingForm_Valve
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation3(SimObject, False)
 
     End Sub
 
@@ -378,6 +385,8 @@ Public Class EditingForm_Valve
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             UpdateProps(sender)
 
             DirectCast(sender, TextBox).SelectAll()
@@ -388,6 +397,7 @@ Public Class EditingForm_Valve
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.PropertyPackage = SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -550,6 +560,7 @@ Public Class EditingForm_Valve
     End Sub
 
     Private Sub chkEnableKvOpRel_CheckedChanged(sender As Object, e As EventArgs) Handles chkEnableKvOpRel.CheckedChanged
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         SimObject.EnableOpeningKvRelationship = chkEnableKvOpRel.Checked
         Panel1.Enabled = chkEnableKvOpRel.Checked
     End Sub
@@ -557,13 +568,15 @@ Public Class EditingForm_Valve
     Private Sub tbKvOpRel_TextChanged(sender As Object, e As EventArgs) Handles tbKvOpRel.KeyDown
         SimObject.PercentOpeningVersusPercentKvExpression = tbKvOpRel.Text
     End Sub
-    Private Sub GroupBox2_MouseMove(sender As Object, e As MouseEventArgs) Handles GroupBox2.MouseMove
+    Private Sub GroupBox2_MouseMove(sender As Object, e As MouseEventArgs) Handles GroupBoxParameters.MouseMove
         MyBase.Editor_MouseMove(sender, e)
     End Sub
 
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
 
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
@@ -576,6 +589,8 @@ Public Class EditingForm_Valve
 
     Private Sub btnCalcKv_Click(sender As Object, e As EventArgs) Handles btnCalcKv.Click
 
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
         SimObject.CalculateKv()
 
         UpdateInfo()
@@ -583,6 +598,7 @@ Public Class EditingForm_Valve
     End Sub
 
     Private Sub rbKv_CheckedChanged(sender As Object, e As EventArgs) Handles rbKv.CheckedChanged, rbCv.CheckedChanged
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If rbCv.Checked Then SimObject.FlowCoefficient = UnitOperations.Valve.FlowCoefficientType.Cv
         If rbKv.Checked Then SimObject.FlowCoefficient = UnitOperations.Valve.FlowCoefficientType.Kv
     End Sub
@@ -595,11 +611,14 @@ Public Class EditingForm_Valve
     End Sub
 
     Private Sub cbOpeningKvRelType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbOpeningKvRelType.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
         SimObject.DefinedOpeningKvRelationShipType = cbOpeningKvRelType.SelectedIndex
 
         gbTable.Enabled = False
         tbKvOpRel.Enabled = False
-        tbOp.Enabled = False
+        tbOp.Enabled = True
         tbCharParam.Enabled = False
 
         Select Case SimObject.DefinedOpeningKvRelationShipType
@@ -607,10 +626,8 @@ Public Class EditingForm_Valve
                 gbTable.Enabled = True
             Case UnitOperations.Valve.OpeningKvRelationshipType.UserDefined
                 tbKvOpRel.Enabled = True
-                tbOp.Enabled = True
             Case UnitOperations.Valve.OpeningKvRelationshipType.QuickOpening
                 tbCharParam.Enabled = True
-            Case Else
         End Select
     End Sub
 

@@ -38,4 +38,10 @@ Public Interface IDynamicsEvent
 
     Property ScriptID As String
 
+    Property TransitionType As Enums.Dynamics.DynamicsEventTransitionType
+
+    Property TransitionReference As Enums.Dynamics.DynamicsEventTransitionReferenceType
+
+    Property TransitionReferenceEventID As String
+
 End Interface

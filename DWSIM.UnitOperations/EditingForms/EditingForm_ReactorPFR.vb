@@ -4,6 +4,7 @@ Imports DWSIM.SharedClasses.UnitOperations
 Imports su = DWSIM.SharedClasses.SystemsOfUnits
 Imports DWSIM.UnitOperations.UnitOperations
 Imports System.Drawing
+Imports unvell.ReoGrid.DataFormat
 
 Public Class EditingForm_ReactorPFR
 
@@ -19,6 +20,8 @@ Public Class EditingForm_ReactorPFR
     Private Sub EditingForm_HeaterCooler_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Me.ShowHint = GlobalSettings.Settings.DefaultEditFormLocation
+
+        ChangeDefaultFont()
 
         UpdateInfo()
 
@@ -151,6 +154,8 @@ Public Class EditingForm_ReactorPFR
 
             nupNT.Value = SimObject.NumberOfTubes
 
+            cbSlurryVisc.SelectedIndex = .SlurryViscosityMode
+
             Select Case .ReactorSizingType
                 Case Reactors.Reactor_PFR.SizingType.Diameter
                     rbDiameter.Checked = True
@@ -199,7 +204,7 @@ Public Class EditingForm_ReactorPFR
 
             gridResults.Rows.Add(New Object() { .FlowSheet.GetTranslatedString("DeltaT"), su.Converter.ConvertFromSI(units.deltaT, .DeltaT.GetValueOrDefault).ToString(nf), units.deltaT})
             gridResults.Rows.Add(New Object() { .FlowSheet.GetTranslatedString("RConvPGridItem3"), su.Converter.ConvertFromSI(units.heatflow, .DeltaQ.GetValueOrDefault).ToString(nf), units.heatflow})
-            gridResults.Rows.Add(New Object() { .FlowSheet.GetTranslatedString("TKResTime"), su.Converter.ConvertFromSI(units.time, .ResidenceTime).ToString(nf), units.time})
+            gridResults.Rows.Add(New Object() { .FlowSheet.GetTranslatedString("Residence Time"), su.Converter.ConvertFromSI(units.time, .ResidenceTime).ToString(nf), units.time})
             gridResults.Rows.Add(New Object() { .FlowSheet.GetTranslatedString("Quedadepresso"), su.Converter.ConvertFromSI(units.deltaP, .DeltaP.GetValueOrDefault).ToString(nf), units.deltaP})
 
             'reaction props
@@ -287,7 +292,7 @@ Public Class EditingForm_ReactorPFR
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -319,12 +324,13 @@ Public Class EditingForm_ReactorPFR
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation3(SimObject, False)
 
     End Sub
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.PropertyPackage = SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -454,6 +460,8 @@ Public Class EditingForm_ReactorPFR
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             UpdateProps(sender)
 
             DirectCast(sender, TextBox).SelectAll()
@@ -478,6 +486,7 @@ Public Class EditingForm_ReactorPFR
 
     Private Sub cbReacSet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbReacSet.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.ReactionSetID = SimObject.FlowSheet.ReactionSets.Values.Where(Function(x) x.Name = cbReacSet.SelectedItem.ToString).FirstOrDefault.ID
             Dim reactions = SimObject.FlowSheet.ReactionSets(SimObject.ReactionSetID).Reactions.Values.Select(Function(r) r.ReactionID).ToArray()
             tbCatDiam.Enabled = False
@@ -500,6 +509,8 @@ Public Class EditingForm_ReactorPFR
     End Sub
 
     Private Sub cbCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCalcMode.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
         Select Case cbCalcMode.SelectedIndex
             Case 0
@@ -713,6 +724,8 @@ Public Class EditingForm_ReactorPFR
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
+
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"
@@ -787,4 +800,76 @@ Public Class EditingForm_ReactorPFR
             End Try
         End If
     End Sub
+
+    Private Sub btnExportProfile_Click(sender As Object, e As EventArgs) Handles btnExportProfile.Click
+
+        If SimObject.Profile.Count > 0 Then
+
+            Dim grid As unvell.ReoGrid.ReoGridControl = SimObject.FlowSheet().GetSpreadsheetObject()
+
+            Dim sheet = grid.CreateWorksheet(SimObject.GraphicObject.Tag + "_" + New Random().Next(1000).ToString())
+            grid.Worksheets.Add(sheet)
+
+            grid.CurrentWorksheet = sheet
+
+            Dim item = SimObject.Profile(0)
+
+            sheet.Cells(0, 0).Data = String.Format("Length ({0})", units.distance)
+            sheet.Cells(0, 1).Data = String.Format("Temperature ({0})", units.temperature)
+            sheet.Cells(0, 2).Data = String.Format("Pressure ({0})", units.pressure)
+
+            Dim i, j As Integer
+            j = 3
+            For Each pitem In item.Item4
+                sheet.Cells(0, j).Data = String.Format("{0} MolFrac", pitem.Compound)
+                sheet.Cells(0, j + 1).Data = String.Format("{0} MassFrac", pitem.Compound)
+                sheet.Cells(0, j + 2).Data = String.Format("{0} MolFlow ({1})", pitem.Compound, units.molarflow)
+                sheet.Cells(0, j + 3).Data = String.Format("{0} MassFlow ({1})", pitem.Compound, units.massflow)
+                sheet.Cells(0, j + 4).Data = String.Format("{0} MolConc ({1})", pitem.Compound, units.molar_conc)
+                sheet.Cells(0, j + 5).Data = String.Format("{0} MassConc ({1})", pitem.Compound, units.mass_conc)
+                j += 6
+            Next
+
+            i = 1
+            For Each item In SimObject.Profile
+                sheet.Cells(i, 0).Data = item.Item1.ConvertFromSI(units.distance)
+                sheet.Cells(i, 1).Data = item.Item2.ConvertFromSI(units.temperature)
+                sheet.Cells(i, 2).Data = item.Item3.ConvertFromSI(units.pressure)
+                j = 3
+                For Each pitem In item.Item4
+                    sheet.Cells(i, j).Data = pitem.MolarFraction
+                    sheet.Cells(i, j + 1).Data = pitem.MassFraction
+                    sheet.Cells(i, j + 2).Data = pitem.MolarFlow.ConvertFromSI(units.molarflow)
+                    sheet.Cells(i, j + 3).Data = pitem.MassFlow.ConvertFromSI(units.massflow)
+                    sheet.Cells(i, j + 4).Data = pitem.MolarConcentration.ConvertFromSI(units.molar_conc)
+                    sheet.Cells(i, j + 5).Data = pitem.MassConcentration.ConvertFromSI(units.mass_conc)
+                    j += 6
+                Next
+                i += 1
+            Next
+
+            sheet.SetRangeDataFormat(New unvell.ReoGrid.RangePosition(1, 0, i, j + 5), unvell.ReoGrid.DataFormat.CellDataFormatFlag.Number,
+                  New NumberDataFormatter.NumberFormatArgs() With
+                  {
+                    .DecimalPlaces = 6, .NegativeStyle = NumberDataFormatter.NumberNegativeStyle.Minus, .UseSeparator = False
+                  })
+
+            sheet.ScaleFactor = GlobalSettings.Settings.DpiScale
+
+            For k = 0 To j
+                sheet.AutoFitColumnWidth(k)
+            Next
+
+            MessageBox.Show(String.Format("Data export finished successfully to sheet '{0}'.", sheet.Name), "DWSIM", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+        End If
+
+    End Sub
+
+    Private Sub cbSlurryVisc_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSlurryVisc.SelectedIndexChanged
+
+        SimObject.SlurryViscosityMode = cbSlurryVisc.SelectedIndex
+
+    End Sub
+
 End Class

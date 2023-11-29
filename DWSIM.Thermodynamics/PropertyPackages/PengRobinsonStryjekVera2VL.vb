@@ -29,6 +29,7 @@ Namespace PropertyPackages
 
         Private m_props As New PropertyPackages.Auxiliary.PROPS
         Public m_pr As New PropertyPackages.Auxiliary.PRSV2VL
+        Private m_id As New PropertyPackages.Auxiliary.Ideal
 
         Public Overrides ReadOnly Property Popular As Boolean = True
 
@@ -93,18 +94,35 @@ Namespace PropertyPackages
         Public Overrides Function DW_CalcCp_ISOL(ByVal Phase1 As PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
             Select Case Phase1
                 Case Phase.Liquid
-                    Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid), RET_VTC, RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid), RET_VTC, RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    Else
+                        Return AUX_CPm(Phase1, T)
+                    End If
                 Case Phase.Aqueous
                     Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Aqueous), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
                 Case Phase.Liquid1
-                    Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid1), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid1), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    Else
+                        Return AUX_CPm(Phase1, T)
+                    End If
                 Case Phase.Liquid2
-                    Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid2), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid2), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    Else
+                        Return AUX_CPm(Phase1, T)
+                    End If
                 Case Phase.Liquid3
-                    Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid3), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        Return Me.m_pr.CpCvR("L", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Liquid3), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
+                    Else
+                        Return AUX_CPm(Phase1, T)
+                    End If
                 Case Phase.Vapor
                     Return Me.m_pr.CpCvR("V", T, P, RET_VMOL(Phase1), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(Phase.Vapor), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())(1)
             End Select
+            Return 0.0#
         End Function
 
         Public Overrides Function DW_CalcEnergyFlowMistura_ISOL(ByVal T As Double, ByVal P As Double) As Double
@@ -327,9 +345,14 @@ Namespace PropertyPackages
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.entropy = result
                 result = Me.m_pr.Z_PR(T, P, RET_VMOL(dwpl), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, "L")
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.compressibilityFactor = result
-                resultObj = Me.m_pr.CpCvR("L", T, P, RET_VMOL(dwpl), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(dwpl), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = resultObj(1)
-                Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = resultObj(2)
+                If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                    resultObj = Me.m_pr.CpCvR("L", T, P, RET_VMOL(dwpl), RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VMAS(dwpl), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = resultObj(1)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = resultObj(2)
+                Else
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCp = AUX_CPm(dwpl, T)
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.heatCapacityCv = AUX_CPm(dwpl, T)
+                End If
                 result = Me.AUX_MMM(Phase)
                 Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight = result
                 result = Me.CurrentMaterialStream.Phases(phaseID).Properties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Phases(phaseID).Properties.molecularWeight.GetValueOrDefault
@@ -398,15 +421,6 @@ Namespace PropertyPackages
         Public Overrides Function DW_CalcTensaoSuperficial_ISOL(ByVal Phase1 As PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
             Return Me.AUX_SURFTM(T)
         End Function
-
-        Public Overrides Sub DW_CalcTwoPhaseProps(ByVal Phase1 As PropertyPackages.Phase, ByVal Phase2 As PropertyPackages.Phase)
-
-            Dim T As Double
-
-            T = Me.CurrentMaterialStream.Phases(0).Properties.temperature.GetValueOrDefault
-            Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
-
-        End Sub
 
         Public Overrides Function DW_CalcViscosidadeDinamica_ISOL(ByVal Phase1 As PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
             If Phase1 = Phase.Liquid Then
@@ -667,7 +681,11 @@ Namespace PropertyPackages
             Dim H As Double
 
             If st = State.Liquid Then
-                H = Me.m_pr.H_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
+                If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                    H = Me.m_pr.H_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
+                Else
+                    H = Me.m_id.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx), Me.RET_VHVAP(T)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P)
+                End If
             ElseIf st = State.Vapor Then
                 H = Me.m_pr.H_PR_MIX("V", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
             ElseIf st = State.Solid Then
@@ -682,7 +700,11 @@ Namespace PropertyPackages
             Dim H As Double
 
             If st = State.Liquid Then
-                H = Me.m_pr.H_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                    H = Me.m_pr.H_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
+                Else
+                    H = Me.m_id.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P)
+                End If
             ElseIf st = State.Vapor Then
                 H = Me.m_pr.H_PR_MIX("V", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
             ElseIf st = State.Solid Then
@@ -698,7 +720,11 @@ Namespace PropertyPackages
             Dim S As Double
 
             If st = State.Liquid Then
-                S = Me.m_pr.S_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx))
+                If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                    S = Me.m_pr.S_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx))
+                Else
+                    S = Me.m_id.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx), Me.RET_VHVAP(T)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P) / T
+                End If
             ElseIf st = State.Vapor Then
                 S = Me.m_pr.S_PR_MIX("V", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx))
             ElseIf st = State.Solid Then
@@ -713,7 +739,11 @@ Namespace PropertyPackages
             Dim S As Double
 
             If st = State.Liquid Then
-                S = Me.m_pr.S_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                    S = Me.m_pr.S_PR_MIX("L", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                Else
+                    S = Me.m_id.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P) / T
+                End If
             ElseIf st = State.Vapor Then
                 S = Me.m_pr.S_PR_MIX("V", T, P, Vx, RET_VKij(), RET_VKij2, RET_KAPPA1, RET_KAPPA2, RET_KAPPA3, RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
             ElseIf st = State.Solid Then

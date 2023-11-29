@@ -111,6 +111,10 @@ Namespace UnitOperations
 
         Public Property PinchPointAtOutlets As Boolean = False
 
+        Public Property UseShellAndTubeGeometryInformation As Boolean = False
+
+        Public Property CalculateHeatExchangeProfile As Boolean = False
+
         Public Property STProperties() As STHXProperties
             Get
                 If m_stprops Is Nothing Then m_stprops = New STHXProperties
@@ -1307,6 +1311,10 @@ Namespace UnitOperations
             'Validate unitop status.
             Me.Validate()
 
+            HeatProfile = New Double() {}
+            TemperatureProfileCold = New Double() {}
+            TemperatureProfileHot = New Double() {}
+
             StIn0 = Me.GetInletMaterialStream(0)
             StIn1 = Me.GetInletMaterialStream(1)
 
@@ -1788,7 +1796,9 @@ Namespace UnitOperations
                     Dim tmp = StInHot.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureTemperature, Ph2, Th2, 0.0#)
                     Hh2 = tmp.CalculatedEnthalpy
                     Q = -Wh * (Hh2 - Hh1)
-                    If Q > MaxHeatExchange Then Q = MaxHeatExchange
+                    If Q > MaxHeatExchange Then
+                        Throw New Exception(String.Format("Invalid Outlet Temperature for Hot Fluid: {0} kW required but only {1} kW are available", Q, MaxHeatExchange))
+                    End If
                     DeltaHc = (Q - HeatLoss) / Wc
                     Hc2 = Hc1 + DeltaHc
                     StInCold.PropertyPackage.CurrentMaterialStream = StInCold
@@ -1818,7 +1828,9 @@ Namespace UnitOperations
                     Dim tmp = StInCold.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureTemperature, Pc2, Tc2, 0)
                     Hc2 = tmp.CalculatedEnthalpy
                     Q = Wc * (Hc2 - Hc1)
-                    If Q > MaxHeatExchange Then Q = MaxHeatExchange
+                    If Q > MaxHeatExchange Then
+                        Throw New Exception(String.Format("Invalid Outlet Temperature for Cold Fluid: {0} kW required but only {1} kW are available", Q, MaxHeatExchange))
+                    End If
                     DeltaHh = -(Q + HeatLoss) / Wh
                     Hh2 = Hh1 + DeltaHh
                     StInHot.PropertyPackage.CurrentMaterialStream = StInHot
@@ -2658,6 +2670,58 @@ Namespace UnitOperations
             CheckSpec(Ph2, True, "hot stream outlet pressure")
             CheckSpec(Pc2, True, "cold stream outlet pressure")
 
+            If CalcMode <> HeatExchangerCalcMode.PinchPoint And CalculateHeatExchangeProfile Then
+
+                Dim dhc, dhh As Double
+
+                Dim tcprof, thprof, qprof As New List(Of Double)
+
+                tcprof.Clear()
+                thprof.Clear()
+                qprof.Clear()
+
+                For j = 0 To 10
+
+                    Dim dqx = CDbl(j) / 10.0 * MaxHeatExchange
+
+                    dhc = dqx / Wc
+                    dhh = dqx / Wh
+
+                    'calculate profiles
+
+                    tmpstr = StInCold.Clone
+                    tmpstr.PropertyPackage = StInCold.PropertyPackage
+                    tmpstr.SetFlowsheet(StInCold.FlowSheet)
+
+                    tmpstr.Phases(0).Properties.enthalpy = Hc1 + dhc
+                    tmpstr.Phases(0).Properties.pressure = Pc1 - Convert.ToDouble(j) / 10.0 * ColdSidePressureDrop
+                    tmpstr.SpecType = StreamSpec.Pressure_and_Enthalpy
+                    IObj?.SetCurrent()
+                    tmpstr.Calculate(True, True)
+
+                    qprof.Add(dqx)
+                    tcprof.Add(tmpstr.Phases(0).Properties.temperature.GetValueOrDefault)
+
+                    tmpstr = StInHot.Clone
+                    tmpstr.PropertyPackage = StInHot.PropertyPackage
+                    tmpstr.SetFlowsheet(StInHot.FlowSheet)
+
+                    tmpstr.Phases(0).Properties.enthalpy = Hh1 - dhh
+                    tmpstr.Phases(0).Properties.pressure = Ph1 - Convert.ToDouble(j) / 10.0 * HotSidePressureDrop
+                    tmpstr.SpecType = StreamSpec.Pressure_and_Enthalpy
+                    IObj?.SetCurrent()
+                    tmpstr.Calculate(True, True)
+
+                    thprof.Add(tmpstr.Phases(0).Properties.temperature.GetValueOrDefault)
+
+                Next
+
+                Me.HeatProfile = qprof.ToArray
+                Me.TemperatureProfileCold = tcprof.ToArray
+                Me.TemperatureProfileHot = thprof.ToArray
+
+            End If
+
             IObj?.Paragraphs.Add("<h2>Results</h2>")
 
             IObj?.Paragraphs.Add("<mi>T_{c,out}</mi> = " & Tc2 & " K")
@@ -2671,7 +2735,7 @@ Namespace UnitOperations
 
             IObj?.Paragraphs.Add("<mi>\Delta T_{ml}</mi> = " & LMTD & " K")
 
-            ThermalEfficiency = (Q - HeatLoss) / MaxHeatExchange * 100
+            If CalcMode <> HeatExchangerCalcMode.ThermalEfficiency Then ThermalEfficiency = (Q - HeatLoss) / MaxHeatExchange * 100
 
             If HeatLoss > Math.Abs(Q.GetValueOrDefault) Then Throw New Exception("Invalid Heat Loss.")
 
@@ -2767,7 +2831,7 @@ Namespace UnitOperations
                     Case 4
                         value = SystemsOfUnits.Converter.ConvertFromSI(su.temperature, Me.TempHotOut)
                     Case 5
-                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Shell_Di)
+                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Shell_Di / 1000)
                     Case 6
                         value = SystemsOfUnits.Converter.ConvertFromSI(su.foulingfactor, Me.STProperties.Shell_Fouling)
                     Case 7
@@ -2775,11 +2839,11 @@ Namespace UnitOperations
                     Case 8
                         value = Me.STProperties.Shell_NumberOfShellsInSeries
                     Case 9
-                        value = SystemsOfUnits.Converter.ConvertFromSI(su.thickness, Me.STProperties.Shell_BaffleSpacing)
+                        value = SystemsOfUnits.Converter.ConvertFromSI(su.thickness, Me.STProperties.Shell_BaffleSpacing / 1000)
                     Case 10
-                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Tube_Di)
+                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Tube_Di / 1000)
                     Case 11
-                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Tube_De)
+                        value = SystemsOfUnits.Converter.ConvertFromSI(su.diameter, Me.STProperties.Tube_De / 1000)
                     Case 12
                         value = SystemsOfUnits.Converter.ConvertFromSI(su.distance, Me.STProperties.Tube_Length)
                     Case 13
@@ -2789,7 +2853,7 @@ Namespace UnitOperations
                     Case 15
                         value = Me.STProperties.Tube_NumberPerShell
                     Case 16
-                        value = SystemsOfUnits.Converter.ConvertFromSI(su.thickness, Me.STProperties.Tube_Pitch)
+                        value = SystemsOfUnits.Converter.ConvertFromSI(su.thickness, Me.STProperties.Tube_Pitch / 1000)
                     Case 17
                         value = SystemsOfUnits.Converter.ConvertFromSI(su.foulingfactor, Me.STProperties.OverallFoulingFactor)
                     Case 18
@@ -2896,7 +2960,7 @@ Namespace UnitOperations
                     'PROP_HX_4	Hot Fluid Outlet Temperature
                     Me.TempHotOut = SystemsOfUnits.Converter.ConvertToSI(su.temperature, propval)
                 Case 5
-                    Me.STProperties.Shell_Di = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval)
+                    Me.STProperties.Shell_Di = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval) * 1000
                 Case 6
                     Me.STProperties.Shell_Fouling = SystemsOfUnits.Converter.ConvertToSI(su.foulingfactor, propval)
                 Case 7
@@ -2904,11 +2968,11 @@ Namespace UnitOperations
                 Case 8
                     Me.STProperties.Shell_NumberOfShellsInSeries = propval
                 Case 9
-                    Me.STProperties.Shell_BaffleSpacing = SystemsOfUnits.Converter.ConvertToSI(su.thickness, propval)
+                    Me.STProperties.Shell_BaffleSpacing = SystemsOfUnits.Converter.ConvertToSI(su.thickness, propval) * 1000
                 Case 10
-                    Me.STProperties.Tube_Di = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval)
+                    Me.STProperties.Tube_Di = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval) * 1000
                 Case 11
-                    Me.STProperties.Tube_De = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval)
+                    Me.STProperties.Tube_De = SystemsOfUnits.Converter.ConvertToSI(su.diameter, propval) * 1000
                 Case 12
                     Me.STProperties.Tube_Length = SystemsOfUnits.Converter.ConvertToSI(su.distance, propval)
                 Case 13
@@ -2918,7 +2982,7 @@ Namespace UnitOperations
                 Case 15
                     Me.STProperties.Tube_NumberPerShell = propval
                 Case 16
-                    Me.STProperties.Tube_Pitch = SystemsOfUnits.Converter.ConvertToSI(su.thickness, propval)
+                    Me.STProperties.Tube_Pitch = SystemsOfUnits.Converter.ConvertToSI(su.thickness, propval) * 1000
                 Case 27
                     Me.MITA = SystemsOfUnits.Converter.ConvertToSI(su.deltaT, propval)
                 Case 28

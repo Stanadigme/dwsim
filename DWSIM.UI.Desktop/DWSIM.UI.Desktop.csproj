@@ -16,6 +16,9 @@
     <TargetFrameworkProfile />
     <MacBuildBundle>false</MacBuildBundle>
   </PropertyGroup>
+  <PropertyGroup>
+    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
@@ -74,7 +77,11 @@
   <PropertyGroup>
     <ApplicationIcon>DWSIM_ico.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DWSIM.UI.Desktop.GTK\Libraries\gtk-sharp-2.0\atk-sharp.dll</HintPath>
@@ -238,6 +245,9 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="unvell.ReoScript">
@@ -250,6 +260,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="Xamarin.Mac">
       <HintPath>..\DWSIM\References\Xamarin.Mac.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=3.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.3.5.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
@@ -299,6 +310,10 @@
     <ProjectReference Include="..\DWSIM.Interfaces\DWSIM.Interfaces.vbproj">
       <Project>{50bfd69a-487e-4b38-86ea-48acd85a0eb1}</Project>
       <Name>DWSIM.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DWSIM.Thermodynamics.ThermoC\DWSIM.Thermodynamics.ThermoC.csproj">
+      <Project>{da169354-7c6f-437a-8c32-1a2cb84eab5a}</Project>
+      <Name>DWSIM.Thermodynamics.ThermoC</Name>
     </ProjectReference>
     <ProjectReference Include="..\DWSIM.Thermodynamics\DWSIM.Thermodynamics.vbproj">
       <Project>{369bc7af-836b-4de1-93e3-b051bc148b23}</Project>
@@ -362,29 +377,22 @@ xcopy "$(SolutionDir)PlatformFiles\Windows\CoolProp.dll" "$(TargetDir)" /E /Y /F
 
 xcopy "$(TargetDir)*" "$(SolutionDir)DistPackages\Windows\" /E /Y /F /D
 xcopy "$(TargetDir)*" "$(SolutionDir)DistPackages\Linux\" /E /Y /F /D
-xcopy "$(TargetDir)*" "$(SolutionDir)DistPackages\Raspberry\" /E /Y /F /D
 xcopy "$(TargetDir)*" "$(SolutionDir)DistPackages\macOS\" /E /Y /F /D
 
 xcopy "$(SolutionDir)PlatformFiles\Common\*" "$(SolutionDir)DistPackages\Windows\" /E /Y /F /D
 xcopy "$(SolutionDir)PlatformFiles\Common\*" "$(SolutionDir)DistPackages\Linux\" /E /Y /F /D
-xcopy "$(SolutionDir)PlatformFiles\Common\*" "$(SolutionDir)DistPackages\Raspberry\" /E /Y /F /D
 xcopy "$(SolutionDir)PlatformFiles\Common\*" "$(SolutionDir)DistPackages\macOS\" /E /Y /F /D
 
 xcopy "$(SolutionDir)PlatformFiles\Windows\*" "$(SolutionDir)DistPackages\Windows\" /E /Y /F
 xcopy "$(SolutionDir)PlatformFiles\Linux\*" "$(SolutionDir)DistPackages\Linux\" /E /Y /F
-xcopy "$(SolutionDir)PlatformFiles\Raspberry\*" "$(SolutionDir)DistPackages\Raspberry\" /E /Y /F
 xcopy "$(SolutionDir)PlatformFiles\macOS\*" "$(SolutionDir)DistPackages\macOS\" /E /Y /F
 
 xcopy "$(SolutionDir)DWSIM\bin\Release\plugins\*" "$(SolutionDir)DistPackages\Windows\plugins\" /E /Y /F /D
 xcopy "$(SolutionDir)DWSIM\bin\Release\plugins\*" "$(SolutionDir)DistPackages\Linux\plugins\" /E /Y /F /D
-xcopy "$(SolutionDir)DWSIM\bin\Release\plugins\*" "$(SolutionDir)DistPackages\Raspberry\plugins\" /E /Y /F /D
 xcopy "$(SolutionDir)DWSIM\bin\Release\plugins\*" "$(SolutionDir)DistPackages\macOS\plugins\" /E /Y /F /D
 
 xcopy "$(SolutionDir)DWSIM\bin\Release\DWSIM.exe" "$(SolutionDir)DistPackages\macOS\" /E /Y /F /D
 xcopy "$(SolutionDir)DWSIM\bin\Release\PropertyGridEx.dll" "$(SolutionDir)DistPackages\macOS\" /E /Y /F /D
-
-xcopy "$(SolutionDir)DWSIM\bin\Release\DWSIM.exe" "$(SolutionDir)DistPackages\Raspberry\" /E /Y /F /D
-xcopy "$(SolutionDir)DWSIM\bin\Release\PropertyGridEx.dll" "$(SolutionDir)DistPackages\Raspberry\" /E /Y /F /D
 
 rd /S /Q "$(SolutionDir)DistPackages\Windows\DWSIM.UI.Desktop.app" 1&gt;nul 4&gt;nul
 rd /S /Q "$(SolutionDir)DistPackages\Windows\x64" 1&gt;nul 4&gt;nul
@@ -409,26 +417,11 @@ rd /S /Q "$(SolutionDir)DistPackages\macOS\pt" 1&gt;nul 4&gt;nul
 rd /S /Q "$(SolutionDir)DistPackages\macOS\pt-BR" 1&gt;nul 4&gt;nul
 rd /S /Q "$(SolutionDir)DistPackages\macOS\ECE" 1&gt;nul 4&gt;nul
 
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\DWSIM.UI.Desktop.app" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\data\unifac" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\x64" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\x86" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\de" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\docs" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\es" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\help" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\de" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\pt 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\pt-BR" 1&gt;nul 4&gt;nul
-rd /S /Q "$(SolutionDir)DistPackages\Raspberry\ECE" 1&gt;nul 4&gt;nul
-
 erase /S /Q "$(SolutionDir)DistPackages\Linux\libSkiaSharp.dll" 2&gt;nul 1&gt;nul 4&gt;nul
-erase /S /Q "$(SolutionDir)DistPackages\Raspberry\libSkiaSharp.dll" 2&gt;nul 1&gt;nul 4&gt;nul
 erase /S /Q "$(SolutionDir)DistPackages\macOS\libSkiaSharp.dll" 2&gt;nul 1&gt;nul 4&gt;nul
 
 erase /S /Q"$(SolutionDir)DistPackages\Windows\*vshost*.*" 2&gt;nul 1&gt;nul 4&gt;nul
 erase /S /Q "$(SolutionDir)DistPackages\Linux\*vshost*.*" 2&gt;nul 1&gt;nul 4&gt;nul
-erase /S /Q "$(SolutionDir)DistPackages\Raspberry\*vshost*.*" 2&gt;nul 1&gt;nul 4&gt;nul
 erase /S /Q "$(SolutionDir)DistPackages\macOS\*vshost*.*" 2&gt;nul 1&gt;nul 4&gt;nul
 
 ) else if "$(PlatformName)" == "x86" (

@@ -42,8 +42,6 @@ Partial Class FormOptions
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.GroupBox13 = New System.Windows.Forms.GroupBox()
         Me.chkAA = New System.Windows.Forms.CheckBox()
-        Me.cbRenderer = New System.Windows.Forms.ComboBox()
-        Me.Label23 = New System.Windows.Forms.Label()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
         Me.ComboBoxPropPackCopyMode = New System.Windows.Forms.ComboBox()
         Me.Label7 = New System.Windows.Forms.Label()
@@ -88,13 +86,17 @@ Partial Class FormOptions
         Me.KryptonTextBox1 = New System.Windows.Forms.TextBox()
         Me.KryptonLabel1 = New System.Windows.Forms.Label()
         Me.KryptonCheckBox6 = New System.Windows.Forms.CheckBox()
-        Me.FaTabStripItem7 = New System.Windows.Forms.TabPage()
-        Me.GroupBox16 = New System.Windows.Forms.GroupBox()
-        Me.chkUpdates = New System.Windows.Forms.CheckBox()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.GroupBox17 = New System.Windows.Forms.GroupBox()
+        Me.btnDownPy = New System.Windows.Forms.Button()
         Me.btnSelectPythonPath = New System.Windows.Forms.Button()
         Me.tbPythonPath = New System.Windows.Forms.TextBox()
         Me.Label18 = New System.Windows.Forms.Label()
+        Me.FaTabStripItem7 = New System.Windows.Forms.TabPage()
+        Me.gbLoadExtensions = New System.Windows.Forms.GroupBox()
+        Me.chkLoadExtensions = New System.Windows.Forms.CheckBox()
+        Me.GroupBox16 = New System.Windows.Forms.GroupBox()
+        Me.chkUpdates = New System.Windows.Forms.CheckBox()
         Me.GroupBox15 = New System.Windows.Forms.GroupBox()
         Me.chkIgnoreCompConstData = New System.Windows.Forms.CheckBox()
         Me.GroupBox14 = New System.Windows.Forms.GroupBox()
@@ -123,9 +125,11 @@ Partial Class FormOptions
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.FaTabStripItem7.SuspendLayout()
-        Me.GroupBox16.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
         Me.GroupBox17.SuspendLayout()
+        Me.FaTabStripItem7.SuspendLayout()
+        Me.gbLoadExtensions.SuspendLayout()
+        Me.GroupBox16.SuspendLayout()
         Me.GroupBox15.SuspendLayout()
         Me.GroupBox14.SuspendLayout()
         Me.GroupBox6.SuspendLayout()
@@ -138,6 +142,7 @@ Partial Class FormOptions
         Me.FaTabStrip1.Controls.Add(Me.TabPage1)
         Me.FaTabStrip1.Controls.Add(Me.FaTabStripItem3)
         Me.FaTabStrip1.Controls.Add(Me.FaTabStripItem2)
+        Me.FaTabStrip1.Controls.Add(Me.TabPage2)
         Me.FaTabStrip1.Controls.Add(Me.FaTabStripItem7)
         Me.FaTabStrip1.Name = "FaTabStrip1"
         Me.FaTabStrip1.SelectedIndex = 0
@@ -224,8 +229,6 @@ Partial Class FormOptions
         '
         resources.ApplyResources(Me.GroupBox13, "GroupBox13")
         Me.GroupBox13.Controls.Add(Me.chkAA)
-        Me.GroupBox13.Controls.Add(Me.cbRenderer)
-        Me.GroupBox13.Controls.Add(Me.Label23)
         Me.GroupBox13.Name = "GroupBox13"
         Me.GroupBox13.TabStop = False
         '
@@ -233,19 +236,6 @@ Partial Class FormOptions
         '
         resources.ApplyResources(Me.chkAA, "chkAA")
         Me.chkAA.Name = "chkAA"
-        '
-        'cbRenderer
-        '
-        resources.ApplyResources(Me.cbRenderer, "cbRenderer")
-        Me.cbRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbRenderer.FormattingEnabled = True
-        Me.cbRenderer.Items.AddRange(New Object() {resources.GetString("cbRenderer.Items"), resources.GetString("cbRenderer.Items1")})
-        Me.cbRenderer.Name = "cbRenderer"
-        '
-        'Label23
-        '
-        resources.ApplyResources(Me.Label23, "Label23")
-        Me.Label23.Name = "Label23"
         '
         'GroupBox5
         '
@@ -610,37 +600,28 @@ Partial Class FormOptions
         resources.ApplyResources(Me.KryptonCheckBox6, "KryptonCheckBox6")
         Me.KryptonCheckBox6.Name = "KryptonCheckBox6"
         '
-        'FaTabStripItem7
+        'TabPage2
         '
-        resources.ApplyResources(Me.FaTabStripItem7, "FaTabStripItem7")
-        Me.FaTabStripItem7.BackColor = System.Drawing.SystemColors.Window
-        Me.FaTabStripItem7.Controls.Add(Me.GroupBox16)
-        Me.FaTabStripItem7.Controls.Add(Me.GroupBox17)
-        Me.FaTabStripItem7.Controls.Add(Me.GroupBox15)
-        Me.FaTabStripItem7.Controls.Add(Me.GroupBox14)
-        Me.FaTabStripItem7.Controls.Add(Me.GroupBox6)
-        Me.FaTabStripItem7.Name = "FaTabStripItem7"
-        '
-        'GroupBox16
-        '
-        resources.ApplyResources(Me.GroupBox16, "GroupBox16")
-        Me.GroupBox16.Controls.Add(Me.chkUpdates)
-        Me.GroupBox16.Name = "GroupBox16"
-        Me.GroupBox16.TabStop = False
-        '
-        'chkUpdates
-        '
-        resources.ApplyResources(Me.chkUpdates, "chkUpdates")
-        Me.chkUpdates.Name = "chkUpdates"
+        resources.ApplyResources(Me.TabPage2, "TabPage2")
+        Me.TabPage2.Controls.Add(Me.GroupBox17)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.UseVisualStyleBackColor = True
         '
         'GroupBox17
         '
         resources.ApplyResources(Me.GroupBox17, "GroupBox17")
+        Me.GroupBox17.Controls.Add(Me.btnDownPy)
         Me.GroupBox17.Controls.Add(Me.btnSelectPythonPath)
         Me.GroupBox17.Controls.Add(Me.tbPythonPath)
         Me.GroupBox17.Controls.Add(Me.Label18)
         Me.GroupBox17.Name = "GroupBox17"
         Me.GroupBox17.TabStop = False
+        '
+        'btnDownPy
+        '
+        resources.ApplyResources(Me.btnDownPy, "btnDownPy")
+        Me.btnDownPy.Name = "btnDownPy"
+        Me.btnDownPy.UseVisualStyleBackColor = True
         '
         'btnSelectPythonPath
         '
@@ -657,6 +638,41 @@ Partial Class FormOptions
         '
         resources.ApplyResources(Me.Label18, "Label18")
         Me.Label18.Name = "Label18"
+        '
+        'FaTabStripItem7
+        '
+        resources.ApplyResources(Me.FaTabStripItem7, "FaTabStripItem7")
+        Me.FaTabStripItem7.BackColor = System.Drawing.SystemColors.Window
+        Me.FaTabStripItem7.Controls.Add(Me.gbLoadExtensions)
+        Me.FaTabStripItem7.Controls.Add(Me.GroupBox16)
+        Me.FaTabStripItem7.Controls.Add(Me.GroupBox15)
+        Me.FaTabStripItem7.Controls.Add(Me.GroupBox14)
+        Me.FaTabStripItem7.Controls.Add(Me.GroupBox6)
+        Me.FaTabStripItem7.Name = "FaTabStripItem7"
+        '
+        'gbLoadExtensions
+        '
+        resources.ApplyResources(Me.gbLoadExtensions, "gbLoadExtensions")
+        Me.gbLoadExtensions.Controls.Add(Me.chkLoadExtensions)
+        Me.gbLoadExtensions.Name = "gbLoadExtensions"
+        Me.gbLoadExtensions.TabStop = False
+        '
+        'chkLoadExtensions
+        '
+        resources.ApplyResources(Me.chkLoadExtensions, "chkLoadExtensions")
+        Me.chkLoadExtensions.Name = "chkLoadExtensions"
+        '
+        'GroupBox16
+        '
+        resources.ApplyResources(Me.GroupBox16, "GroupBox16")
+        Me.GroupBox16.Controls.Add(Me.chkUpdates)
+        Me.GroupBox16.Name = "GroupBox16"
+        Me.GroupBox16.TabStop = False
+        '
+        'chkUpdates
+        '
+        resources.ApplyResources(Me.chkUpdates, "chkUpdates")
+        Me.chkUpdates.Name = "chkUpdates"
         '
         'GroupBox15
         '
@@ -761,11 +777,14 @@ Partial Class FormOptions
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.FaTabStripItem7.ResumeLayout(False)
-        Me.GroupBox16.ResumeLayout(False)
-        Me.GroupBox16.PerformLayout()
+        Me.TabPage2.ResumeLayout(False)
         Me.GroupBox17.ResumeLayout(False)
         Me.GroupBox17.PerformLayout()
+        Me.FaTabStripItem7.ResumeLayout(False)
+        Me.gbLoadExtensions.ResumeLayout(False)
+        Me.gbLoadExtensions.PerformLayout()
+        Me.GroupBox16.ResumeLayout(False)
+        Me.GroupBox16.PerformLayout()
         Me.GroupBox15.ResumeLayout(False)
         Me.GroupBox14.ResumeLayout(False)
         Me.GroupBox6.ResumeLayout(False)
@@ -842,8 +861,6 @@ Partial Class FormOptions
     Friend WithEvents Label21 As Label
     Public WithEvents GroupBox13 As GroupBox
     Public WithEvents chkAA As CheckBox
-    Friend WithEvents cbRenderer As ComboBox
-    Public WithEvents Label23 As Label
     Public WithEvents chkEditorDoubleClick As CheckBox
     Friend WithEvents GroupBox1 As GroupBox
     Public WithEvents btnClearDir As Button
@@ -851,4 +868,8 @@ Partial Class FormOptions
     Public WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents GroupBox16 As GroupBox
     Public WithEvents chkUpdates As CheckBox
+    Friend WithEvents gbLoadExtensions As GroupBox
+    Public WithEvents chkLoadExtensions As CheckBox
+    Friend WithEvents TabPage2 As TabPage
+    Public WithEvents btnDownPy As Button
 End Class

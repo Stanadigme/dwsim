@@ -173,6 +173,8 @@ Public Class FormImportCompoundFromThermo
 
     Private Sub FormImportCompoundFromThermo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+        ChangeDefaultFont()
+
     End Sub
 
 End Class

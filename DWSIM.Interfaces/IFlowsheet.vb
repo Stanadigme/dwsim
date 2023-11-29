@@ -106,6 +106,8 @@
 
     Sub AutoLayout()
 
+    Sub NaturalLayout()
+
     Sub DisplayForm(form As Object)
 
     Sub UpdateOpenEditForms()
@@ -359,6 +361,34 @@
     Function AddCompound(compname As String) As ICompoundConstantProperties
 
     Sub SetDirtyStatus()
+
+    Function GetAvailableFlowsheetObjectTypeNames() As Array
+
+    Function AddFlowsheetObject(typename As String, objname As String) As ISimulationObject
+
+    Sub DisplayBrowserWindow(url As String)
+
+    Sub DisplayDockableBrowserWindow(url As String)
+
+    Sub RequestCalculation2(Wait As Boolean)
+
+    Sub RequestCalculation3(obj As ISimulationObject, Wait As Boolean)
+
+    Property MessagesLog As List(Of String)
+
+    Property AvailableExternalUnitOperations As Dictionary(Of String, IExternalUnitOperation)
+
+    Function GetSnapshot(type As Enums.SnapshotType, Optional obj As ISimulationObject = Nothing) As XDocument
+
+    Sub RestoreSnapshot(data As XDocument, type As Enums.SnapshotType)
+
+    Sub RegisterSnapshot(stype As Enums.SnapshotType, Optional obj As ISimulationObject = Nothing)
+
+    Sub ResetCalculationStatus()
+
+    Sub CloseOpenEditForms()
+
+    Function Clone() As IFlowsheet
 
 End Interface
 

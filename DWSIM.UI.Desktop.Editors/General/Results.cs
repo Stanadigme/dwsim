@@ -1,33 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using DWSIM.Interfaces;
-using DWSIM.Interfaces.Enums.GraphicObjects;
 using DWSIM.UnitOperations.UnitOperations;
 using DWSIM.UnitOperations.Reactors;
-using DWSIM.UnitOperations.SpecialOps;
-using DWSIM.UnitOperations.Streams;
-using DWSIM.Thermodynamics.Streams;
-
 using Eto.Forms;
-
 using cv = DWSIM.SharedClasses.SystemsOfUnits.Converter;
 using s = DWSIM.UI.Shared.Common;
 using Eto.Drawing;
-
-using StringResources = DWSIM.UI.Desktop.Shared.StringArrays;
-using DWSIM.Thermodynamics.PropertyPackages;
-using DWSIM.Interfaces.Enums;
 using OxyPlot;
 using OxyPlot.Axes;
-
 using DWSIM.ExtensionMethods;
-using System.IO;
 using DWSIM.UI.Shared;
-using System.Net;
+using DWSIM.CrossPlatform.UI.Controls.ReoGrid.DataFormat;
+using DWSIM.CrossPlatform.UI.Controls;
+using DWSIM.CrossPlatform.UI.Controls.ReoGrid;
+using DWSIM.Thermodynamics.Databases.ChemeoLink;
 
 namespace DWSIM.UI.Desktop.Editors
 {
@@ -186,6 +174,61 @@ namespace DWSIM.UI.Desktop.Editors
                 if (reactor.points != null && reactor.points.Count > 0)
                 {
 
+                    var btn2 = new Button { Text = "Export Profile to new Spreadsheet" };
+                    container.Rows.Add(new TableRow(btn2));
+                    btn2.Click += (sender, e) =>
+                    {
+                        var grid = (ReoGridControl)SimObject.GetFlowsheet().GetSpreadsheetObject();
+                        var sheet = grid.CreateWorksheet(SimObject.GraphicObject.Tag + "_" +new Random().Next(1000).ToString());
+                        grid.Worksheets.Add(sheet);
+                        grid.CurrentWorksheet = sheet;
+                        var item = reactor.Profile[0];
+                        sheet.Cells[0, 0].Data = string.Format("Length ({0})", su.distance);
+                        sheet.Cells[0, 1].Data = string.Format("Temperature ({0})", su.temperature);
+                        sheet.Cells[0, 2].Data = string.Format("Pressure ({0})", su.pressure);
+                        int i;
+                        int j = 3;
+                        foreach (var pitem in item.Item4)
+                        {
+                            sheet.Cells[0, j].Data = string.Format("{0} MolFrac", pitem.Compound);
+                            sheet.Cells[0, (j + 1)].Data = string.Format("{0} MassFrac", pitem.Compound);
+                            sheet.Cells[0, (j + 2)].Data = string.Format("{0} MolFlow ({1})", pitem.Compound, su.molarflow);
+                            sheet.Cells[0, (j + 3)].Data = string.Format("{0} MassFlow ({1})", pitem.Compound, su.massflow);
+                            sheet.Cells[0, (j + 4)].Data = string.Format("{0} MolConc ({1})", pitem.Compound, su.molar_conc);
+                            sheet.Cells[0, (j + 5)].Data = string.Format("{0} MassConc ({1})", pitem.Compound, su.mass_conc);
+                            j+=6;
+                        }
+
+                        i = 1;
+                        foreach (var item2 in reactor.Profile)
+                        {
+                            sheet.Cells[i, 0].Data = item2.Item1.ConvertFromSI(su.distance);
+                            sheet.Cells[i, 1].Data = item2.Item2.ConvertFromSI(su.temperature);
+                            sheet.Cells[i, 2].Data = item2.Item3.ConvertFromSI(su.pressure);
+                            j = 3;
+                            foreach (var pitem in item2.Item4)
+                            {
+                                sheet.Cells[i, j].Data = pitem.MolarFraction;
+                                sheet.Cells[i, (j + 1)].Data = pitem.MassFraction;
+                                sheet.Cells[i, (j + 2)].Data = pitem.MolarFlow.ConvertFromSI(su.molarflow);
+                                sheet.Cells[i, (j + 3)].Data = pitem.MassFlow.ConvertFromSI(su.massflow);
+                                sheet.Cells[i, (j + 4)].Data = pitem.MolarConcentration.ConvertFromSI(su.molar_conc);
+                                sheet.Cells[i, (j + 5)].Data = pitem.MassConcentration.ConvertFromSI(su.mass_conc);
+                                j+=6;
+                            }
+                            i++;
+                        }
+
+                        sheet.SetRangeDataFormat(new RangePosition(1, 0, i, (j + 5)), CellDataFormatFlag.Number, new NumberDataFormatter.NumberFormatArgs() { DecimalPlaces=6, NegativeStyle=NumberDataFormatter.NumberNegativeStyle.Minus, UseSeparator=false });
+                        for (int k = 0; (k <= j); k++)
+                        {
+                            sheet.AutoFitColumnWidth(k);
+                        }
+
+                        MessageBox.Show(string.Format("Data export finished successfully to sheet \'{0}\'.", sheet.Name), "DWSIM", MessageBoxButtons.OK, MessageBoxType.Information);
+
+                    };
+
                     var btn = new Button { Text = "View PFR Properties Profile" };
                     container.Rows.Add(new TableRow(btn));
                     btn.Click += (sender, e) =>
@@ -220,7 +263,7 @@ namespace DWSIM.UI.Desktop.Editors
             {
                 var hx = (HeatExchanger)SimObject;
 
-                if (hx.CalculationMode == HeatExchangerCalcMode.PinchPoint && hx.HeatProfile.Length > 0)
+                if (hx.HeatProfile.Length > 0)
                 {
 
                     var btn = new Button { Text = "View Heat Exchanged Profile" };
@@ -241,10 +284,50 @@ namespace DWSIM.UI.Desktop.Editors
                         chart.Model.InvalidatePlot(true);
                         chart.Invalidate();
 
+                        var maxT = Math.Max(hx.TemperatureProfileHot.Max(), hx.TemperatureProfileCold.Max());
+                        var minT = Math.Min(hx.TemperatureProfileHot.Min(), hx.TemperatureProfileCold.Min());
+
+                        model.AddLineSeries(new double[] { hx.Q.GetValueOrDefault(), hx.Q.GetValueOrDefault() }.ConvertUnits("kW", su.heatflow),
+                            new double[] { minT, maxT }.ConvertUnits("K", su.temperature), OxyColors.Red, "Operating Point");
+
+                        model.LegendItemAlignment = OxyPlot.HorizontalAlignment.Center;
+                        model.LegendOrientation = LegendOrientation.Horizontal;
+
+                        var doccontainer = new DocumentControl();
+                        var docp1 = new DocumentPage { Text = "Chart", Closable = false };
+                        var docp2 = new DocumentPage { Text = "Table", Closable = false };
+                        doccontainer.Pages.Add(docp1);
+                        doccontainer.Pages.Add(docp2);
+
+                        var gridcontrol = GridControl.GetGridControl();
+
+                        var grid = gridcontrol.GridControl;
+                        grid.Width = 700;
+
+                        var sheet = grid.Worksheets[0];
+
+                        sheet.SetRows(100);
+                        sheet.SetCols(3);
+                        sheet.SetColumnsWidth(0, 3, 200);
+                        sheet.ColumnHeaders[0].Text = String.Format("Heat Exchanged ({0})", su.heatflow);
+                        sheet.ColumnHeaders[1].Text = String.Format("Hot Fluid Temperature ({0})", su.temperature);
+                        sheet.ColumnHeaders[2].Text = String.Format("Cold Fluid Temperature ({0})", su.temperature);
+
+                        for (int i = 0; i < hx.HeatProfile.Count(); i++)
+                        {
+                            sheet.Cells[i, 0].Data = hx.HeatProfile[i].ConvertFromSI(su.heatflow);
+                            sheet.Cells[i, 1].Data = hx.TemperatureProfileHot[i].ConvertFromSI(su.temperature);
+                            sheet.Cells[i, 2].Data = hx.TemperatureProfileCold[i].ConvertFromSI(su.temperature);
+                        }
+
+                        docp2.Content = gridcontrol;
+
+                        docp1.Content = chart;
+
                         var form = new Form()
                         {
                             Icon = Eto.Drawing.Icon.FromResource(imgprefix + "DWSIM_ico.ico"),
-                            Content = new Scrollable { Content = chart, Border = BorderType.None, ExpandContentWidth = true, ExpandContentHeight = true },
+                            Content = new Scrollable { Content = doccontainer, Border = BorderType.None, ExpandContentWidth = true, ExpandContentHeight = true },
                             Title = "Heat Profile: " + SimObject.GraphicObject.Tag,
                             ClientSize = new Size(800, 600),
                             ShowInTaskbar = false,
@@ -254,6 +337,7 @@ namespace DWSIM.UI.Desktop.Editors
                             Resizable = true
                         };
                         form.Show();
+                        form.Center();
 
                     };
                 }

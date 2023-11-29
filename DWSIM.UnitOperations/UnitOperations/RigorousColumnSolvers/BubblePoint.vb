@@ -68,7 +68,12 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
             Dim flashalgs As New List(Of FlashAlgorithm)
 
             For ia As Integer = 0 To ns
-                flashalgs.Add(New NestedLoops With {.FlashSettings = pp.FlashSettings})
+                Dim flashcopy = pp.FlashBase.GetNewInstance()
+                If flashcopy Is Nothing Then
+                    flashalgs.Add(New NestedLoops With {.FlashSettings = pp.FlashBase.FlashSettings})
+                Else
+                    flashalgs.Add(flashcopy)
+                End If
             Next
 
             Dim spval1, spval2 As Double
@@ -879,6 +884,8 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                       ColumnSpec.SpecType.Component_Molar_Flow_Rate,
                       ColumnSpec.SpecType.Component_Mass_Flow_Rate
                     spval1 = spval1.ConvertToSI(specs("C").SpecUnit)
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    spval1 /= 100.0
             End Select
 
             Select Case specs("R").SType
@@ -889,6 +896,8 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                       ColumnSpec.SpecType.Component_Molar_Flow_Rate,
                       ColumnSpec.SpecType.Component_Mass_Flow_Rate
                     spval2 = spval2.ConvertToSI(specs("R").SpecUnit)
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    spval2 /= 100.0
             End Select
 
             'step1
@@ -964,6 +973,9 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
 
             If Not rebabs Then
                 Select Case specs("C").SType
+                    Case ColumnSpec.SpecType.Feed_Recovery
+                        LSSj(0) = spval1 * F.SumY
+                        rr = Lj(0) / LSSj(0)
                     Case ColumnSpec.SpecType.Product_Mass_Flow_Rate
                         LSSj(0) = spval1 / pp.AUX_MMM(x(0)) * 1000
                         rr = Lj(0) / LSSj(0)
@@ -984,13 +996,12 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
 
             If Not refabs Then
                 Select Case specs("R").SType
+                    Case ColumnSpec.SpecType.Feed_Recovery
+                        B = spval2 * F.SumY
                     Case ColumnSpec.SpecType.Product_Mass_Flow_Rate
                         B = spval2 / pp.AUX_MMM(x(ns)) * 1000
                     Case ColumnSpec.SpecType.Product_Molar_Flow_Rate
                         B = spval2
-                    'Case ColumnSpec.SpecType.Stream_Ratio
-                    '    B = sumF - LSSj(0) - sumLSS - sumVSS - Vj(0)
-                    '    Vj(ns) = B * spval2
                     Case ColumnSpec.SpecType.Heat_Duty
                         Q(ns) = -spval2
                         Dim sum3, sum4 As Double
@@ -1264,7 +1275,7 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                                                                                  K(ipar) = Kant(ipar)
                                                                              End If
                                                                          Catch ex As Exception
-                                                                             Throw New Exception(String.Format(pp.Flowsheet.GetTranslatedString("Error calculating bubble point temperature for stage {0} with P = {1} Pa and molar composition {2}"), ipar, P(ipar), xc.ToArrayString()), ex)
+                                                                             Throw New Exception(String.Format(pp.Flowsheet.GetTranslatedString("Error calculating bubble point temperature for stage {0} with P = {1} Pa and molar composition {2}"), ipar, P(ipar), xc(ipar).ToArrayString()), ex)
                                                                          End Try
                                                                      End Sub)
                                                         End Sub,
@@ -1283,7 +1294,7 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                                     tmp = flashalgs(i).Flash_PV(xc(i), P(i), 0.0, Tj(i), pp, True, K(i))
                                 End If
                             Catch ex As Exception
-                                Throw New Exception(String.Format(pp.Flowsheet.GetTranslatedString("Error calculating bubble point temperature for stage {0} with P = {1} Pa and molar composition {2}"), i, P(i), xc.ToArrayString()), ex)
+                                Throw New Exception(String.Format(pp.Flowsheet.GetTranslatedString("Error calculating bubble point temperature for stage {0} with P = {1} Pa and molar composition {2}"), i, P(i), xc(i).ToArrayString()), ex)
                             End Try
                             Tj(i) = tmp(4)
                             Kant(i) = K(i)
@@ -1488,6 +1499,9 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
 
                 If Not rebabs Then
                     Select Case specs("C").SType
+                        Case ColumnSpec.SpecType.Feed_Recovery
+                            LSSj(0) = spval1 * F.SumY
+                            rr = Lj(0) / LSSj(0)
                         Case ColumnSpec.SpecType.Product_Mass_Flow_Rate
                             LSSj(0) = spval1 / pp.AUX_MMM(xc(0)) * 1000
                             rr = Lj(0) / LSSj(0)
@@ -1508,6 +1522,8 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
 
                 If Not refabs Then
                     Select Case specs("R").SType
+                        Case ColumnSpec.SpecType.Feed_Recovery
+                            B = spval2 * F.SumY
                         Case ColumnSpec.SpecType.Product_Mass_Flow_Rate
                             B = spval2 / pp.AUX_MMM(xc(ns)) * 1000
                         Case ColumnSpec.SpecType.Product_Molar_Flow_Rate
@@ -1677,9 +1693,9 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                         reporter?.AppendLine("========================================================")
                         reporter?.AppendLine()
 
-                        reporter?.AppendLine(String.Format("{0,-16}{1,26}{2,26}{3,26}", "Iteration", "Temperature Error"))
+                        reporter?.AppendLine(String.Format("{0,-16}{1,26}", "Iteration", "Temperature Error"))
                         For i = 0 To t_error_hist.Count - 1
-                            reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}{2,26:G6}{3,26:G6}", i + 1, t_error_hist(i)))
+                            reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}", i + 1, t_error_hist(i)))
                         Next
 
                         reporter?.AppendLine("========================================================")
@@ -1702,9 +1718,9 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                     reporter?.AppendLine("========================================================")
                     reporter?.AppendLine()
 
-                    reporter?.AppendLine(String.Format("{0,-16}{1,26}{2,26}{3,26}", "Iteration", "Temperature Error"))
+                    reporter?.AppendLine(String.Format("{0,-16}{1,26}", "Iteration", "Temperature Error"))
                     For i = 0 To t_error_hist.Count - 1
-                        reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}{2,26:G6}{3,26:G6}", i + 1, t_error_hist(i)))
+                        reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}", i + 1, t_error_hist(i)))
                     Next
 
                     reporter?.AppendLine("========================================================")
@@ -1779,6 +1795,19 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                 reporter?.AppendLine()
 
             Loop Until t_error < tolerance * ns / 100 And ic > 1
+
+            'check mass balance
+            For i = 0 To ns
+                If Math.Abs(yc(i).SumY - 1.0) > 0.001 Then
+                    Throw New Exception("Could not converge to a valid solution")
+                End If
+                If Math.Abs(xc(i).SumY - 1.0) > 0.001 Then
+                    Throw New Exception("Could not converge to a valid solution")
+                End If
+                If Lj(i) < 0.0 Or Vj(i) < 0.0 Or LSSj(i) < 0.0 Then
+                    Throw New Exception("Could not converge to a valid solution. Please check the column specs")
+                End If
+            Next
 
             IObj?.Paragraphs.Add("The algorithm converged in " & ic & " iterations.")
 
@@ -1924,6 +1953,8 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                     col.Specs("C").CalculatedValue = LSS(0)
                 Case ColumnSpec.SpecType.Heat_Duty
                     col.Specs("C").CalculatedValue = Q(0)
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    col.Specs("C").CalculatedValue = LSS(0) / F.SumY * 100.0
             End Select
 
             Select Case col.Specs("R").SType
@@ -1953,6 +1984,8 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                     col.Specs("R").CalculatedValue = L(ns)
                 Case ColumnSpec.SpecType.Heat_Duty
                     col.Specs("R").CalculatedValue = Q(ns)
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    col.Specs("R").CalculatedValue = L(ns) / F.SumY * 100.0
             End Select
 
             With output

@@ -34,6 +34,7 @@ Partial Class FormFlowsheet
         Me.tsmiCut = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmiCopy = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmiPaste = New System.Windows.Forms.ToolStripMenuItem()
+        Me.InvertSelectionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmiRemoveSelected = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmiCloneSelected = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsmiRecalc = New System.Windows.Forms.ToolStripMenuItem()
@@ -61,9 +62,6 @@ Partial Class FormFlowsheet
         Me.PropriedadesDasSubstanciasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.InspectorTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ProToolsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CapitalCostEstimatorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ExcelReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DynamicsTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.ModoDinamicoAtivoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GerenciadorDoModoDinamicoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -71,10 +69,6 @@ Partial Class FormFlowsheet
         Me.FerramentaParaSintoniaDeControladoresPIDToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UtilitiesTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSMIAddUtility = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DashboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.MultivariateSensitivityStudyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DesignOfExperimentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.OptimumTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptimizationTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.AnaliseDeSensibilidadeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MultivariateOptimizerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -87,7 +81,6 @@ Partial Class FormFlowsheet
         Me.varpaneltsmi = New System.Windows.Forms.ToolStripMenuItem()
         Me.COObjTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConsoleOutputTSMI = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ConsoleInterativoIronPtyhonToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleWeatherPanelVisibilityToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.RestoreLayoutTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -111,8 +104,8 @@ Partial Class FormFlowsheet
         Me.tsbAbortCalc = New System.Windows.Forms.ToolStripButton()
         Me.tsbSimultAdjustSolver = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.tsbUndo = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.tsbRedo = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.tsbUndo = New System.Windows.Forms.ToolStripButton()
+        Me.tsbRedo = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
         Me.tsbDynamics = New System.Windows.Forms.ToolStripButton()
@@ -132,6 +125,9 @@ Partial Class FormFlowsheet
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.lblLastMessage = New System.Windows.Forms.LinkLabel()
+        Me.pbSolver = New CircularProgress.SpinningProgress.SpinningProgress()
+        Me.btnOpenLogPanel = New System.Windows.Forms.Button()
+        Me.btnViewFullLog = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -144,7 +140,7 @@ Partial Class FormFlowsheet
         'MenuStrip1
         '
         Me.MenuStrip1.AllowItemReorder = True
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileTSMI, Me.EditTSMI, Me.InsertTSMI, Me.ToolsTSMI, Me.ProToolsToolStripMenuItem, Me.DynamicsTSMI, Me.UtilitiesTSMI, Me.DashboardToolStripMenuItem, Me.OptimizationTSMI, Me.ResultsTSMI, Me.PluginsTSMI, Me.ShowTSMI})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileTSMI, Me.EditTSMI, Me.InsertTSMI, Me.ToolsTSMI, Me.DynamicsTSMI, Me.UtilitiesTSMI, Me.OptimizationTSMI, Me.ResultsTSMI, Me.PluginsTSMI, Me.ShowTSMI})
         resources.ApplyResources(Me.MenuStrip1, "MenuStrip1")
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
@@ -169,7 +165,7 @@ Partial Class FormFlowsheet
         '
         'EditTSMI
         '
-        Me.EditTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmiUndo, Me.tsmiRedo, Me.ToolStripSeparator14, Me.tsmiCut, Me.tsmiCopy, Me.tsmiPaste, Me.tsmiRemoveSelected, Me.tsmiCloneSelected, Me.tsmiRecalc, Me.tsmiExportData, Me.ToolStripSeparator18, Me.tsmiConfigSimulation})
+        Me.EditTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmiUndo, Me.tsmiRedo, Me.ToolStripSeparator14, Me.tsmiCut, Me.tsmiCopy, Me.tsmiPaste, Me.InvertSelectionToolStripMenuItem, Me.tsmiRemoveSelected, Me.tsmiCloneSelected, Me.tsmiRecalc, Me.tsmiExportData, Me.ToolStripSeparator18, Me.tsmiConfigSimulation})
         Me.EditTSMI.MergeAction = System.Windows.Forms.MergeAction.MatchOnly
         Me.EditTSMI.MergeIndex = 1
         Me.EditTSMI.Name = "EditTSMI"
@@ -178,7 +174,7 @@ Partial Class FormFlowsheet
         'tsmiUndo
         '
         resources.ApplyResources(Me.tsmiUndo, "tsmiUndo")
-        Me.tsmiUndo.Image = Global.DWSIM.My.Resources.Resources.undo_161
+        Me.tsmiUndo.Image = Global.DWSIM.My.Resources.Resources.undo_96px
         Me.tsmiUndo.MergeAction = System.Windows.Forms.MergeAction.Insert
         Me.tsmiUndo.MergeIndex = 0
         Me.tsmiUndo.Name = "tsmiUndo"
@@ -186,7 +182,7 @@ Partial Class FormFlowsheet
         'tsmiRedo
         '
         resources.ApplyResources(Me.tsmiRedo, "tsmiRedo")
-        Me.tsmiRedo.Image = Global.DWSIM.My.Resources.Resources.redo_16
+        Me.tsmiRedo.Image = Global.DWSIM.My.Resources.Resources.redo_96px
         Me.tsmiRedo.MergeAction = System.Windows.Forms.MergeAction.Insert
         Me.tsmiRedo.MergeIndex = 1
         Me.tsmiRedo.Name = "tsmiRedo"
@@ -223,11 +219,19 @@ Partial Class FormFlowsheet
         Me.tsmiPaste.Name = "tsmiPaste"
         resources.ApplyResources(Me.tsmiPaste, "tsmiPaste")
         '
+        'InvertSelectionToolStripMenuItem
+        '
+        Me.InvertSelectionToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.invert_selection_80px
+        Me.InvertSelectionToolStripMenuItem.MergeAction = System.Windows.Forms.MergeAction.Insert
+        Me.InvertSelectionToolStripMenuItem.MergeIndex = 6
+        Me.InvertSelectionToolStripMenuItem.Name = "InvertSelectionToolStripMenuItem"
+        resources.ApplyResources(Me.InvertSelectionToolStripMenuItem, "InvertSelectionToolStripMenuItem")
+        '
         'tsmiRemoveSelected
         '
         Me.tsmiRemoveSelected.Image = Global.DWSIM.My.Resources.Resources.cross
         Me.tsmiRemoveSelected.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.tsmiRemoveSelected.MergeIndex = 6
+        Me.tsmiRemoveSelected.MergeIndex = 7
         Me.tsmiRemoveSelected.Name = "tsmiRemoveSelected"
         resources.ApplyResources(Me.tsmiRemoveSelected, "tsmiRemoveSelected")
         '
@@ -235,7 +239,7 @@ Partial Class FormFlowsheet
         '
         Me.tsmiCloneSelected.Image = Global.DWSIM.My.Resources.Resources.sheep
         Me.tsmiCloneSelected.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.tsmiCloneSelected.MergeIndex = 7
+        Me.tsmiCloneSelected.MergeIndex = 8
         Me.tsmiCloneSelected.Name = "tsmiCloneSelected"
         resources.ApplyResources(Me.tsmiCloneSelected, "tsmiCloneSelected")
         '
@@ -243,7 +247,7 @@ Partial Class FormFlowsheet
         '
         Me.tsmiRecalc.Image = Global.DWSIM.My.Resources.Resources.arrow_refresh
         Me.tsmiRecalc.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.tsmiRecalc.MergeIndex = 8
+        Me.tsmiRecalc.MergeIndex = 9
         Me.tsmiRecalc.Name = "tsmiRecalc"
         resources.ApplyResources(Me.tsmiRecalc, "tsmiRecalc")
         '
@@ -251,14 +255,14 @@ Partial Class FormFlowsheet
         '
         Me.tsmiExportData.Image = Global.DWSIM.My.Resources.Resources.clipboard_sign
         Me.tsmiExportData.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.tsmiExportData.MergeIndex = 9
+        Me.tsmiExportData.MergeIndex = 10
         Me.tsmiExportData.Name = "tsmiExportData"
         resources.ApplyResources(Me.tsmiExportData, "tsmiExportData")
         '
         'ToolStripSeparator18
         '
         Me.ToolStripSeparator18.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.ToolStripSeparator18.MergeIndex = 10
+        Me.ToolStripSeparator18.MergeIndex = 11
         Me.ToolStripSeparator18.Name = "ToolStripSeparator18"
         resources.ApplyResources(Me.ToolStripSeparator18, "ToolStripSeparator18")
         '
@@ -266,7 +270,7 @@ Partial Class FormFlowsheet
         '
         Me.tsmiConfigSimulation.Image = Global.DWSIM.My.Resources.Resources.brick
         Me.tsmiConfigSimulation.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.tsmiConfigSimulation.MergeIndex = 11
+        Me.tsmiConfigSimulation.MergeIndex = 12
         Me.tsmiConfigSimulation.Name = "tsmiConfigSimulation"
         resources.ApplyResources(Me.tsmiConfigSimulation, "tsmiConfigSimulation")
         '
@@ -417,26 +421,6 @@ Partial Class FormFlowsheet
         Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
         resources.ApplyResources(Me.ToolStripSeparator15, "ToolStripSeparator15")
         '
-        'ProToolsToolStripMenuItem
-        '
-        Me.ProToolsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CapitalCostEstimatorToolStripMenuItem, Me.ExcelReportsToolStripMenuItem})
-        Me.ProToolsToolStripMenuItem.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.ProToolsToolStripMenuItem.MergeIndex = 4
-        Me.ProToolsToolStripMenuItem.Name = "ProToolsToolStripMenuItem"
-        resources.ApplyResources(Me.ProToolsToolStripMenuItem, "ProToolsToolStripMenuItem")
-        '
-        'CapitalCostEstimatorToolStripMenuItem
-        '
-        Me.CapitalCostEstimatorToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.icons8_coins
-        Me.CapitalCostEstimatorToolStripMenuItem.Name = "CapitalCostEstimatorToolStripMenuItem"
-        resources.ApplyResources(Me.CapitalCostEstimatorToolStripMenuItem, "CapitalCostEstimatorToolStripMenuItem")
-        '
-        'ExcelReportsToolStripMenuItem
-        '
-        Me.ExcelReportsToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.Excel
-        Me.ExcelReportsToolStripMenuItem.Name = "ExcelReportsToolStripMenuItem"
-        resources.ApplyResources(Me.ExcelReportsToolStripMenuItem, "ExcelReportsToolStripMenuItem")
-        '
         'DynamicsTSMI
         '
         Me.DynamicsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModoDinamicoAtivoToolStripMenuItem, Me.GerenciadorDoModoDinamicoToolStripMenuItem, Me.ControlesDoIntegradorToolStripMenuItem, Me.FerramentaParaSintoniaDeControladoresPIDToolStripMenuItem})
@@ -480,32 +464,6 @@ Partial Class FormFlowsheet
         Me.TSMIAddUtility.Image = Global.DWSIM.My.Resources.Resources.add
         Me.TSMIAddUtility.Name = "TSMIAddUtility"
         resources.ApplyResources(Me.TSMIAddUtility, "TSMIAddUtility")
-        '
-        'DashboardToolStripMenuItem
-        '
-        Me.DashboardToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MultivariateSensitivityStudyToolStripMenuItem, Me.DesignOfExperimentsToolStripMenuItem, Me.OptimumTesterToolStripMenuItem})
-        Me.DashboardToolStripMenuItem.MergeAction = System.Windows.Forms.MergeAction.Insert
-        Me.DashboardToolStripMenuItem.MergeIndex = 6
-        Me.DashboardToolStripMenuItem.Name = "DashboardToolStripMenuItem"
-        resources.ApplyResources(Me.DashboardToolStripMenuItem, "DashboardToolStripMenuItem")
-        '
-        'MultivariateSensitivityStudyToolStripMenuItem
-        '
-        Me.MultivariateSensitivityStudyToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.icons8_scatter_plot
-        Me.MultivariateSensitivityStudyToolStripMenuItem.Name = "MultivariateSensitivityStudyToolStripMenuItem"
-        resources.ApplyResources(Me.MultivariateSensitivityStudyToolStripMenuItem, "MultivariateSensitivityStudyToolStripMenuItem")
-        '
-        'DesignOfExperimentsToolStripMenuItem
-        '
-        Me.DesignOfExperimentsToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.icons8_scatter_plot
-        Me.DesignOfExperimentsToolStripMenuItem.Name = "DesignOfExperimentsToolStripMenuItem"
-        resources.ApplyResources(Me.DesignOfExperimentsToolStripMenuItem, "DesignOfExperimentsToolStripMenuItem")
-        '
-        'OptimumTesterToolStripMenuItem
-        '
-        Me.OptimumTesterToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.icons8_scatter_plot
-        Me.OptimumTesterToolStripMenuItem.Name = "OptimumTesterToolStripMenuItem"
-        resources.ApplyResources(Me.OptimumTesterToolStripMenuItem, "OptimumTesterToolStripMenuItem")
         '
         'OptimizationTSMI
         '
@@ -563,7 +521,7 @@ Partial Class FormFlowsheet
         '
         'ShowTSMI
         '
-        Me.ShowTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.varpaneltsmi, Me.COObjTSMI, Me.ConsoleOutputTSMI, Me.ConsoleInterativoIronPtyhonToolStripMenuItem, Me.ToggleWeatherPanelVisibilityToolStripMenuItem, Me.ToolStripSeparator10, Me.RestoreLayoutTSMI, Me.tsmiCloseOpenedEditors})
+        Me.ShowTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.varpaneltsmi, Me.COObjTSMI, Me.ConsoleOutputTSMI, Me.ToggleWeatherPanelVisibilityToolStripMenuItem, Me.ToolStripSeparator10, Me.RestoreLayoutTSMI, Me.tsmiCloseOpenedEditors})
         Me.ShowTSMI.MergeAction = System.Windows.Forms.MergeAction.MatchOnly
         Me.ShowTSMI.MergeIndex = 9
         Me.ShowTSMI.Name = "ShowTSMI"
@@ -585,11 +543,6 @@ Partial Class FormFlowsheet
         '
         Me.ConsoleOutputTSMI.Name = "ConsoleOutputTSMI"
         resources.ApplyResources(Me.ConsoleOutputTSMI, "ConsoleOutputTSMI")
-        '
-        'ConsoleInterativoIronPtyhonToolStripMenuItem
-        '
-        Me.ConsoleInterativoIronPtyhonToolStripMenuItem.Name = "ConsoleInterativoIronPtyhonToolStripMenuItem"
-        resources.ApplyResources(Me.ConsoleInterativoIronPtyhonToolStripMenuItem, "ConsoleInterativoIronPtyhonToolStripMenuItem")
         '
         'ToggleWeatherPanelVisibilityToolStripMenuItem
         '
@@ -669,7 +622,7 @@ Partial Class FormFlowsheet
         '
         'ToolStripButton1
         '
-        Me.ToolStripButton1.Image = Global.DWSIM.My.Resources.Resources.cog
+        Me.ToolStripButton1.Image = Global.DWSIM.My.Resources.Resources.settings_80px
         resources.ApplyResources(Me.ToolStripButton1, "ToolStripButton1")
         Me.ToolStripButton1.Name = "ToolStripButton1"
         '
@@ -682,7 +635,7 @@ Partial Class FormFlowsheet
         '
         Me.tsbAtivar.CheckOnClick = True
         Me.tsbAtivar.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbAtivar.Image = Global.DWSIM.My.Resources.Resources.control_power_blue
+        Me.tsbAtivar.Image = Global.DWSIM.My.Resources.Resources.hibernate_60px
         resources.ApplyResources(Me.tsbAtivar, "tsbAtivar")
         Me.tsbAtivar.Name = "tsbAtivar"
         '
@@ -690,19 +643,19 @@ Partial Class FormFlowsheet
         '
         Me.tsbCalcF.BackColor = System.Drawing.Color.LightSteelBlue
         Me.tsbCalcF.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbCalcF.Image = Global.DWSIM.My.Resources.Resources.control_play
+        Me.tsbCalcF.Image = Global.DWSIM.My.Resources.Resources.play2_96px
         resources.ApplyResources(Me.tsbCalcF, "tsbCalcF")
         Me.tsbCalcF.Name = "tsbCalcF"
         '
         'tsbCalc
         '
-        Me.tsbCalc.Image = Global.DWSIM.My.Resources.Resources.control_play_blue
+        Me.tsbCalc.Image = Global.DWSIM.My.Resources.Resources.play_96px
         resources.ApplyResources(Me.tsbCalc, "tsbCalc")
         Me.tsbCalc.Name = "tsbCalc"
         '
         'tsbAbortCalc
         '
-        Me.tsbAbortCalc.Image = Global.DWSIM.My.Resources.Resources.control_stop_blue
+        Me.tsbAbortCalc.Image = Global.DWSIM.My.Resources.Resources.stop_96px
         resources.ApplyResources(Me.tsbAbortCalc, "tsbAbortCalc")
         Me.tsbAbortCalc.Name = "tsbAbortCalc"
         '
@@ -710,7 +663,7 @@ Partial Class FormFlowsheet
         '
         Me.tsbSimultAdjustSolver.CheckOnClick = True
         Me.tsbSimultAdjustSolver.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbSimultAdjustSolver.Image = Global.DWSIM.My.Resources.Resources.control_power
+        Me.tsbSimultAdjustSolver.Image = Global.DWSIM.My.Resources.Resources.hibernate_80px
         resources.ApplyResources(Me.tsbSimultAdjustSolver, "tsbSimultAdjustSolver")
         Me.tsbSimultAdjustSolver.Name = "tsbSimultAdjustSolver"
         '
@@ -722,15 +675,15 @@ Partial Class FormFlowsheet
         'tsbUndo
         '
         Me.tsbUndo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbUndo.Image = Global.DWSIM.My.Resources.Resources.undo_161
         resources.ApplyResources(Me.tsbUndo, "tsbUndo")
+        Me.tsbUndo.Image = Global.DWSIM.My.Resources.Resources.undo_96px
         Me.tsbUndo.Name = "tsbUndo"
         '
         'tsbRedo
         '
         Me.tsbRedo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbRedo.Image = Global.DWSIM.My.Resources.Resources.redo_16
         resources.ApplyResources(Me.tsbRedo, "tsbRedo")
+        Me.tsbRedo.Image = Global.DWSIM.My.Resources.Resources.redo_96px
         Me.tsbRedo.Name = "tsbRedo"
         '
         'ToolStripSeparator3
@@ -782,21 +735,21 @@ Partial Class FormFlowsheet
         'tsbStoreSolution
         '
         Me.tsbStoreSolution.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbStoreSolution.Image = Global.DWSIM.My.Resources.Resources.arrow_up1
+        Me.tsbStoreSolution.Image = Global.DWSIM.My.Resources.Resources.move_up_96px
         resources.ApplyResources(Me.tsbStoreSolution, "tsbStoreSolution")
         Me.tsbStoreSolution.Name = "tsbStoreSolution"
         '
         'tsbLoadSolution
         '
         Me.tsbLoadSolution.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbLoadSolution.Image = Global.DWSIM.My.Resources.Resources.arrow_down
+        Me.tsbLoadSolution.Image = Global.DWSIM.My.Resources.Resources.move_down_96px
         resources.ApplyResources(Me.tsbLoadSolution, "tsbLoadSolution")
         Me.tsbLoadSolution.Name = "tsbLoadSolution"
         '
         'tsbDeleteSolution
         '
         Me.tsbDeleteSolution.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsbDeleteSolution.Image = Global.DWSIM.My.Resources.Resources.cross
+        Me.tsbDeleteSolution.Image = Global.DWSIM.My.Resources.Resources.close_96px
         resources.ApplyResources(Me.tsbDeleteSolution, "tsbDeleteSolution")
         Me.tsbDeleteSolution.Name = "tsbDeleteSolution"
         '
@@ -848,7 +801,10 @@ Partial Class FormFlowsheet
         '
         'Panel1
         '
+        Me.Panel1.BackColor = System.Drawing.Color.White
         Me.Panel1.Controls.Add(Me.FlowLayoutPanel1)
+        Me.Panel1.Controls.Add(Me.btnOpenLogPanel)
+        Me.Panel1.Controls.Add(Me.btnViewFullLog)
         resources.ApplyResources(Me.Panel1, "Panel1")
         Me.Panel1.Name = "Panel1"
         '
@@ -857,6 +813,7 @@ Partial Class FormFlowsheet
         Me.FlowLayoutPanel1.Controls.Add(Me.PictureBox1)
         Me.FlowLayoutPanel1.Controls.Add(Me.Label1)
         Me.FlowLayoutPanel1.Controls.Add(Me.lblLastMessage)
+        Me.FlowLayoutPanel1.Controls.Add(Me.pbSolver)
         resources.ApplyResources(Me.FlowLayoutPanel1, "FlowLayoutPanel1")
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         '
@@ -879,6 +836,28 @@ Partial Class FormFlowsheet
         Me.lblLastMessage.Name = "lblLastMessage"
         Me.lblLastMessage.TabStop = True
         '
+        'pbSolver
+        '
+        Me.pbSolver.ActiveSegmentColour = System.Drawing.Color.SteelBlue
+        Me.pbSolver.AutoIncrementFrequency = 50.0R
+        Me.pbSolver.BehindTransistionSegmentIsActive = False
+        resources.ApplyResources(Me.pbSolver, "pbSolver")
+        Me.pbSolver.Name = "pbSolver"
+        Me.pbSolver.TransistionSegment = 4
+        Me.pbSolver.TransistionSegmentColour = System.Drawing.Color.LightSkyBlue
+        '
+        'btnOpenLogPanel
+        '
+        resources.ApplyResources(Me.btnOpenLogPanel, "btnOpenLogPanel")
+        Me.btnOpenLogPanel.Name = "btnOpenLogPanel"
+        Me.btnOpenLogPanel.UseVisualStyleBackColor = True
+        '
+        'btnViewFullLog
+        '
+        resources.ApplyResources(Me.btnViewFullLog, "btnViewFullLog")
+        Me.btnViewFullLog.Name = "btnViewFullLog"
+        Me.btnViewFullLog.UseVisualStyleBackColor = True
+        '
         'FormFlowsheet
         '
         resources.ApplyResources(Me, "$this")
@@ -898,6 +877,7 @@ Partial Class FormFlowsheet
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TSTable.ResumeLayout(False)
         Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
@@ -970,12 +950,9 @@ Partial Class FormFlowsheet
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents tsbCalc As ToolStripButton
     Friend WithEvents tsbAbortCalc As ToolStripButton
-    Friend WithEvents tsbAtivar As ToolStripButton
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents tsbSimultAdjustSolver As ToolStripButton
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-    Friend WithEvents tsbUndo As ToolStripDropDownButton
-    Friend WithEvents tsbRedo As ToolStripDropDownButton
     Friend WithEvents tsbCalcF As ToolStripButton
     Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
     Friend WithEvents ToolStripLabel1 As ToolStripLabel
@@ -996,21 +973,20 @@ Partial Class FormFlowsheet
     Public WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents tsmiRichText As ToolStripMenuItem
     Friend WithEvents BotaoToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ProToolsToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents CapitalCostEstimatorToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ExcelReportsToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents DashboardToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents MultivariateSensitivityStudyToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents DesignOfExperimentsToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents OptimumTesterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SumarioToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CriadorDeComponentesSolidosToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToggleWeatherPanelVisibilityToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CriarPseudocomponentesEmBateladaToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ConsoleInterativoIronPtyhonToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents Panel1 As Panel
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents Label1 As Label
     Friend WithEvents lblLastMessage As LinkLabel
+    Friend WithEvents btnOpenLogPanel As Button
+    Public WithEvents tsbAtivar As ToolStripButton
+    Friend WithEvents InvertSelectionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents btnViewFullLog As Button
+    Friend WithEvents tsbUndo As ToolStripButton
+    Friend WithEvents tsbRedo As ToolStripButton
+    Friend WithEvents pbSolver As CircularProgress.SpinningProgress.SpinningProgress
 End Class

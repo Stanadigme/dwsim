@@ -148,7 +148,7 @@ Public Class EditingForm_EnergyStream
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation3(SimObject, False)
 
     End Sub
 
@@ -167,6 +167,8 @@ Public Class EditingForm_EnergyStream
     Private Sub TextBoxKeyDown(sender As Object, e As KeyEventArgs) Handles tbEnergyFlow.KeyDown
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             UpdateProps(sender)
 
@@ -250,6 +252,7 @@ Public Class EditingForm_EnergyStream
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"

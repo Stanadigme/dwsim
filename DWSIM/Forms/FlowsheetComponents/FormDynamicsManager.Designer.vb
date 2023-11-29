@@ -22,8 +22,6 @@ Partial Class FormDynamicsManager
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FormDynamicsManager))
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -35,26 +33,16 @@ Partial Class FormDynamicsManager
         Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.Label12 = New System.Windows.Forms.Label()
-        Me.pbUnitOps = New System.Windows.Forms.PictureBox()
-        Me.Label11 = New System.Windows.Forms.Label()
-        Me.pbValves = New System.Windows.Forms.PictureBox()
-        Me.Label10 = New System.Windows.Forms.Label()
-        Me.pbStreamValves = New System.Windows.Forms.PictureBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.gridselectedset = New System.Windows.Forms.DataGridView()
-        Me.id = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.active = New System.Windows.Forms.DataGridViewCheckBoxColumn()
-        Me.itemname = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.coleventstamp = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.coleventtype = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.associatedobject = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.associatedproperty = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.failsafevalue = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.unit = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Button2 = New System.Windows.Forms.Button()
+        Me.tbEventID = New System.Windows.Forms.TextBox()
+        Me.Label12 = New System.Windows.Forms.Label()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
         Me.btnAddEvent = New System.Windows.Forms.ToolStripButton()
         Me.btnCopyEvent = New System.Windows.Forms.ToolStripButton()
@@ -96,12 +84,19 @@ Partial Class FormDynamicsManager
         Me.panelSelIntegrator = New System.Windows.Forms.Panel()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
+        Me.nupDays = New System.Windows.Forms.NumericUpDown()
+        Me.Label10 = New System.Windows.Forms.Label()
+        Me.nupHours = New System.Windows.Forms.NumericUpDown()
         Me.nupIntegrationStep = New System.Windows.Forms.NumericUpDown()
+        Me.Label11 = New System.Windows.Forms.Label()
         Me.Label14 = New System.Windows.Forms.Label()
+        Me.nupMinutes = New System.Windows.Forms.NumericUpDown()
         Me.nupRTStep = New System.Windows.Forms.NumericUpDown()
+        Me.nupMinutesl = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
-        Me.dtpIntegratorDuration = New System.Windows.Forms.DateTimePicker()
+        Me.nupSeconds = New System.Windows.Forms.NumericUpDown()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.nupSecondsl = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.nupCalcControlFreq = New System.Windows.Forms.NumericUpDown()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -171,15 +166,23 @@ Partial Class FormDynamicsManager
         Me.Button1 = New System.Windows.Forms.Button()
         Me.lblStatus = New System.Windows.Forms.Label()
         Me.chkDynamics = New System.Windows.Forms.CheckBox()
-        Me.Label13 = New System.Windows.Forms.Label()
+        Me.id = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.active = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+        Me.itemname = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.coleventstamp = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.coleventtype = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.associatedobject = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.associatedproperty = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.failsafevalue = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.unit = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column10 = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.Column11 = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.Column12 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        CType(Me.pbUnitOps, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.pbValves, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.pbStreamValves, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage3.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         CType(Me.gridselectedset, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.Panel1.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.gridsets, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -196,8 +199,12 @@ Partial Class FormDynamicsManager
         Me.panelSelIntegrator.SuspendLayout()
         Me.TabControl2.SuspendLayout()
         Me.TabPage5.SuspendLayout()
+        CType(Me.nupDays, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.nupHours, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nupIntegrationStep, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.nupMinutes, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nupRTStep, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.nupSeconds, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nupCalcControlFreq, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nupCalcBalFreq, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nupCalcEqFreq, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -222,7 +229,6 @@ Partial Class FormDynamicsManager
         'TabControl1
         '
         resources.ApplyResources(Me.TabControl1, "TabControl1")
-        Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage6)
         Me.TabControl1.Controls.Add(Me.TabPage2)
@@ -232,54 +238,6 @@ Partial Class FormDynamicsManager
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        '
-        'TabPage1
-        '
-        resources.ApplyResources(Me.TabPage1, "TabPage1")
-        Me.TabPage1.Controls.Add(Me.Label12)
-        Me.TabPage1.Controls.Add(Me.pbUnitOps)
-        Me.TabPage1.Controls.Add(Me.Label11)
-        Me.TabPage1.Controls.Add(Me.pbValves)
-        Me.TabPage1.Controls.Add(Me.Label10)
-        Me.TabPage1.Controls.Add(Me.pbStreamValves)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'Label12
-        '
-        resources.ApplyResources(Me.Label12, "Label12")
-        Me.Label12.Name = "Label12"
-        '
-        'pbUnitOps
-        '
-        resources.ApplyResources(Me.pbUnitOps, "pbUnitOps")
-        Me.pbUnitOps.Image = Global.DWSIM.My.Resources.Resources.icons8_ok
-        Me.pbUnitOps.Name = "pbUnitOps"
-        Me.pbUnitOps.TabStop = False
-        '
-        'Label11
-        '
-        resources.ApplyResources(Me.Label11, "Label11")
-        Me.Label11.Name = "Label11"
-        '
-        'pbValves
-        '
-        resources.ApplyResources(Me.pbValves, "pbValves")
-        Me.pbValves.Image = Global.DWSIM.My.Resources.Resources.icons8_ok
-        Me.pbValves.Name = "pbValves"
-        Me.pbValves.TabStop = False
-        '
-        'Label10
-        '
-        resources.ApplyResources(Me.Label10, "Label10")
-        Me.Label10.Name = "Label10"
-        '
-        'pbStreamValves
-        '
-        resources.ApplyResources(Me.pbStreamValves, "pbStreamValves")
-        Me.pbStreamValves.Image = Global.DWSIM.My.Resources.Resources.icons8_ok
-        Me.pbStreamValves.Name = "pbStreamValves"
-        Me.pbStreamValves.TabStop = False
         '
         'TabPage3
         '
@@ -293,6 +251,7 @@ Partial Class FormDynamicsManager
         '
         resources.ApplyResources(Me.GroupBox1, "GroupBox1")
         Me.GroupBox1.Controls.Add(Me.gridselectedset)
+        Me.GroupBox1.Controls.Add(Me.Panel1)
         Me.GroupBox1.Controls.Add(Me.ToolStrip2)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.TabStop = False
@@ -302,74 +261,35 @@ Partial Class FormDynamicsManager
         resources.ApplyResources(Me.gridselectedset, "gridselectedset")
         Me.gridselectedset.AllowUserToAddRows = False
         Me.gridselectedset.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
-        Me.gridselectedset.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.id, Me.active, Me.itemname, Me.coleventstamp, Me.coleventtype, Me.associatedobject, Me.associatedproperty, Me.failsafevalue, Me.unit})
+        Me.gridselectedset.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.id, Me.active, Me.itemname, Me.coleventstamp, Me.coleventtype, Me.associatedobject, Me.associatedproperty, Me.failsafevalue, Me.unit, Me.Column10, Me.Column11, Me.Column12})
         Me.gridselectedset.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
         Me.gridselectedset.Name = "gridselectedset"
         Me.gridselectedset.RowHeadersVisible = False
         '
-        'id
+        'Panel1
         '
-        resources.ApplyResources(Me.id, "id")
-        Me.id.Name = "id"
+        resources.ApplyResources(Me.Panel1, "Panel1")
+        Me.Panel1.Controls.Add(Me.Button2)
+        Me.Panel1.Controls.Add(Me.tbEventID)
+        Me.Panel1.Controls.Add(Me.Label12)
+        Me.Panel1.Name = "Panel1"
         '
-        'active
+        'Button2
         '
-        Me.active.FalseValue = "False"
-        Me.active.FillWeight = 5.0!
-        resources.ApplyResources(Me.active, "active")
-        Me.active.Name = "active"
-        Me.active.TrueValue = "True"
+        resources.ApplyResources(Me.Button2, "Button2")
+        Me.Button2.Name = "Button2"
+        Me.Button2.UseVisualStyleBackColor = True
         '
-        'itemname
+        'tbEventID
         '
-        Me.itemname.FillWeight = 54.21845!
-        resources.ApplyResources(Me.itemname, "itemname")
-        Me.itemname.Name = "itemname"
+        resources.ApplyResources(Me.tbEventID, "tbEventID")
+        Me.tbEventID.Name = "tbEventID"
+        Me.tbEventID.ReadOnly = True
         '
-        'coleventstamp
+        'Label12
         '
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle1.Format = "T"
-        DataGridViewCellStyle1.NullValue = "00:00:00"
-        Me.coleventstamp.DefaultCellStyle = DataGridViewCellStyle1
-        Me.coleventstamp.FillWeight = 30.0!
-        resources.ApplyResources(Me.coleventstamp, "coleventstamp")
-        Me.coleventstamp.Name = "coleventstamp"
-        '
-        'coleventtype
-        '
-        resources.ApplyResources(Me.coleventtype, "coleventtype")
-        Me.coleventtype.Name = "coleventtype"
-        '
-        'associatedobject
-        '
-        resources.ApplyResources(Me.associatedobject, "associatedobject")
-        Me.associatedobject.Name = "associatedobject"
-        Me.associatedobject.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.associatedobject.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
-        '
-        'associatedproperty
-        '
-        Me.associatedproperty.FillWeight = 200.0!
-        resources.ApplyResources(Me.associatedproperty, "associatedproperty")
-        Me.associatedproperty.Name = "associatedproperty"
-        Me.associatedproperty.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.associatedproperty.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
-        '
-        'failsafevalue
-        '
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-        Me.failsafevalue.DefaultCellStyle = DataGridViewCellStyle2
-        Me.failsafevalue.FillWeight = 54.21845!
-        resources.ApplyResources(Me.failsafevalue, "failsafevalue")
-        Me.failsafevalue.Name = "failsafevalue"
-        '
-        'unit
-        '
-        Me.unit.FillWeight = 45.18204!
-        resources.ApplyResources(Me.unit, "unit")
-        Me.unit.Name = "unit"
-        Me.unit.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
+        resources.ApplyResources(Me.Label12, "Label12")
+        Me.Label12.Name = "Label12"
         '
         'ToolStrip2
         '
@@ -669,12 +589,19 @@ Partial Class FormDynamicsManager
         'TabPage5
         '
         resources.ApplyResources(Me.TabPage5, "TabPage5")
+        Me.TabPage5.Controls.Add(Me.nupDays)
+        Me.TabPage5.Controls.Add(Me.Label10)
+        Me.TabPage5.Controls.Add(Me.nupHours)
         Me.TabPage5.Controls.Add(Me.nupIntegrationStep)
+        Me.TabPage5.Controls.Add(Me.Label11)
         Me.TabPage5.Controls.Add(Me.Label14)
+        Me.TabPage5.Controls.Add(Me.nupMinutes)
         Me.TabPage5.Controls.Add(Me.nupRTStep)
+        Me.TabPage5.Controls.Add(Me.nupMinutesl)
         Me.TabPage5.Controls.Add(Me.Label7)
-        Me.TabPage5.Controls.Add(Me.dtpIntegratorDuration)
+        Me.TabPage5.Controls.Add(Me.nupSeconds)
         Me.TabPage5.Controls.Add(Me.Label1)
+        Me.TabPage5.Controls.Add(Me.nupSecondsl)
         Me.TabPage5.Controls.Add(Me.Label2)
         Me.TabPage5.Controls.Add(Me.nupCalcControlFreq)
         Me.TabPage5.Controls.Add(Me.Label4)
@@ -686,6 +613,22 @@ Partial Class FormDynamicsManager
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.UseVisualStyleBackColor = True
         '
+        'nupDays
+        '
+        resources.ApplyResources(Me.nupDays, "nupDays")
+        Me.nupDays.Name = "nupDays"
+        '
+        'Label10
+        '
+        resources.ApplyResources(Me.Label10, "Label10")
+        Me.Label10.Name = "Label10"
+        '
+        'nupHours
+        '
+        resources.ApplyResources(Me.nupHours, "nupHours")
+        Me.nupHours.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.nupHours.Name = "nupHours"
+        '
         'nupIntegrationStep
         '
         resources.ApplyResources(Me.nupIntegrationStep, "nupIntegrationStep")
@@ -695,10 +638,21 @@ Partial Class FormDynamicsManager
         Me.nupIntegrationStep.Name = "nupIntegrationStep"
         Me.nupIntegrationStep.Value = New Decimal(New Integer() {1000, 0, 0, 0})
         '
+        'Label11
+        '
+        resources.ApplyResources(Me.Label11, "Label11")
+        Me.Label11.Name = "Label11"
+        '
         'Label14
         '
         resources.ApplyResources(Me.Label14, "Label14")
         Me.Label14.Name = "Label14"
+        '
+        'nupMinutes
+        '
+        resources.ApplyResources(Me.nupMinutes, "nupMinutes")
+        Me.nupMinutes.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.nupMinutes.Name = "nupMinutes"
         '
         'nupRTStep
         '
@@ -708,23 +662,31 @@ Partial Class FormDynamicsManager
         Me.nupRTStep.Name = "nupRTStep"
         Me.nupRTStep.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
+        'nupMinutesl
+        '
+        resources.ApplyResources(Me.nupMinutesl, "nupMinutesl")
+        Me.nupMinutesl.Name = "nupMinutesl"
+        '
         'Label7
         '
         resources.ApplyResources(Me.Label7, "Label7")
         Me.Label7.Name = "Label7"
         '
-        'dtpIntegratorDuration
+        'nupSeconds
         '
-        resources.ApplyResources(Me.dtpIntegratorDuration, "dtpIntegratorDuration")
-        Me.dtpIntegratorDuration.Format = System.Windows.Forms.DateTimePickerFormat.Time
-        Me.dtpIntegratorDuration.Name = "dtpIntegratorDuration"
-        Me.dtpIntegratorDuration.ShowUpDown = True
-        Me.dtpIntegratorDuration.Value = New Date(1753, 1, 1, 0, 0, 0, 0)
+        resources.ApplyResources(Me.nupSeconds, "nupSeconds")
+        Me.nupSeconds.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.nupSeconds.Name = "nupSeconds"
         '
         'Label1
         '
         resources.ApplyResources(Me.Label1, "Label1")
         Me.Label1.Name = "Label1"
+        '
+        'nupSecondsl
+        '
+        resources.ApplyResources(Me.nupSecondsl, "nupSecondsl")
+        Me.nupSecondsl.Name = "nupSecondsl"
         '
         'Label2
         '
@@ -1246,36 +1208,107 @@ Partial Class FormDynamicsManager
         Me.chkDynamics.Name = "chkDynamics"
         Me.chkDynamics.UseVisualStyleBackColor = False
         '
-        'Label13
+        'id
         '
-        resources.ApplyResources(Me.Label13, "Label13")
-        Me.Label13.ForeColor = System.Drawing.Color.DarkRed
-        Me.Label13.Name = "Label13"
+        resources.ApplyResources(Me.id, "id")
+        Me.id.Name = "id"
+        '
+        'active
+        '
+        Me.active.FalseValue = "False"
+        Me.active.FillWeight = 5.0!
+        resources.ApplyResources(Me.active, "active")
+        Me.active.Name = "active"
+        Me.active.TrueValue = "True"
+        '
+        'itemname
+        '
+        Me.itemname.FillWeight = 54.21845!
+        resources.ApplyResources(Me.itemname, "itemname")
+        Me.itemname.Name = "itemname"
+        '
+        'coleventstamp
+        '
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle1.Format = "c"
+        DataGridViewCellStyle1.NullValue = "00:00:00"
+        Me.coleventstamp.DefaultCellStyle = DataGridViewCellStyle1
+        Me.coleventstamp.FillWeight = 30.0!
+        resources.ApplyResources(Me.coleventstamp, "coleventstamp")
+        Me.coleventstamp.Name = "coleventstamp"
+        '
+        'coleventtype
+        '
+        resources.ApplyResources(Me.coleventtype, "coleventtype")
+        Me.coleventtype.Name = "coleventtype"
+        '
+        'associatedobject
+        '
+        resources.ApplyResources(Me.associatedobject, "associatedobject")
+        Me.associatedobject.Name = "associatedobject"
+        Me.associatedobject.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.associatedobject.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
+        '
+        'associatedproperty
+        '
+        Me.associatedproperty.FillWeight = 200.0!
+        resources.ApplyResources(Me.associatedproperty, "associatedproperty")
+        Me.associatedproperty.Name = "associatedproperty"
+        Me.associatedproperty.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.associatedproperty.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
+        '
+        'failsafevalue
+        '
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        Me.failsafevalue.DefaultCellStyle = DataGridViewCellStyle2
+        Me.failsafevalue.FillWeight = 54.21845!
+        resources.ApplyResources(Me.failsafevalue, "failsafevalue")
+        Me.failsafevalue.Name = "failsafevalue"
+        '
+        'unit
+        '
+        Me.unit.FillWeight = 45.18204!
+        resources.ApplyResources(Me.unit, "unit")
+        Me.unit.Name = "unit"
+        Me.unit.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
+        '
+        'Column10
+        '
+        resources.ApplyResources(Me.Column10, "Column10")
+        Me.Column10.Items.AddRange(New Object() {"Step", "Linear", "Log", "Inverse Log", "Random"})
+        Me.Column10.Name = "Column10"
+        '
+        'Column11
+        '
+        resources.ApplyResources(Me.Column11, "Column11")
+        Me.Column11.Items.AddRange(New Object() {"Initial State", "Previous Event", "Reference Event"})
+        Me.Column11.Name = "Column11"
+        '
+        'Column12
+        '
+        resources.ApplyResources(Me.Column12, "Column12")
+        Me.Column12.Name = "Column12"
         '
         'FormDynamicsManager
         '
         resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
         Me.CloseButton = False
         Me.CloseButtonVisible = False
-        Me.Controls.Add(Me.Label13)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.chkDynamics)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.TabControl1)
+        Me.DoubleBuffered = True
         Me.Name = "FormDynamicsManager"
         Me.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document
         Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
-        Me.TabPage1.PerformLayout()
-        CType(Me.pbUnitOps, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.pbValves, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.pbStreamValves, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage3.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         CType(Me.gridselectedset, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.ToolStrip2.ResumeLayout(False)
         Me.ToolStrip2.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -1300,8 +1333,12 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
         Me.TabControl2.ResumeLayout(False)
         Me.TabPage5.ResumeLayout(False)
         Me.TabPage5.PerformLayout()
+        CType(Me.nupDays, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.nupHours, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.nupIntegrationStep, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.nupMinutes, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.nupRTStep, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.nupSeconds, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.nupCalcControlFreq, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.nupCalcBalFreq, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.nupCalcEqFreq, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1334,7 +1371,6 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
     End Sub
 
     Friend WithEvents TabControl1 As TabControl
-    Friend WithEvents TabPage1 As TabPage
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents TabPage3 As TabPage
     Friend WithEvents lblStatus As Label
@@ -1397,7 +1433,6 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
     Friend WithEvents Label6 As Label
     Friend WithEvents Label5 As Label
     Friend WithEvents Label4 As Label
-    Friend WithEvents dtpIntegratorDuration As DateTimePicker
     Friend WithEvents nupCalcControlFreq As NumericUpDown
     Friend WithEvents nupCalcBalFreq As NumericUpDown
     Friend WithEvents nupCalcEqFreq As NumericUpDown
@@ -1413,20 +1448,7 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
     Friend WithEvents TabPage4 As TabPage
     Friend WithEvents TabPage8 As TabPage
     Friend WithEvents dgvControllers As DataGridView
-    Friend WithEvents Label10 As Label
-    Friend WithEvents pbStreamValves As PictureBox
-    Friend WithEvents Label11 As Label
-    Friend WithEvents pbValves As PictureBox
     Friend WithEvents dgvIndicators As DataGridView
-    Friend WithEvents id As DataGridViewTextBoxColumn
-    Friend WithEvents active As DataGridViewCheckBoxColumn
-    Friend WithEvents itemname As DataGridViewTextBoxColumn
-    Friend WithEvents coleventstamp As DataGridViewTextBoxColumn
-    Friend WithEvents coleventtype As DataGridViewComboBoxColumn
-    Friend WithEvents associatedobject As DataGridViewComboBoxColumn
-    Friend WithEvents associatedproperty As DataGridViewComboBoxColumn
-    Friend WithEvents failsafevalue As DataGridViewTextBoxColumn
-    Friend WithEvents unit As DataGridViewTextBoxColumn
     Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
     Friend WithEvents DataGridViewCheckBoxColumn1 As DataGridViewCheckBoxColumn
     Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
@@ -1451,8 +1473,6 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
     Friend WithEvents Column5 As DataGridViewTextBoxColumn
     Friend WithEvents Column7 As DataGridViewTextBoxColumn
     Friend WithEvents Column6 As DataGridViewTextBoxColumn
-    Friend WithEvents Label12 As Label
-    Friend WithEvents pbUnitOps As PictureBox
     Friend WithEvents TabControl2 As TabControl
     Friend WithEvents TabPage5 As TabPage
     Friend WithEvents TabPage9 As TabPage
@@ -1465,9 +1485,32 @@ Me.AutoScaleDimensions = New System.Drawing.SizeF(96, 96)
     Friend WithEvents DataGridViewComboBoxColumn1 As DataGridViewComboBoxColumn
     Friend WithEvents DataGridViewComboBoxColumn5 As DataGridViewComboBoxColumn
     Friend WithEvents DataGridViewTextBoxColumn18 As DataGridViewTextBoxColumn
-    Friend WithEvents Label13 As Label
     Friend WithEvents Label14 As Label
     Friend WithEvents nupRTStep As NumericUpDown
     Friend WithEvents chkResetAll As CheckBox
     Friend WithEvents nupIntegrationStep As NumericUpDown
+    Friend WithEvents nupDays As NumericUpDown
+    Friend WithEvents Label10 As Label
+    Friend WithEvents nupHours As NumericUpDown
+    Friend WithEvents Label11 As Label
+    Friend WithEvents nupMinutes As NumericUpDown
+    Friend WithEvents nupMinutesl As Label
+    Friend WithEvents nupSeconds As NumericUpDown
+    Friend WithEvents nupSecondsl As Label
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Button2 As Button
+    Friend WithEvents tbEventID As TextBox
+    Friend WithEvents Label12 As Label
+    Friend WithEvents id As DataGridViewTextBoxColumn
+    Friend WithEvents active As DataGridViewCheckBoxColumn
+    Friend WithEvents itemname As DataGridViewTextBoxColumn
+    Friend WithEvents coleventstamp As DataGridViewTextBoxColumn
+    Friend WithEvents coleventtype As DataGridViewComboBoxColumn
+    Friend WithEvents associatedobject As DataGridViewComboBoxColumn
+    Friend WithEvents associatedproperty As DataGridViewComboBoxColumn
+    Friend WithEvents failsafevalue As DataGridViewTextBoxColumn
+    Friend WithEvents unit As DataGridViewTextBoxColumn
+    Friend WithEvents Column10 As DataGridViewComboBoxColumn
+    Friend WithEvents Column11 As DataGridViewComboBoxColumn
+    Friend WithEvents Column12 As DataGridViewTextBoxColumn
 End Class

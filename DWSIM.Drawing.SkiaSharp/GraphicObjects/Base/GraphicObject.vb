@@ -155,7 +155,14 @@ Namespace GraphicObjects
         Public Function MeasureString(text As String, paint As SKPaint) As SKSize
 
             Dim trect As New SKRect(0, 0, 2, 2)
+
+            Dim aa = paint.IsAntialias
+
+            paint.IsAntialias = False
+
             paint.GetTextPath(text, 0, 0).GetBounds(trect)
+
+            paint.IsAntialias = aa
 
             Return New SKSize(trect.Width, trect.Height)
 
@@ -350,8 +357,11 @@ Namespace GraphicObjects
 #End Region
 
         Public Overridable Function GetPosition() As SKPoint
-            Dim myPosition As New SKPoint(X, Y)
-            Return myPosition
+            Return New SKPoint(X, Y)
+        End Function
+
+        Public Overridable Function GetCenterPosition() As SKPoint
+            Return New SKPoint(X + Width / 2, Y + Height / 2)
         End Function
 
         Public Overridable Sub SetPosition(ByVal Value As SKPoint)
@@ -570,6 +580,12 @@ Namespace GraphicObjects
             End If
 
         End Function
+
+        Public Sub ReleaseReferences() Implements IGraphicObject.ReleaseReferences
+
+            Owner = Nothing
+
+        End Sub
 
     End Class
 

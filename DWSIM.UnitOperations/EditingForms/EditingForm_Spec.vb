@@ -41,13 +41,16 @@ Public Class EditingForm_Spec
 
             'connections
 
-            Dim objlist As String() = .FlowSheet.SimulationObjects.Values.Where(Function(x) TypeOf x Is ISimulationObject).Select(Function(m) m.GraphicObject.Tag).ToArray
+            Dim objlist As String() = .FlowSheet.SimulationObjects.Values.Where(Function(x) TypeOf x Is ISimulationObject).Select(Function(m) m.GraphicObject.Tag).OrderBy(Function(m) m).ToArray
 
             cbSourceObj.Items.Clear()
             cbSourceObj.Items.AddRange(objlist)
 
             cbTargetObj.Items.Clear()
             cbTargetObj.Items.AddRange(objlist)
+
+            cbRefObj.Items.Clear()
+            cbRefObj.Items.AddRange(objlist)
 
             If .SourceObjectData.ID <> "" Then
                 Dim obj = .GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.Name = .SourceObjectData.ID).SingleOrDefault
@@ -65,6 +68,12 @@ Public Class EditingForm_Spec
                     cbTargetProp.SelectedItem = .FlowSheet.GetTranslatedString(.TargetObjectData.PropertyName)
                 End If
             End If
+            If .ReferenceObjectID <> "" Then
+                Dim obj = .GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.Name = .ReferenceObjectID).SingleOrDefault
+                If Not obj Is Nothing Then cbRefObj.SelectedItem = obj.GraphicObject.Tag
+            End If
+
+            cbCalcMode.SelectedIndex = .SpecCalculationMode
 
             'annotation
 
@@ -106,7 +115,7 @@ Public Class EditingForm_Spec
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation2(False)
 
     End Sub
 
@@ -257,11 +266,35 @@ Public Class EditingForm_Spec
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"
             DirectCast(SimObject.FlowSheet, Interfaces.IFlowsheetGUI).UpdateInterface()
 
+        End If
+
+    End Sub
+
+    Private Sub cbRefObj_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbRefObj.SelectedIndexChanged
+
+        Try
+            If Loaded Then SimObject.ReferenceObjectID = SimObject.FlowSheet.GetObject(cbRefObj.SelectedItem.ToString()).Name
+        Catch ex As Exception
+        End Try
+
+    End Sub
+
+    Private Sub cbCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCalcMode.SelectedIndexChanged
+
+        If Loaded Then
+            SimObject.SpecCalculationMode = cbCalcMode.SelectedIndex
+        End If
+
+        If SimObject.SpecCalculationMode = Enums.SpecCalcMode2.AfterObject Or SimObject.SpecCalculationMode = Enums.SpecCalcMode2.BeforeObject Then
+            cbRefObj.Enabled = True
+        Else
+            cbRefObj.Enabled = False
         End If
 
     End Sub

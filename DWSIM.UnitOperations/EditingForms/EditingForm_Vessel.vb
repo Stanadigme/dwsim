@@ -20,6 +20,8 @@ Public Class EditingForm_Vessel
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Sub UpdateInfo()
@@ -325,6 +327,7 @@ Public Class EditingForm_Vessel
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            VesselObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, VesselObject)
             VesselObject.PropertyPackage = VesselObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -349,12 +352,14 @@ Public Class EditingForm_Vessel
     End Sub
 
     Private Sub chkOverrideT_CheckedChanged(sender As Object, e As EventArgs) Handles chkOverrideT.CheckedChanged
+        If Loaded Then VesselObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, VesselObject)
         tbTemperature.Enabled = chkOverrideT.Checked
         VesselObject.OverrideT = chkOverrideT.Checked
         If Loaded Then RequestCalc()
     End Sub
 
     Private Sub chkOverrideP_CheckedChanged(sender As Object, e As EventArgs) Handles chkOverrideP.CheckedChanged
+        If Loaded Then VesselObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, VesselObject)
         tbPressure.Enabled = chkOverrideP.Checked
         VesselObject.OverrideP = chkOverrideP.Checked
         If Loaded Then RequestCalc()
@@ -415,12 +420,14 @@ Public Class EditingForm_Vessel
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        VesselObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        VesselObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub cbPressureCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPressureCalcMode.SelectedIndexChanged
 
         If Loaded Then
+
+            VesselObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, VesselObject)
 
             Select Case cbPressureCalcMode.SelectedIndex
                 Case 0
@@ -573,7 +580,7 @@ Public Class EditingForm_Vessel
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
-
+            VesselObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
             If Loaded Then VesselObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then VesselObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = VesselObject.GraphicObject.Tag & " (" & VesselObject.GetDisplayName() & ")"

@@ -14,9 +14,13 @@ Public Class EditingForm_HeatExchanger
     Dim units As SharedClasses.SystemsOfUnits.Units
     Dim nf As String
 
+    Public Overrides ReadOnly Property Modular As Boolean = True
+
     Private Sub EditingForm_HeaterCooler_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         UpdateInfo()
+
+        ChangeDefaultFont()
 
     End Sub
 
@@ -185,7 +189,7 @@ Public Class EditingForm_HeatExchanger
                     gridResults.Rows.Add(New Object() {"Fouling Resistance", .STProperties.Ff.ToString("E6"), units.foulingfactor})
                 End If
 
-                If .CalculationMode = UnitOperations.HeatExchangerCalcMode.PinchPoint Then
+                If .HeatProfile.Count > 0 Then
                     btnViewProfile.Enabled = True
                 Else
                     btnViewProfile.Enabled = False
@@ -221,6 +225,8 @@ Public Class EditingForm_HeatExchanger
 
     Private Sub cbCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCalcMode.SelectedIndexChanged
 
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
         SimObject.CalculationMode = cbCalcMode.SelectedIndex
 
         tbColdFluidOutletT.Enabled = True
@@ -243,6 +249,8 @@ Public Class EditingForm_HeatExchanger
         chkForcePinchToOutlets.Enabled = False
 
         btnEditSTProps.Enabled = False
+
+        chkCalculateProfile.Enabled = True
 
         Select Case cbCalcMode.SelectedIndex
             Case 0
@@ -342,6 +350,7 @@ Public Class EditingForm_HeatExchanger
                 tbHotFluidPDrop.Enabled = True
                 tbEfficiency.Enabled = False
                 chkForcePinchToOutlets.Enabled = True
+                chkCalculateProfile.Enabled = False
             Case 8
                 'Thermal Efficiency
                 tbHotFluidOutletT.Enabled = False
@@ -460,8 +469,14 @@ Public Class EditingForm_HeatExchanger
 
         If sender Is tbHotFluidPDrop Then uobj.HotSidePressureDrop = su.Converter.ConvertToSI(cbHotFluidPDrop.SelectedItem.ToString, tbHotFluidPDrop.Text.ParseExpressionToDouble)
         If sender Is tbColdFluidPDrop Then uobj.ColdSidePressureDrop = su.Converter.ConvertToSI(cbColdFluidPDrop.SelectedItem.ToString, tbColdFluidPDrop.Text.ParseExpressionToDouble)
-        If sender Is tbHotFluidOutletT Then uobj.HotSideOutletTemperature = su.Converter.ConvertToSI(cbHotFluidOutletT.SelectedItem.ToString, tbHotFluidOutletT.Text.ParseExpressionToDouble)
-        If sender Is tbColdFluidOutletT Then uobj.ColdSideOutletTemperature = su.Converter.ConvertToSI(cbColdFluidOutletT.SelectedItem.ToString, tbColdFluidOutletT.Text.ParseExpressionToDouble)
+        If sender Is tbHotFluidOutletT Then
+            uobj.DefinedTemperature = UnitOperations.SpecifiedTemperature.Hot_Fluid
+            uobj.HotSideOutletTemperature = su.Converter.ConvertToSI(cbHotFluidOutletT.SelectedItem.ToString, tbHotFluidOutletT.Text.ParseExpressionToDouble)
+        End If
+        If sender Is tbColdFluidOutletT Then
+            uobj.DefinedTemperature = UnitOperations.SpecifiedTemperature.Cold_Fluid
+            uobj.ColdSideOutletTemperature = su.Converter.ConvertToSI(cbColdFluidOutletT.SelectedItem.ToString, tbColdFluidOutletT.Text.ParseExpressionToDouble)
+        End If
         If sender Is tbArea Then uobj.Area = su.Converter.ConvertToSI(cbArea.SelectedItem.ToString, tbArea.Text.ParseExpressionToDouble)
         If sender Is tbOverallU Then uobj.OverallCoefficient = su.Converter.ConvertToSI(cbOverallHTC.SelectedItem.ToString, tbOverallU.Text.ParseExpressionToDouble)
         If sender Is tbHeat Then uobj.Q = su.Converter.ConvertToSI(cbHeat.SelectedItem.ToString, tbHeat.Text.ParseExpressionToDouble)
@@ -477,7 +492,7 @@ Public Class EditingForm_HeatExchanger
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation2(False)
 
     End Sub
 
@@ -504,6 +519,8 @@ Public Class EditingForm_HeatExchanger
                                                                         tbOVF1.KeyDown, tbOVF2.KeyDown
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             UpdateProps(sender)
 
@@ -706,12 +723,16 @@ Public Class EditingForm_HeatExchanger
 
     Private Sub btnEditSTProps_Click(sender As Object, e As EventArgs) Handles btnEditSTProps.Click
 
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
         Dim f As New EditingForm_HeatExchanger_SHProperties With {.hx = SimObject}
         SimObject.FlowSheet.DisplayForm(f)
 
     End Sub
 
     Private Sub cbFlowDir_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbFlowDir.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         SimObject.FlowDir = cbFlowDir.SelectedIndex
         If Loaded Then RequestCalc()
     End Sub
@@ -723,13 +744,15 @@ Public Class EditingForm_HeatExchanger
 
     End Sub
 
-    Private Sub GroupBox2_MouseMove(sender As Object, e As MouseEventArgs) Handles GroupBox2.MouseMove
+    Private Sub GroupBox2_MouseMove(sender As Object, e As MouseEventArgs) Handles GroupBoxParameters.MouseMove
         MyBase.Editor_MouseMove(sender, e)
     End Sub
 
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
 
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
@@ -747,4 +770,9 @@ Public Class EditingForm_HeatExchanger
     Private Sub chkIgnoreLMTD_CheckedChanged(sender As Object, e As EventArgs) Handles chkIgnoreLMTD.CheckedChanged
         SimObject.IgnoreLMTDError = chkIgnoreLMTD.Checked
     End Sub
+
+    Private Sub chkCalculateProfile_CheckedChanged(sender As Object, e As EventArgs) Handles chkCalculateProfile.CheckedChanged
+        SimObject.CalculateHeatExchangeProfile = chkCalculateProfile.Checked
+    End Sub
+
 End Class

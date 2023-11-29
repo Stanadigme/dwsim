@@ -1,12 +1,10 @@
 ﻿Imports System.Linq
 Imports System.Threading.Tasks
 Imports DWSIM.DynamicsManager
-Imports Eto.Threading
-Imports Mono.CSharp
+Imports DWSIM.Interfaces
 Imports OxyPlot
 Imports OxyPlot.Axes
 Imports OxyPlot.Series
-Imports Python.Runtime
 
 Public Class FormDynamicsIntegratorControl
 
@@ -21,6 +19,10 @@ Public Class FormDynamicsIntegratorControl
     Public LiveChart As New FormChart_OxyPlot
 
     Private ChartIsSetup As Boolean = False
+
+    Private FlowsheetClone As IFlowsheet
+
+    Private Historian As New Dictionary(Of Date, XDocument)
 
     Private Sub FormDynamicsIntegratorControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -46,8 +48,12 @@ Public Class FormDynamicsIntegratorControl
 
             For Each item In Flowsheet.DynamicsManager.ScheduleList
                 If item.Value.CurrentIntegrator <> "" Then
-                    Dim integ = Flowsheet.DynamicsManager.IntegratorList(item.Value.CurrentIntegrator).Description
-                    cbScenario.Items.Add(item.Value.Description & " (" & integ & ")")
+                    If Flowsheet.DynamicsManager.IntegratorList.ContainsKey(item.Value.CurrentIntegrator) Then
+                        Dim integ = Flowsheet.DynamicsManager.IntegratorList(item.Value.CurrentIntegrator).Description
+                        cbScenario.Items.Add(item.Value.Description & " (" & integ & ")")
+                    Else
+                        cbScenario.Items.Add(item.Value.Description)
+                    End If
                 Else
                     cbScenario.Items.Add(item.Value.Description)
                 End If
@@ -81,14 +87,28 @@ Public Class FormDynamicsIntegratorControl
         If Flowsheet.DynamicMode Then
             If Not Running Then
                 ChartIsSetup = False
-                RunIntegrator(False, False, False, False)
+                Try
+                    RunIntegrator(False, False, False, False)
+                Catch ex As Exception
+                    Running = False
+                    btnRun.BackgroundImage = My.Resources.icons8_play
+                    Throw ex
+                End Try
             Else
                 If Not Paused Then
-                    RunIntegrator(False, False, True, False)
+                    Try
+                        RunIntegrator(False, False, True, False)
+                    Catch ex As Exception
+                        Running = False
+                        btnRun.BackgroundImage = My.Resources.icons8_play
+                        Throw ex
+                    End Try
                 End If
             End If
         Else
             Flowsheet.ShowMessage(DWSIM.App.GetLocalString("DynamicsDisabled"), Interfaces.IFlowsheet.MessageType.Warning)
+            Running = False
+            btnRun.BackgroundImage = My.Resources.icons8_play
         End If
 
     End Sub
@@ -130,6 +150,14 @@ Public Class FormDynamicsIntegratorControl
         Dim finaltime = currentposition
 
         Dim events = eventset.Events.Values.Where(Function(x) x.TimeStamp >= initialtime And x.TimeStamp < finaltime).ToList
+
+        Dim props = Flowsheet.DynamicsManager.GetPropertyValuesFromEvents(FlowsheetClone, currentposition, Historian, eventset)
+
+        For Each p In props
+            Dim obj = Flowsheet.SimulationObjects(p.Item1)
+            Dim value = p.Item3
+            obj.SetPropertyValue(p.Item2, value)
+        Next
 
         For Each ev In events
             If ev.Enabled Then
@@ -218,6 +246,8 @@ Public Class FormDynamicsIntegratorControl
         If Not Flowsheet.DynamicsManager.IntegratorList.ContainsKey(schedule.CurrentIntegrator) Then
             Throw New Exception(Flowsheet.GetTranslatedString1("Please select a valid integrator for the selected schedule."))
         End If
+
+        Flowsheet.ShowMessage(DWSIM.App.GetLocalString("Dynamics Integrator Starting..."), Interfaces.IFlowsheet.MessageType.Information)
 
         Dim integrator = Flowsheet.DynamicsManager.IntegratorList(schedule.CurrentIntegrator)
 
@@ -315,6 +345,10 @@ Public Class FormDynamicsIntegratorControl
 
         Flowsheet.SupressMessages = True
 
+        FlowsheetClone = Flowsheet.Clone()
+
+        Historian = New Dictionary(Of Date, XDocument)()
+
         Dim exceptions As New List(Of Exception)
 
         If Not restarting Then
@@ -341,6 +375,8 @@ Public Class FormDynamicsIntegratorControl
 
                                         Dim sw As New Stopwatch
                                         sw.Start()
+
+                                        Flowsheet.ProcessScripts(Scripts.EventType.IntegratorPreStep, Scripts.ObjectType.Integrator, "")
 
                                         Dim i0 As Integer = i
 
@@ -384,7 +420,11 @@ Public Class FormDynamicsIntegratorControl
 
                                         If exceptions.Count > 0 Then Exit While
 
+                                        Historian.Add(integrator.CurrentTime, Flowsheet.GetSnapshot(SnapshotType.ObjectData))
+
                                         StoreVariableValues(integrator, i, integrator.CurrentTime)
+
+                                        Flowsheet.ProcessScripts(Scripts.EventType.IntegratorStep, Scripts.ObjectType.Integrator, "")
 
                                         If Not guiless Then
                                             Flowsheet.RunCodeOnUIThread(Sub()

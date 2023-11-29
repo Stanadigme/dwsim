@@ -46,7 +46,6 @@ Imports DWSIM.Interfaces.Enums
 Imports DWSIM.SharedClasses
 
 Imports props = DWSIM.Thermodynamics.PropertyPackages.Auxiliary.PROPS
-
 Namespace PropertyPackages
 
 #Region "    Global Enumerations"
@@ -187,6 +186,12 @@ Namespace PropertyPackages
             Ideal = 1
             Excess = 2
             ExpData = 3
+            LiqCp_Excess = 4
+        End Enum
+
+        Public Enum LiquidEnthalpyEntropyCpCvCalcMode_EOS
+            EOS = 0
+            ExpData = 1
         End Enum
 
         Public Enum VaporPhaseFugacityCalcMode
@@ -239,6 +244,8 @@ Namespace PropertyPackages
 
         Public Property EnthalpyEntropyCpCvCalculationMode As EnthalpyEntropyCpCvCalcMode = EnthalpyEntropyCpCvCalcMode.LeeKesler
 
+        Public Property LiquidEnthalpyEntropyCpCvCalculationMode_EOS As LiquidEnthalpyEntropyCpCvCalcMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS
+
         Public Property IgnoreVaporFractionLimit As Boolean = False
 
         Public Property IgnoreSalinityLimit As Boolean = False
@@ -251,7 +258,9 @@ Namespace PropertyPackages
 
         Public Property UseHenryConstants As Boolean = True
 
-        Public Property AutoEstimateMissingNRTLUNIQUACParameters = True
+        Public Overridable ReadOnly Property IsAmineModel As Boolean = False
+
+        Public Property AutoEstimateMissingNRTLUNIQUACParameters As Boolean = True
 
         ''' <summary>
         ''' ' For mobile compatibility only.
@@ -259,6 +268,7 @@ Namespace PropertyPackages
         ''' <returns></returns>
         Public Property ParametersXMLString = ""
 
+        Public Property AreModelParametersDirty = True
 
 #End Region
 
@@ -267,10 +277,10 @@ Namespace PropertyPackages
         Public Const ClassId As String = ""
 
         <JsonIgnore> <System.NonSerialized()> Private m_ms As Interfaces.IMaterialStream = Nothing
-        Private m_ss As New System.Collections.Generic.List(Of String)
+        Private m_ss As New List(Of String)
         Private m_configurable As Boolean = False
 
-        Public m_Henry As New System.Collections.Generic.Dictionary(Of String, HenryParam)
+        Public Shared m_Henry As New Dictionary(Of String, HenryParam)
 
         <NonSerialized> Private m_ip As DataTable
 
@@ -338,6 +348,20 @@ Namespace PropertyPackages
 
             Me.LoadUserDBs()
 
+            'load additional compounds
+
+            Try
+                Me.LoadAdditionalCompounds()
+            Catch ex As Exception
+            End Try
+
+        End Sub
+
+        Public Sub LoadAdditionalCompounds()
+            Dim comps = Databases.UserDB.LoadAdditionalCompounds()
+            For Each cp As BaseClasses.ConstantProperties In comps
+                If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
+            Next
         End Sub
 
         Public Sub LoadCheDLDB()
@@ -475,15 +499,15 @@ Namespace PropertyPackages
 
         Public Property OverrideKvalFugCoeff As Boolean = False
 
-        Public KvalFugacityCoefficientOverride As Func(Of Double(), Double, Double, State, Double())
+        Public KvalFugacityCoefficientOverride As Func(Of Double(), Double, Double, State, PropertyPackage, Double())
 
         Public Property OverrideEnthalpyCalculation As Boolean = False
 
-        Public EnthalpyCalculationOverride As Func(Of Double(), Double, Double, State, Double)
+        Public EnthalpyCalculationOverride As Func(Of Double(), Double, Double, State, PropertyPackage, Double)
 
         Public Property OverrideEntropyCalculation As Boolean = False
 
-        Public EntropyCalculationOverride As Func(Of Double(), Double, Double, State, Double)
+        Public EntropyCalculationOverride As Func(Of Double(), Double, Double, State, PropertyPackage, Double)
 
         Public Property ForceNewFlashAlgorithmInstance As Boolean = False
 
@@ -680,6 +704,16 @@ Namespace PropertyPackages
             pp.LoadData(data)
 
             pp.UniqueID = "PP-" + Guid.NewGuid().ToString()
+
+            If EnthalpyCalculationOverride IsNot Nothing Then
+                pp.EnthalpyCalculationOverride = EnthalpyCalculationOverride.Clone()
+            End If
+            If EntropyCalculationOverride IsNot Nothing Then
+                pp.EntropyCalculationOverride = EntropyCalculationOverride.Clone()
+            End If
+            If KvalFugacityCoefficientOverride IsNot Nothing Then
+                pp.KvalFugacityCoefficientOverride = KvalFugacityCoefficientOverride.Clone()
+            End If
 
             Return pp
 
@@ -1309,21 +1343,21 @@ Namespace PropertyPackages
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
         Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As Double(), ByVal Vy As Double(), ByVal T As Double, ByVal P As Double, Optional ByVal type As String = "LV") As Double()
 
-            If Vx.HasNaN() Or Vx.HasInf() Then
-                Throw New Exception(String.Format(Flowsheet.GetTranslatedString("Tried to calculate K-values with invalid liquid composition: {0}"), Vx.ToArrayString()))
-            End If
+            'If Vx.HasNaN() Or Vx.HasInf() Then
+            '    Throw New Exception(String.Format("Tried to calculate K-values with invalid liquid composition: {0}", Vx.ToArrayString()))
+            'End If
 
-            If Vy.HasNaN() Or Vy.HasInf() Then
-                Throw New Exception(String.Format(Flowsheet.GetTranslatedString("Tried to calculate K-values with invalid vapor composition: {0}"), Vy.ToArrayString()))
-            End If
+            'If Vy.HasNaN() Or Vy.HasInf() Then
+            '    Throw New Exception(String.Format("Tried to calculate K-values with invalid vapor composition: {0}", Vy.ToArrayString()))
+            'End If
 
-            If Double.IsNaN(T) Or Double.IsInfinity(T) Then
-                Throw New Exception(String.Format(Flowsheet.GetTranslatedString("Tried to calculate K-values with invalid temperature: {0} K"), T))
-            End If
+            'If Double.IsNaN(T) Or Double.IsInfinity(T) Then
+            '    Throw New Exception(String.Format("Tried to calculate K-values with invalid temperature: {0} K", T))
+            'End If
 
-            If Double.IsNaN(P) Or Double.IsInfinity(P) Then
-                Throw New Exception(String.Format(Flowsheet.GetTranslatedString("Tried to calculate K-values with invalid pressure: {0} Pa"), P))
-            End If
+            'If Double.IsNaN(P) Or Double.IsInfinity(P) Then
+            '    Throw New Exception(String.Format("Tried to calculate K-values with invalid pressure: {0} Pa", P))
+            'End If
 
             Dim IObj As Inspector.InspectorItem = Inspector.Host.GetNewInspectorItem()
 
@@ -1352,25 +1386,43 @@ Namespace PropertyPackages
 
                 IObj?.Paragraphs.Add(String.Format("Fugacity coefficient calculation overriden by user. Calling user-defined functions..."))
 
-                fugliq = KvalFugacityCoefficientOverride.Invoke(Vx, T, P, State.Liquid)
+                fugliq = KvalFugacityCoefficientOverride.Invoke(Vx, T, P, State.Liquid, Me)
                 If type = "LV" Then
-                    fugvap = KvalFugacityCoefficientOverride.Invoke(Vy, T, P, State.Vapor)
+                    fugvap = KvalFugacityCoefficientOverride.Invoke(Vy, T, P, State.Vapor, Me)
                 Else ' LL
-                    fugvap = KvalFugacityCoefficientOverride.Invoke(Vy, T, P, State.Liquid)
+                    fugvap = KvalFugacityCoefficientOverride.Invoke(Vy, T, P, State.Liquid, Me)
                 End If
 
             Else
 
                 IObj?.SetCurrent()
 
-                fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid)
+                If Settings.EnableParallelProcessing Then
 
-                IObj?.SetCurrent()
+                    Dim t1 = Task.Run(Sub() fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid))
 
-                If type = "LV" Then
-                    fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
-                Else ' LL
-                    fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Liquid)
+                    Dim t2 = Task.Run(Sub()
+                                          If type = "LV" Then
+                                              fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+                                          Else ' LL
+                                              fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Liquid)
+                                          End If
+                                      End Sub)
+
+                    Task.WaitAll(t1, t2)
+
+                Else
+
+                    fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid)
+
+                    IObj?.SetCurrent()
+
+                    If type = "LV" Then
+                        fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+                    Else ' LL
+                        fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Liquid)
+                    End If
+
                 End If
 
             End If
@@ -1386,7 +1438,7 @@ Namespace PropertyPackages
 
             K = fugliq.DivideY(fugvap)
 
-            If Double.IsNaN(K.Sum) Or Double.IsInfinity(K.Sum) Or K.Sum = 0.0# Then
+            If Double.IsNaN(K.SumY) Or Double.IsInfinity(K.SumY) Or K.SumY = 0.0# Then
                 Dim cprops = DW_GetConstantProperties()
                 Dim Pc, Tc, w As Double
                 For i = 0 To n
@@ -1428,8 +1480,6 @@ Namespace PropertyPackages
 
             For i = 0 To n
                 If K(i) = 0.0 Then K(i) = 1.0E-20
-                'If K(i) < 0.0000000001 Then K(i) = 0.0000000001
-                'If K(i) > 1.0E+20 Then K(i) = 1.0E+20
             Next
 
             IObj?.Paragraphs.Add(String.Format("<h2>Results</h2>"))
@@ -1698,6 +1748,10 @@ Namespace PropertyPackages
             T = Me.CurrentMaterialStream.Phases(0).Properties.temperature.GetValueOrDefault
             Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
 
+            Me.CurrentMaterialStream.Phases(1).Properties.surfaceTension = Me.AUX_SURFTM(1, T)
+            Me.CurrentMaterialStream.Phases(3).Properties.surfaceTension = Me.AUX_SURFTM(3, T)
+            Me.CurrentMaterialStream.Phases(4).Properties.surfaceTension = Me.AUX_SURFTM(4, T)
+
         End Sub
 
         Public Function DW_CalcGibbsEnergy(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, Optional ByVal forcephase As String = "") As Double
@@ -1896,7 +1950,7 @@ Namespace PropertyPackages
                 If Me.FlashBase.FlashSettings(Enums.FlashSetting.CalculateBubbleAndDewPoints) Then
                     Try
                         Dim Vz As Double() = Me.RET_VMOL(Phase.Mixture)
-                        Dim myres As Object = Me.FlashBase.Flash_PV(Vz, P, 0, 0, Me)
+                        Dim myres As Object = Me.FlashBase.Flash_PV(Vz, P, 0, T, Me)
                         'check if liquid phase is stable.
                         Dim myres2 As Object = Me.FlashBase.Flash_PT(Vz, P, myres(4), Me)
                         If myres2(5) > 0.0# Then
@@ -1918,7 +1972,7 @@ Namespace PropertyPackages
                     End Try
                     Try
                         Dim Vz As Double() = Me.RET_VMOL(Phase.Mixture)
-                        Dim myres As Object = Me.FlashBase.Flash_TV(Vz, T, 0, 0, Me)
+                        Dim myres As Object = Me.FlashBase.Flash_TV(Vz, T, 0, P, Me)
                         'check if liquid phase is stable.
                         Dim myres2 As Object = Me.FlashBase.Flash_PT(Vz, myres(4), T, Me)
                         If myres2(5) > 0.0# Then
@@ -1933,7 +1987,7 @@ Namespace PropertyPackages
                     End Try
                     Try
                         Dim Vz As Double() = Me.RET_VMOL(Phase.Mixture)
-                        result = Me.FlashBase.Flash_TV(Vz, T, 1.0, T, Me)(4)
+                        result = Me.FlashBase.Flash_TV(Vz, T, 1.0, P, Me)(4)
                         Me.CurrentMaterialStream.Phases(0).Properties.dewPressure = result
                     Catch ex As Exception
                         Me.CurrentMaterialStream.Flowsheet.ShowMessage("Dew Pressure calculation error: " & ex.Message.ToString, Interfaces.IFlowsheet.MessageType.GeneralError)
@@ -4836,8 +4890,7 @@ redirect2:                  IObj?.SetCurrent()
                 engine.Runtime.LoadAssembly(GetType(System.String).Assembly)
                 engine.Runtime.LoadAssembly(GetType(BaseClasses.ConstantProperties).Assembly)
                 scope = engine.CreateScope()
-                scope.SetVariable("flowsheet", Flowsheet)
-                scope.SetVariable("plugins", Flowsheet.UtilityPlugins)
+                scope.SetVariable("flowsheet", CurrentMaterialStream.Flowsheet)
                 scope.SetVariable("this", Me)
                 scope.SetVariable("matstr", CurrentMaterialStream)
                 scope.SetVariable("T", CurrentMaterialStream.Phases(0).Properties.temperature.GetValueOrDefault)
@@ -5108,6 +5161,8 @@ redirect2:                  IObj?.SetCurrent()
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.molarfraction = Nothing
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.bulk_modulus = Nothing
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.isothermal_compressibility = Nothing
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.CO2loading = Nothing
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.CO2partialpressure = Nothing
 
                 Else
 
@@ -5139,6 +5194,8 @@ redirect2:                  IObj?.SetCurrent()
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.kinematic_viscosity = Nothing
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.bulk_modulus = Nothing
                     Me.CurrentMaterialStream.Phases(phaseID).Properties.isothermal_compressibility = Nothing
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.CO2loading = Nothing
+                    Me.CurrentMaterialStream.Phases(phaseID).Properties.CO2partialpressure = Nothing
 
                     If Not CalculatedOnly Then
                         Me.CurrentMaterialStream.Phases(phaseID).Properties.molarflow = Nothing
@@ -5312,8 +5369,11 @@ redirect2:                  IObj?.SetCurrent()
         Public Function HasHenryConstants(compname As String) As Boolean
 
             Dim CAS = Me.CurrentMaterialStream.Phases(0).Compounds(compname).ConstantProperties.CAS_Number
-
-            Return m_Henry.ContainsKey(CAS)
+            If CAS <> "" Then
+                Return m_Henry.ContainsKey(CAS)
+            Else
+                Return False
+            End If
 
         End Function
 
@@ -5339,10 +5399,12 @@ redirect2:                  IObj?.SetCurrent()
 
             IObj?.Paragraphs.Add(String.Format("CAS Number: {0}", CAS))
 
-            If m_Henry.ContainsKey(CAS) Then
-                KHCP = m_Henry(CAS).KHcp
-                C = m_Henry(CAS).C
-            End If
+            SyncLock m_Henry
+                If m_Henry.ContainsKey(CAS) Then
+                    KHCP = m_Henry(CAS).KHcp
+                    C = m_Henry(CAS).C
+                End If
+            End SyncLock
 
             IObj?.Paragraphs.Add(String.Format("KHCP: {0}", KHCP))
             IObj?.Paragraphs.Add(String.Format("C: {0}", C))
@@ -5848,7 +5910,7 @@ redirect2:                  IObj?.SetCurrent()
 
         End Function
 
-        Public Overridable Function AUX_PVAPi(ByVal sub1 As ICompoundConstantProperties, ByVal T As Double)
+        Public Overridable Function AUX_PVAPi(ByVal sub1 As ICompoundConstantProperties, ByVal T As Double) As Double
 
             Dim ID = sub1.ID
 
@@ -5934,7 +5996,7 @@ redirect2:                  IObj?.SetCurrent()
         End Function
 
 
-        Public Overridable Function AUX_PVAPi(ByVal sub1 As String, ByVal T As Double)
+        Public Overridable Function AUX_PVAPi(ByVal sub1 As String, ByVal T As Double) As Double
 
             Dim ID = Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties.ID
 
@@ -6747,6 +6809,73 @@ Final3:
 
         End Function
 
+        Public Overridable Function AUX_SURFTM(pidx As Integer, T As Double) As Double
+
+            Dim IObj As Inspector.InspectorItem = Inspector.Host.GetNewInspectorItem()
+
+            Inspector.Host.CheckAndAdd(IObj, "", "AUX_SURFTM", "Liquid Phase Surface Tension", "Liquid Phase Surface Tension Calculation Routine")
+
+            IObj?.SetCurrent()
+
+            IObj?.Paragraphs.Add("The liquid phase surface 
+                                tension is calculated by doing a molar average of the individual 
+                                component tensions. When experimental data is not available, the value 
+                                is calculated with the Brock-Bird equation,")
+
+            IObj?.Paragraphs.Add("<m>\frac{\sigma}{P_{c}^{2/3}T_{c}^{1/3}}=(0.132\alpha_{c}-0.279)(1-T_{r})^{11/9}</m>")
+
+            IObj?.Paragraphs.Add("<m>\alpha_{c}=0.9076[1+\frac{T_{br}\ln(P_{c}/1.01325)}{1-T_{br}}],</m>")
+
+            IObj?.Paragraphs.Add("where")
+
+            IObj?.Paragraphs.Add("<mi>\sigma</mi> Surface tension (N/m)")
+
+            IObj?.Paragraphs.Add("<mi>T_{c}</mi> Critical temperature (K)")
+
+            IObj?.Paragraphs.Add("<mi>P_{c}</mi> Critical pressure (Pa)")
+
+            IObj?.Paragraphs.Add("<mi>T_{br}</mi> Reduced normal boiling point, <mi>T_{b}/T_{c}</mi>")
+
+            Dim val As Double = 0
+            Dim tmpval As Double = 0.0#
+            Dim nbp As Double
+            Dim subst As Interfaces.ICompound
+            Dim ftotal As Double = 1
+
+            For Each subst In Me.CurrentMaterialStream.Phases(pidx).Compounds.Values
+                IObj?.SetCurrent()
+                IObj?.Paragraphs.Add(String.Format("Calculating Surface Tension for {0}... (xi = {1})", subst.Name, subst.MoleFraction.GetValueOrDefault))
+                If T / subst.ConstantProperties.Critical_Temperature < 1.0 Then
+                    With subst.ConstantProperties
+                        If .SurfaceTensionEquation <> "" And .SurfaceTensionEquation <> "0" And Not .IsIon And Not .IsSalt Then
+                            tmpval = CalcCSTDepProp(.SurfaceTensionEquation, .Surface_Tension_Const_A, .Surface_Tension_Const_B, .Surface_Tension_Const_C, .Surface_Tension_Const_D, .Surface_Tension_Const_E, T, .Critical_Temperature)
+                            IObj?.Paragraphs.Add(String.Format("Value calculated from experimental curve: {0} N/m", tmpval))
+                        ElseIf .IsIon Or .IsSalt Then
+                            tmpval = 0.0#
+                        Else
+                            nbp = subst.ConstantProperties.Normal_Boiling_Point
+                            If nbp = 0 Then nbp = 0.7 * subst.ConstantProperties.Critical_Temperature
+                            tmpval = Auxiliary.PROPS.sigma_bb(T, nbp, subst.ConstantProperties.Critical_Temperature, subst.ConstantProperties.Critical_Pressure)
+                            IObj?.Paragraphs.Add(String.Format("Value estimated with Brock-Bird correlation: {0} N/m", tmpval))
+                        End If
+                    End With
+                Else
+                    tmpval = 0
+                    ftotal -= subst.MoleFraction.GetValueOrDefault
+                End If
+                val += subst.MoleFraction.GetValueOrDefault * tmpval / ftotal
+            Next
+
+            IObj?.Paragraphs.Add("<h2>Results</h2>")
+
+            IObj?.Paragraphs.Add(String.Format("Liquid Phase Surface Tension: {0} N/m", val))
+
+            IObj?.Close()
+
+            Return val
+
+        End Function
+
         Public Overridable Function AUX_SURFTi(ByVal constprop As Interfaces.ICompoundConstantProperties, ByVal T As Double) As Double
 
             Dim val As Double = 0
@@ -7363,10 +7492,12 @@ Final3:
                 If cprop.LiquidHeatCapacityEquation <> "" And cprop.LiquidHeatCapacityEquation <> "0" And Not cprop.IsIon And Not cprop.IsSalt Then
                     If Integer.TryParse(cprop.LiquidHeatCapacityEquation, New Integer) Then
                         val = CalcCSTDepProp(cprop.LiquidHeatCapacityEquation, cprop.Liquid_Heat_Capacity_Const_A, cprop.Liquid_Heat_Capacity_Const_B, cprop.Liquid_Heat_Capacity_Const_C, cprop.Liquid_Heat_Capacity_Const_D, cprop.Liquid_Heat_Capacity_Const_E, T, cprop.Critical_Temperature)
+                        If cprop.OriginalDB <> "CoolProp" And cprop.OriginalDB <> "ChEDL Thermo" Then
+                            val = val / 1000 / cprop.Molar_Weight 'kJ/kg.K
+                        End If
                     Else
                         val = ParseEquation(cprop.LiquidHeatCapacityEquation, cprop.Liquid_Heat_Capacity_Const_A, cprop.Liquid_Heat_Capacity_Const_B, cprop.Liquid_Heat_Capacity_Const_C, cprop.Liquid_Heat_Capacity_Const_D, cprop.Liquid_Heat_Capacity_Const_E, T) / cprop.Molar_Weight
                     End If
-                    If cprop.OriginalDB <> "CoolProp" And cprop.OriginalDB <> "ChEDL Thermo" Then val = val / 1000 / cprop.Molar_Weight 'kJ/kg.K
                 Else
                     'estimate using Rownlinson/Bondi correlation
                     val = Auxiliary.PROPS.Cpl_rb(AUX_CPi(cprop.Name, T), T, cprop.Critical_Temperature, cprop.Acentric_Factor, cprop.Molar_Weight) 'kJ/kg.K
@@ -7458,26 +7589,76 @@ Final3:
 
         Public Function AUX_INT_CPDTi_L(ByVal T1 As Double, ByVal T2 As Double, ByVal subst As String) As Double
 
-            Dim deltaT As Double = (T2 - T1) / 25
-            Dim Ti, Tc As Double
-            Dim i As Integer = 0
-            Dim integral As Double = 0
+            Dim nsteps As Integer = Math.Abs(T2 - T1) / 10
+
+            If nsteps < 10 Then
+                If Math.Abs(T2 - T1) < 1 Then
+                    nsteps = 2
+                ElseIf Math.Abs(T2 - T1) < 3 Then
+                    nsteps = 4
+                ElseIf Math.Abs(T2 - T1) < 5 Then
+                    nsteps = 6
+                Else
+                    nsteps = 10
+                End If
+            End If
+
+            Dim deltaT As Double = (T2 - T1) / nsteps
+
+            Dim Ti As Double
 
             Ti = T1 + deltaT / 2
-            Tc = Me.CurrentMaterialStream.Phases(0).Compounds(subst).ConstantProperties.Critical_Temperature
-            For i = 0 To 24
-                If Ti > Tc Then
-                    integral += Me.AUX_CPi(subst, Ti) * deltaT
-                Else
-                    integral += Me.AUX_LIQ_Cpi(Me.CurrentMaterialStream.Phases(0).Compounds(subst).ConstantProperties, Ti) * deltaT
-                End If
 
-                Ti += deltaT
+            Dim integrals(nsteps - 1) As Double
+
+            Dim cprops = DW_GetConstantProperties().Where(Function(c) c.Name = subst).SingleOrDefault()
+
+            For i = 0 To nsteps - 1
+                integrals(i) = AUX_LIQ_Cpi(cprops, Ti + i * deltaT)
             Next
 
-            Return integral 'kJ/Kg
+            Dim outval = integrals.Sum * deltaT
+
+            Return outval
 
         End Function
+
+        Public Function AUX_INT_CPDTi_L(ByVal T1 As Double, ByVal T2 As Double, ByVal index As Integer) As Double
+
+            Dim nsteps As Integer = Math.Abs(T2 - T1) / 10
+
+            If nsteps < 10 Then
+                If Math.Abs(T2 - T1) < 1 Then
+                    nsteps = 2
+                ElseIf Math.Abs(T2 - T1) < 3 Then
+                    nsteps = 4
+                ElseIf Math.Abs(T2 - T1) < 5 Then
+                    nsteps = 6
+                Else
+                    nsteps = 10
+                End If
+            End If
+
+            Dim deltaT As Double = (T2 - T1) / nsteps
+
+            Dim Ti As Double
+
+            Ti = T1 + deltaT / 2
+
+            Dim integrals(nsteps - 1) As Double
+
+            Dim cprops = DW_GetConstantProperties()
+
+            For i = 0 To nsteps - 1
+                integrals(i) = AUX_LIQ_Cpi(cprops(index), Ti + i * deltaT)
+            Next
+
+            Dim outval = integrals.Sum * deltaT
+
+            Return outval
+
+        End Function
+
 
         Public Function AUX_INT_CPDT_Ti(ByVal T1 As Double, ByVal T2 As Double, ByVal subst As String) As Double
 
@@ -8107,6 +8288,76 @@ Final3:
 
         End Function
 
+        Public Function RET_Hid_FromLiqCp(Vz As Double(), T As Double, P As Double) As Double
+
+            Dim H, Tb, t1, t2, t3 As Double
+
+            Dim props = DW_GetConstantProperties()
+
+            Dim Vw = AUX_CONVERT_MOL_TO_MASS(Vz)
+
+            t1 = 0
+            t2 = 0
+            t3 = 0
+
+            For i As Integer = 0 To Vz.Length - 1
+                Tb = props(i).Normal_Boiling_Point
+                If Tb = 0.0 Then Tb = 0.7 * props(i).Critical_Temperature
+                If Tb = 0.0 Then Throw New Exception("Unable to calculate Enthalpy from Liquid Cp data - Normal Boiling Point / Critical Temperature not defined")
+                If Vz(i) > 0.0 Then
+                    If T > Tb Then
+                        t1 += Vw(i) * AUX_INT_CPDTi_L(298.15, Tb, i) + P / 1000 / Me.AUX_LIQDENS(Tb, Vz, P)
+                        t2 += Vw(i) * AUX_HVAPi(props(i).Name, Tb)
+                        t3 += Vw(i) * RET_Hid_i(Tb, T, props(i).Name)
+                    Else
+                        t1 += Vw(i) * AUX_INT_CPDTi_L(298.15, T, i) + P / 1000 / Me.AUX_LIQDENS(T, Vz, P)
+                        t2 += Vw(i) * AUX_HVAPi(props(i).Name, T)
+                        t3 += Vw(i) * RET_Hid_i(298.15, T, props(i).Name)
+                    End If
+                End If
+            Next
+
+            H = t1 + t2 + t3
+
+            Return H
+
+        End Function
+
+        Public Function RET_Sid_FromLiqCp(Vz As Double(), T As Double, P As Double) As Double
+
+            Dim S, Tb, t1, t2, t3 As Double
+
+            Dim props = DW_GetConstantProperties()
+
+            Dim Vw = AUX_CONVERT_MOL_TO_MASS(Vz)
+
+            t1 = 0
+            t2 = 0
+            t3 = 0
+
+            For i As Integer = 0 To Vz.Length - 1
+                Tb = props(i).Normal_Boiling_Point
+                If Tb = 0.0 Then Tb = 0.7 * props(i).Critical_Temperature
+                If Tb = 0.0 Then Throw New Exception("Unable to calculate Entropy from Liquid Cp data - Normal Boiling Point / Critical Temperature not defined")
+                If Vz(i) > 0.0 Then
+                    If T > Tb Then
+                        t1 += Vw(i) * AUX_INT_CPDTi_L(298.15, Tb, i) / T + P / 1000 / Me.AUX_LIQDENS(Tb, Vz, P) / T
+                        t2 += Vw(i) * AUX_HVAPi(props(i).Name, Tb) / T
+                        t3 += Vw(i) * RET_Sid_i(Tb, T, P, props(i).Name)
+                    Else
+                        t1 += Vw(i) * AUX_INT_CPDTi_L(298.15, T, i) / T + P / 1000 / Me.AUX_LIQDENS(T, Vz, P) / T
+                        t2 += Vw(i) * AUX_HVAPi(props(i).Name, T) / T
+                        t3 += Vw(i) * RET_Sid_i(298.15, T, P, props(i).Name)
+                    End If
+                End If
+            Next
+
+            S = t1 + t2 + t3
+
+            Return S
+
+        End Function
+
         Public Function RET_Hid(ByVal T1 As Double, ByVal T2 As Double, ByVal Vz As Double()) As Double
 
             Return Me.AUX_INT_CPDTm(T1, T2, Me.AUX_CONVERT_MOL_TO_MASS(Vz))
@@ -8589,7 +8840,7 @@ Final3:
             Dim i As Integer = 0
             Dim subst As Interfaces.ICompound
             For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values
-                val += Vw(i) * Me.AUX_INT_CPDTi_L(T1, T2, subst.Name)
+                val += Vw(i) * Me.AUX_INT_CPDTi_L(T1, T2, i)
                 i += 1
             Next
 
@@ -10076,13 +10327,18 @@ Final3:
                             Me.DW_CalcProp("entropy", phs)
                             Me.DW_CalcProp("compressibilityfactor", phs)
                             Me.DW_CalcProp("density", phs)
+                            Me.DW_CalcProp("heatcapacitycp", phs)
+                            Me.DW_CalcProp("heatcapacitycv", phs)
                             CalcAdditionalPhaseProperties(f)
                     End Select
 
                     If phs = Phase.Solid Then
                         Me.DW_CalcSolidPhaseProps()
                     Else
-                        Me.DW_CalcProp([property], phs)
+                        Try
+                            Me.DW_CalcProp([property], phs)
+                        Catch ex As Exception
+                        End Try
                     End If
 
                     basis = "Mole"
@@ -10116,13 +10372,27 @@ Final3:
                                 Case "Mass", "mass"
                                     res.Add(Me.CurrentMaterialStream.Phases(f).Properties.heatCapacityCv.GetValueOrDefault * 1000)
                             End Select
-                        Case "idealgasheatcapacity"
+                        Case "idealgasheatcapacity", "idealgasheatcapacitycp"
                             If f = 1 Then
-                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Liquid, Me.CurrentMaterialStream.Phases(0).Properties.temperature * 1000))
+                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Liquid, Me.CurrentMaterialStream.Phases(0).Properties.temperature) * 1000)
                             ElseIf f = 2 Then
-                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Vapor, Me.CurrentMaterialStream.Phases(0).Properties.temperature * 1000))
+                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Vapor, Me.CurrentMaterialStream.Phases(0).Properties.temperature) * 1000)
                             Else
-                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Solid, Me.CurrentMaterialStream.Phases(0).Properties.temperature * 1000))
+                                res.Add(Me.AUX_CPm(PropertyPackages.Phase.Solid, Me.CurrentMaterialStream.Phases(0).Properties.temperature) * 1000)
+                            End If
+                        Case "idealgasheatcapacityratio"
+                            If f = 1 Then
+                                Dim Cp = AUX_CPm(Phase.Liquid, T)
+                                Dim Cv = Cp - 8.314 / Me.CurrentMaterialStream.Phases(1).Properties.molecularWeight.GetValueOrDefault()
+                                res.Add(Cp / Cv)
+                            ElseIf f = 2 Then
+                                Dim Cp = AUX_CPm(Phase.Vapor, T)
+                                Dim Cv = Cp - 8.314 / Me.CurrentMaterialStream.Phases(2).Properties.molecularWeight.GetValueOrDefault()
+                                res.Add(Cp / Cv)
+                            Else
+                                Dim Cp = AUX_CPm(Phase.Mixture, T)
+                                Dim Cv = Cp - 8.314 / Me.CurrentMaterialStream.Phases(0).Properties.molecularWeight.GetValueOrDefault()
+                                res.Add(Cp / Cv)
                             End If
                         Case "idealgasenthalpy"
                             If f = 1 Then
@@ -10333,18 +10603,18 @@ Final3:
                             Dim cres = DW_CalcdEnthalpydmoles(Vx, T, P, st)
                             Select Case basis
                                 Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(cres.MultiplyConstY(val))
+                                    res = New ArrayList(cres.MultiplyConstY(val))
                                 Case "Mass", "mass"
-                                    res.Add(cres.MultiplyConstY(1000))
+                                    res = New ArrayList(cres.MultiplyConstY(1000))
                             End Select
                         Case "entropyf.dmoles"
                             Dim val = Me.CurrentMaterialStream.Phases(f).Properties.molecularWeight.GetValueOrDefault
                             Dim cres = DW_CalcdEntropydmoles(Vx, T, P, st)
                             Select Case basis
                                 Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(cres.MultiplyConstY(val))
+                                    res = New ArrayList(cres.MultiplyConstY(val))
                                 Case "Mass", "mass"
-                                    res.Add(cres.MultiplyConstY(1000))
+                                    res = New ArrayList(cres.MultiplyConstY(1000))
                             End Select
                         Case "phasefraction"
                             Select Case basis
@@ -10368,7 +10638,9 @@ Final3:
 
                     Dim i As Integer
                     For i = 0 To res.Count - 1
-                        If Double.IsNaN(res(i)) Then res(i) = 0.0#
+                        If TypeOf res(i) Is Double Then
+                            If Double.IsNaN(res(i)) Then res(i) = Double.NegativeInfinity
+                        End If
                     Next
 
                     Dim arr(res.Count - 1) As Double
@@ -11320,22 +11592,36 @@ Final3:
 
             Dim HenryLines() As String
 
-            Dim t0 As Type = Type.GetType("DWSIM.Thermodynamics.PropertyPackages.PropertyPackage")
+            SyncLock m_Henry
 
-            Using filestr As Stream = Assembly.GetAssembly(t0).GetManifestResourceStream("DWSIM.Thermodynamics.henry.txt")
-                Using t As New StreamReader(filestr)
-                    HenryLines = t.ReadToEnd().Split(vbLf)
+                m_Henry.Clear()
+
+                Dim t0 As Type = Type.GetType("DWSIM.Thermodynamics.PropertyPackages.PropertyPackage")
+
+                Using filestr As Stream = Assembly.GetAssembly(t0).GetManifestResourceStream("DWSIM.Thermodynamics.henry_constants.csv")
+                    Using t As New StreamReader(filestr)
+                        HenryLines = t.ReadToEnd().Split(vbLf)
+                    End Using
                 End Using
-            End Using
 
-            For i = 2 To HenryLines.Length - 1
-                Dim HP As New HenryParam
-                HP.Component = HenryLines(i).Split(";")(1)
-                HP.CAS = HenryLines(i).Split(";")(2)
-                HP.KHcp = HenryLines(i).Split(";")(3).ToDoubleFromInvariant()
-                HP.C = HenryLines(i).Split(";")(4).ToDoubleFromInvariant()
-                If Not m_Henry.ContainsKey(HP.CAS) Then m_Henry.Add(HP.CAS, HP)
-            Next
+                For i = 3 To HenryLines.Length - 2
+                    Dim HP As New HenryParam
+                    Dim cols = HenryLines(i).Split(",")
+                    HP.Component = cols(4).Replace(Chr(34), "")
+                    HP.CAS = cols(10).Replace(Chr(34), "")
+                    Dim val1 = cols(1).Replace(Chr(34), "")
+                    Dim val2 = cols(3).Replace(Chr(34), "")
+                    Dim val3 = cols(2).Replace(Chr(34), "")
+                    If val1 <> "" And val3 <> "" And val2.Contains("L") Then
+                        HP.KHcp = val1.ToDoubleFromInvariant()
+                        HP.C = val3.ToDoubleFromInvariant()
+                        If Not m_Henry.ContainsKey(HP.CAS) Then
+                            m_Henry.Add(HP.CAS, HP)
+                        End If
+                    End If
+                Next
+
+            End SyncLock
 
             If Settings.CAPEOPENMode And Not Settings.ExcelMode Then
 
@@ -11810,6 +12096,13 @@ Final3:
                     VaporPhaseFugacityCalculationMode = [Enum].Parse(VaporPhaseFugacityCalculationMode.GetType, (From el As XElement In data Select el Where el.Name = "VaporPhaseFugacityCalculationMode").FirstOrDefault.Value)
                     SolidPhaseFugacityCalculationMethod = [Enum].Parse(SolidPhaseFugacityCalculationMethod.GetType, (From el As XElement In data Select el Where el.Name = "SolidPhaseFugacityCalculationMethod").FirstOrDefault.Value)
                     EnthalpyEntropyCpCvCalculationMode = [Enum].Parse(EnthalpyEntropyCpCvCalculationMode.GetType, (From el As XElement In data Select el Where el.Name = "EnthalpyEntropyCpCvCalculationMode").FirstOrDefault.Value)
+                Catch ex As Exception
+                End Try
+            End If
+
+            If (From el As XElement In data Select el Where el.Name = "LiquidEnthalpyEntropyCpCvCalculationMode_EOS").FirstOrDefault IsNot Nothing Then
+                Try
+                    LiquidEnthalpyEntropyCpCvCalculationMode_EOS = [Enum].Parse(LiquidEnthalpyEntropyCpCvCalculationMode_EOS.GetType, (From el As XElement In data Select el Where el.Name = "LiquidEnthalpyEntropyCpCvCalculationMode_EOS").FirstOrDefault.Value)
                 Catch ex As Exception
                 End Try
             End If
@@ -12400,6 +12693,7 @@ Final3:
                 .Add(New XElement("SolidPhaseFugacity_UseIdealLiquidPhaseFugacity", SolidPhaseFugacity_UseIdealLiquidPhaseFugacity))
                 .Add(New XElement("SolidPhaseEnthalpy_UsesCp", SolidPhaseEnthalpy_UsesCp))
                 .Add(New XElement("EnthalpyEntropyCpCvCalculationMode", EnthalpyEntropyCpCvCalculationMode))
+                .Add(New XElement("LiquidEnthalpyEntropyCpCvCalculationMode_EOS", LiquidEnthalpyEntropyCpCvCalculationMode_EOS))
                 .Add(New XElement("LiquidFugacity_UsePoyntingCorrectionFactor", LiquidFugacity_UsePoyntingCorrectionFactor))
                 .Add(New XElement("ActivityCoefficientModels_IgnoreMissingInteractionParameters", ActivityCoefficientModels_IgnoreMissingInteractionParameters))
                 .Add(New XElement("IgnoreVaporFractionLimit", IgnoreVaporFractionLimit))
@@ -12852,9 +13146,15 @@ Final3:
 
             Dim form = GetAdvancedEditingForm()
 
+            Dim sf = GlobalSettings.Settings.DpiScale
+
             If GlobalSettings.Settings.OldUI Then
                 form.Topmost = True
                 form.Show()
+                form.Center()
+                ExtensionMethods.Eto.Extensions2.SetFontAndPadding(form)
+                form.Width += 25 * sf
+                form.Height += 70 * sf
                 Return form
             Else
                 form.Topmost = True
@@ -12868,8 +13168,10 @@ Final3:
 
             Dim containers = GetAdvancedEditingContainers()
 
+            Dim sf = GlobalSettings.Settings.DpiScale
+
             If GlobalSettings.Settings.OldUI Then
-                Dim form = sui.GetDefaultEditorForm("Advanced Property Package Settings", 700, 600, containers(1))
+                Dim form = sui.GetDefaultEditorForm("Advanced Property Package Settings", 700 * sf, 600 * sf, containers(1))
                 form.Topmost = True
                 Return form
             Else
@@ -12882,6 +13184,8 @@ Final3:
         End Function
 
         Public Function GetAdvancedEditingContainers() As Eto.Forms.DynamicLayout()
+
+            Dim sf = GlobalSettings.Settings.DpiScale
 
             Dim container1 = sui.GetDefaultContainer()
 
@@ -12929,7 +13233,12 @@ Final3:
                 Next
             Next
 
-            Dim codeeditor As New Eto.Forms.Controls.Scintilla.Shared.ScintillaControl() With {.Height = 200}
+            Dim codeeditor As New Eto.Forms.Controls.Scintilla.Shared.ScintillaControl() With {.Height = 300, .Width = 670}
+
+            If GlobalSettings.Settings.OldUI Then
+                codeeditor.Height *= sf
+                codeeditor.Width *= sf
+            End If
 
             Dim dd = container2.CreateAndAddDropDownRow("Phase/Property", plist, 0,
                                                Sub(sender, e)
@@ -12940,6 +13249,7 @@ Final3:
                                                    End If
                                                End Sub)
 
+            container2.CreateAndAddEmptySpace()
             container2.CreateAndAddControlRow(codeeditor)
             container2.CreateAndAddLabelAndButtonRow("Update/Save Override Script", "Save", Nothing,
                                              Sub(sender, e)
@@ -13145,6 +13455,10 @@ Final3:
 
             Return deriv
 
+        End Function
+
+        Public Function GetAsObject() As Object Implements IPropertyPackage.GetAsObject
+            Return Me
         End Function
 
 #End Region

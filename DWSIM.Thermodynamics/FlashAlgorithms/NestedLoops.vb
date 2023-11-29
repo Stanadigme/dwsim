@@ -17,6 +17,7 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
+Imports System.Numerics
 Imports DotNumerics.Optimization
 Imports DWSIM.MathOps.MathEx
 Imports DWSIM.MathOps.MathEx.BrentOpt
@@ -36,15 +37,15 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
         Inherits FlashAlgorithm
 
-        Dim etol As Double = 0.000001
-        Dim itol As Double = 0.000001
-        Dim maxit_i As Integer = 100
-        Dim maxit_e As Integer = 100
-        Dim dampingfactor As Double = 1.0
+        Protected etol As Double = 0.000001
+        Protected itol As Double = 0.000001
+        Protected maxit_i As Integer = 100
+        Protected maxit_e As Integer = 100
+        Protected dampingfactor As Double = 1.0
         Dim Hv0, Hvid, Hlid, Hf, Hv, Hl As Double
         Dim Sv0, Svid, Slid, Sf, Sv, Sl As Double
 
-        Private CalculatingAzeotrope As Boolean = False
+        Protected CalculatingAzeotrope As Boolean = False
 
         Public DisableParallelCalcs As Boolean = False
 
@@ -140,7 +141,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             Vw = PP.RET_VW()
             Vn = PP.RET_VNAMES()
 
-            fi = Vz.Clone
+            Array.Copy(Vz, fi, n + 1)
 
             'Calculate Ki`s
 
@@ -170,7 +171,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             'Estimate V
 
-            If T > MathEx.Common.Max(PP.RET_VTC, Vz) Then
+            If T > MathEx.Common.Max(VTc, Vz) Then
                 Vy = Vz
                 Vx = Vy.DivideY(Ki).NormalizeY
                 Vx = Vx.ReplaceInvalidsWithZeroes()
@@ -239,8 +240,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
 
             If g > 0 Then Vmin = V Else Vmax = V
 
-
-            V = Brent.BrentOpt3(Vmin, Vmax, 10, 0.001, 100,
+            V = Brent.BrentOpt3(Vmin, Vmax, 2, 0.001, 100,
                            Function(Vb)
                                Return Vz.MultiplyY(Ki.AddConstY(-1).DivideY(Ki.AddConstY(-1).MultiplyConstY(Vb).AddConstY(1))).SumY
                            End Function)
@@ -277,9 +277,9 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
             Vy = Vz.MultiplyY(Ki).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1)).NormalizeY
             Vx = Vy.DivideY(Ki).NormalizeY
 
-            Ki0 = Ki.Clone()
-            Vx0 = Vx.Clone()
-            Vy0 = Vy.Clone()
+            Array.Copy(Ki, Ki0, n + 1)
+            Array.Copy(Vx, Vx0, n + 1)
+            Array.Copy(Vy, Vy0, n + 1)
 
             Dim r1 As Object()
 
@@ -358,7 +358,7 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
 
         End Function
 
-        Private Function ConvergeVF(IObj As InspectorItem, V As Double, Vz As Double(), Vx As Double(), Vy As Double(), Ki As Double(), P As Double, T As Double, PP As PropertyPackage, damplevel As Integer) As Object()
+        Protected Function ConvergeVF(IObj As InspectorItem, V As Double, Vz As Double(), Vx As Double(), Vy As Double(), Ki As Double(), P As Double, T As Double, PP As PropertyPackage, damplevel As Integer) As Object()
 
             Dim n As Integer = Vz.Length - 1
 
@@ -429,8 +429,6 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 Else
 
                     Vant = V
-
-                    'Ki = PP.DW_CheckKvaluesConsistency(Vz, Ki, T, P)
 
                     F = Vz.MultiplyY(Ki.AddConstY(-1).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1))).SumY
                     dF = Vz.NegateY.MultiplyY(Ki.AddConstY(-1).MultiplyY(Ki.AddConstY(-1)).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1)).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1))).SumY

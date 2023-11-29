@@ -24,11 +24,13 @@ Namespace UnitOperations
 
         Inherits UnitOperations.UnitOpBaseClass
 
-        Implements Interfaces.IInput
+        Implements Interfaces.IInput, IControllableObject
 
         Public Overrides Property ObjectClass As SimulationObjectClass = SimulationObjectClass.Inputs
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_Input
+
+        <Xml.Serialization.XmlIgnore> Public Property ControlPanel As Object Implements IControllableObject.ControlPanel
 
         Public Property SelectedObjectID As String = "" Implements IInput.SelectedObjectID
 
@@ -121,6 +123,22 @@ Namespace UnitOperations
                 End If
             End If
         End Sub
+
+        Public Overrides Function GetEditingForm() As Form
+            If f Is Nothing Then
+                f = New EditingForm_Input With {.SimObject = Me}
+                f.Tag = "ObjectEditor"
+                Return f
+            Else
+                If f.IsDisposed Then
+                    f = New EditingForm_Input With {.SimObject = Me}
+                    f.Tag = "ObjectEditor"
+                    Return f
+                Else
+                    Return Nothing
+                End If
+            End If
+        End Function
 
         Public Overrides Function GetIconBitmap() As Object
             Return My.Resources.input

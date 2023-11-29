@@ -132,13 +132,25 @@ Namespace UnitOperations
 
         Public Overrides Function GetPropertyValue(ByVal prop As String, Optional ByVal su As Interfaces.IUnitsOfMeasure = Nothing) As Object
 
-            Return ""
+            Try
+
+                Dim SelectedObject = GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.Name = SelectedObjectID).FirstOrDefault
+
+                Dim currentvalue = SystemsOfUnits.Converter.ConvertFromSI(SelectedPropertyUnits, SelectedObject.GetPropertyValue(SelectedProperty))
+
+                Return currentvalue
+
+            Catch ex As Exception
+
+                Return Double.NaN
+
+            End Try
 
         End Function
 
         Public Overloads Overrides Function GetProperties(ByVal proptype As Interfaces.Enums.PropertyType) As String()
 
-            Return New String() {}
+            Return New String() {"Monitored Value"}
 
         End Function
 
@@ -150,7 +162,7 @@ Namespace UnitOperations
 
         Public Overrides Function GetPropertyUnit(ByVal prop As String, Optional ByVal su As Interfaces.IUnitsOfMeasure = Nothing) As String
 
-            Return ""
+            Return SelectedPropertyUnits
 
         End Function
 
@@ -181,6 +193,22 @@ Namespace UnitOperations
                 End If
             End If
         End Sub
+
+        Public Overrides Function GetEditingForm() As Form
+            If f Is Nothing Then
+                f = New EditingForm_LevelGauge With {.SimObject = Me}
+                f.Tag = "ObjectEditor"
+                Return f
+            Else
+                If f.IsDisposed Then
+                    f = New EditingForm_LevelGauge With {.SimObject = Me}
+                    f.Tag = "ObjectEditor"
+                    Return f
+                Else
+                    Return Nothing
+                End If
+            End If
+        End Function
 
         Public Overrides Function GetIconBitmap() As Object
             Return My.Resources.level_gauge1

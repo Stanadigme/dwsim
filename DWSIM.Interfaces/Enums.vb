@@ -37,6 +37,20 @@ Namespace Enums
             HH = 3
         End Enum
 
+        Public Enum DynamicsEventTransitionType
+            StepChange = 0
+            LinearChange = 1
+            LogChange = 3
+            InverseLogChange = 4
+            RandomChange = 5
+        End Enum
+
+        Public Enum DynamicsEventTransitionReferenceType
+            InitialState = 0
+            PreviousEvent = 1
+            SpecificEvent = 2
+        End Enum
+
     End Class
 
     Public Class Helpers
@@ -80,6 +94,8 @@ Namespace Enums
             IntegratorStarted = 14
             IntegratorFinished = 15
             IntegratorError = 16
+            IntegratorStep = 17
+            IntegratorPreStep = 18
         End Enum
 
     End Class
@@ -108,6 +124,19 @@ Namespace Enums
         CutObjects = 14
         PasteObjects = 15
         SpreadsheetCellChanged = 16
+    End Enum
+
+    Public Enum SnapshotType
+        All = 0
+        ObjectLayout = 1
+        ObjectData = 2
+        Compounds = 3
+        ReactionSubsystem = 4
+        PropertyPackages = 5
+        Spreadsheet = 6
+        SimulationSettings = 7
+        WindowLayout = 8
+        ObjectAddedOrRemoved = 9
     End Enum
 
     Public Enum FlowsheetUtility
@@ -192,6 +221,7 @@ Namespace Enums
         diffusivity = 65
         none = 66
         conductance = 67
+        heat = 68
 
     End Enum
 
@@ -406,6 +436,15 @@ Namespace Enums
         PartialPress
     End Enum
 
+    Public Enum ReactionPhase
+        Liquid
+        Vapor
+        Mixture
+        Solid
+        Liquid_Solid
+        Vapor_Solid
+    End Enum
+
     Public Enum ReactionKineticType
         Arrhenius = 0
         UserDefined = 1
@@ -417,9 +456,9 @@ Namespace Enums
     End Enum
 
     Public Enum KOpt
-        Gibbs
-        Expression
-        Constant
+        Gibbs = 0
+        Expression = 1
+        Constant = 2
     End Enum
 
     Public Enum WarningType
@@ -555,6 +594,18 @@ Namespace Enums
         BeforeTargetObject = 1
         BeforeFlowsheet = 2
         AfterFlowsheet = 3
+
+    End Enum
+
+    Public Enum SpecCalcMode2
+
+        GlobalSetting = 0
+        AfterSourceObject = 1
+        BeforeTargetObject = 2
+        BeforeFlowsheet = 3
+        AfterFlowsheet = 4
+        AfterObject = 5
+        BeforeObject = 6
 
     End Enum
 

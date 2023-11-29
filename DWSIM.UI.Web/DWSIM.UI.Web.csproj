@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -56,7 +56,11 @@
     <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.1587.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.1587.40\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,8 +72,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\UrlSettingsResponseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SystemService.cs" />
+    <Compile Include="Settings\DashboardSettings.cs" />
     <Compile Include="WebUIForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,7 +94,6 @@
     <None Include="dwsim-web-ui\manifest.json" />
     <None Include="dwsim-web-ui\static\css\main.506bd696.css.map" />
     <None Include="dwsim-web-ui\static\js\787.d6b8112c.chunk.js.map" />
-    <None Include="dwsim-web-ui\static\js\main.2ef22d3c.js.map" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -100,8 +105,6 @@
     <Content Include="dwsim-web-ui\s365-full-logo.png" />
     <Content Include="dwsim-web-ui\static\css\main.506bd696.css" />
     <Content Include="dwsim-web-ui\static\js\787.d6b8112c.chunk.js" />
-    <Content Include="dwsim-web-ui\static\js\main.2ef22d3c.js" />
-    <Content Include="dwsim-web-ui\static\js\main.2ef22d3c.js.LICENSE.txt" />
     <Content Include="dwsim-web-ui\static\media\genericfile.a118dce6bd90109248c926aedf58197f.svg" />
     <Content Include="dwsim-web-ui\static\media\xlsx_icon.71610099b6235cf8a249034898e3a53f.svg" />
   </ItemGroup>

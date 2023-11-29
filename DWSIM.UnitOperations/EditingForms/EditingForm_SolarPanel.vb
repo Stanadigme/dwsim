@@ -19,6 +19,8 @@ Public Class EditingForm_SolarPanel
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Sub UpdateInfo()
@@ -107,6 +109,7 @@ Public Class EditingForm_SolarPanel
 
     Private Sub chkUseGlobalIrr_CheckedChanged(sender As Object, e As EventArgs) Handles chkUseGlobalIrr.CheckedChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.UseUserDefinedWeather = Not chkUseGlobalIrr.Checked
         End If
     End Sub
@@ -181,6 +184,8 @@ Public Class EditingForm_SolarPanel
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
 
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()

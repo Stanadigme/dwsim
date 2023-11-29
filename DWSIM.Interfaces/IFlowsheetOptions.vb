@@ -138,4 +138,12 @@ Imports DWSIM.Interfaces.Enums.GraphicObjects
 
     Property SaveFlowsheetMessagesInFile As Boolean
 
+    Property SingleUnitOpMode As Boolean
+
+    Property SingleUnitOpID As String
+
+    Property RTFAnnotations As String
+
+    Property EnabledUndoRedo As Boolean
+
 End Interface

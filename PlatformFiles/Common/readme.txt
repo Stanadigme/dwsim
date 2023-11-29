@@ -1,6 +1,6 @@
 ﻿==================================================
 DWSIM - Open Source Process Simulator
-Version 8.4.1
+Version 8.6.5
 Copyright (c) 2017-2023 Daniel Medeiros and contributors
 Copyright (c) 2008-2016 Daniel Medeiros, Gregor Reichert, Gustavo Leon
 ==================================================
@@ -61,6 +61,166 @@ VERSION HISTORY / CHANGELOG
 ==================================================
 
 The full changelog including souce code changes can be viewed at https://github.com/DanWBR/dwsim/commits/windows
+
+Version 8.6.5
+
+- Includes ThermoC Property Package  
+- Dynamic Event transitions
+- Export PFR Profile to new spreadsheet (Classic UI/CPUI)
+- Heat Exchange Profile now available for all Heat Exchanger calculation modes
+- Enhanced Heat Exchange Profile Viewer (CPUI)
+- New Enthalpy calculation method (Liquid Cp + Excess)
+- EOS-based models can now select Experimental Liquid Cp as Enthalpy calculation method
+- Changed duration controls for Dynamics Integrator to allow periods higher than 24 hours (Classic UI)
+- Fixed issues with Pure Compound Viewer (Classic UI)
+- Fixed conversion reactor energy balance (#541)
+- Fixed not being able to update kappa parameters for PRSV2 PP
+- Fixed Heat Exchanger calculation when specifiyng invalid outlet temperatures
+- Fixed Enthalpy calculation from Liquid Cp
+- Fixed/added CO2 Normal Boiling Point
+- Fixed Excess Enthalpy calculation
+- Fixed Pump curves are not being correctly saved (#548)
+- Fixed input issue with Pipe Hydraulic Profile on Classic UI (#543)
+- German translation fix
+
+Version 8.6.1
+
+- Updated connections for Fuel Cell and Electrolyzer models
+- Updated H/S/Cp calculation routine for Raoult's Law Property Package
+- Added more Dynamics Integrator events to Script Manager
+- Exposing Indicators' monitored values
+- Fixed issue with Compound Viewer (Classic UI)
+- Fixed some Inspector issues
+- Other minor fixes and enhancements
+
+Version 8.6.0
+
+- Redesigned Undo/Redo feature (Classic & Cross-Platform UI)
+- Better handling of unknown errors
+- New standard volumetric flow units
+- Fixed Input and PID controller editors (Classic UI)
+- Fixed object deletion in context menu (Classic UI)
+- Added fields to setup the equilibrium constant calculation in equilibrium reactions (Cross-Platform UI)
+- Fixed Component Properties View: Liquid Phase Missing Property Displays (#521)
+- Fixed Chemsep flowsheet mouse hover issue (#520)
+- CoolProp fix density for INCOM mixture (#519)
+- Bug fixes
+
+Version 8.5.1
+
+- Added messages log feature (Classic UI)
+- Added Experimental liquid cp option for PRSV2
+- Copy object ID to clipboard (Classic UI)
+- Redesigned input box (Classic UI)
+- Implemented feature request #502 (Include Stream Description/Comments for HMB)
+- Implemented #503 (Mixer in dynamic mode, equalize all option)
+- Implemented feature request #500 (Define profile segment from tabular data input Length/Elevation)
+- Added t/h and t/min to mass flow unit set (#513)
+- Redesigned material stream list (Classic UI)
+- Fixed spreadsheet formatting
+- Fixed thermo importing
+- Fixed floating table formatting for compound amounts
+- Fixed energy mixer icon
+- Throwing exception for calculated negative flows in compound separator (#496)
+- Fixed issue with dynamics integrator (Classic UI)
+- Fixed issue #497 (Need clone ForcePhase for ShallowCopy MaterialStream?)
+- Fixed deltaT conversion in phase envelope (Classic UI) (#492)
+- Floating table adjustments
+- Fixed diamter/height units for rig columns
+- Fixed viscosity conversion
+- Fixed calculation order for single object solver requests
+- Fixed updating pump outlet pressure
+- Fixed T/P units in column properties report
+- Fixed issue #505 (Fix add json-compound)
+- Fixed issue #494 ([Linux Cross-Platform UI] Reaction edit exception)
+- Fixed issue #491 ([Linux Cross-Platform UI] New reaction buttons placement)
+- Fixed issue #480 ([Linux Cross-Platform UI] Mono process use 100% CPU after solver failed to calculate)
+- Fixed PR/SRK BIP not updating (#507)
+- Other minor fixes and enhancements
+
+Version 8.5.0
+
+- New Object Palette (Classic UI)
+- Added Aqueous Electorlytes (Reaktoro) Property Package
+- Added Cut/Copy/Paste items to context menus (Classic UI)
+- Removed dependency of the additional Python environments package
+- Fixed an issue with Gibbs Reactor
+- Removed interactive python console (Classic UI)
+- Fixed compound search (Classic UI) (#489)
+- Fixed Infinity Loop on Calc Critical Point in PR78 (#487)
+- Other fixes and enhancements
+
+Version 8.4.7
+
+- Added Feed Recovery as specification for Distillation Columns
+- Added context menu in compound selection panel for viewing, exporting and replacing (Classic UI)
+- Exposed Tray Spacing for user definition in Rigorous Column
+- Implemented Stop button for Cross-Platform UI (feature request #481)
+- Fixed loading of additional compounds for Property Packages in CAPE-OPEN/Excel mode
+- Improved initialization time
+- Other bug fixes
+
+Version 8.4.6
+
+- Fixed memory leaks in Classic UI
+- Overall performance and memory consumption improvements
+
+Version 8.4.5
+
+- New Henry's Constants database from https://henrys-law.org/
+- Added MaterialStream.SetOverallMolarComposition() function
+- Clear log when converging recycles (Classic UI)
+- Fixed issue with kinetic and hetcat reaction editors (Classic UI)
+- Removed OpenGL renderer (Classic UI)
+- Fixed Classic UI freezing during calculations
+- Fixed Compressor/Expander curve extrapolation
+- Other minor fixes and enhancements
+
+Version 8.4.4
+
+- Implemented Natural Layout feature for PFD
+- Display phase total amount in Material Stream editor (Classic UI)
+- Implemented #461: warning messages when detecting unexpected phases for Pump, Compressor and Expander
+- Fixed and updated Excel Add-In sample
+- Fixed issue with macOS/Linux freezing when estimating missing NRTL/UNIQUAC parameters
+- Fixed SVLLE flash algorithm error with forced solids
+- Fixed #457: SetOverallMassComposition not working
+- Fixed SetPropertyVal for Cape-Open UO
+- Fixed deadlock on UIThread
+- Fixed PFR pressure drop calculation
+- Fixed issue with Liquid-Liquid Extraction column
+- Fixed missing BIP message for UNIFAC models
+- Fixed some property display units for heat exchanger
+- Other minor bug fixes and UI adjustments
+
+Version 8.4.3
+
+- Updates to Simulate 365 Login and File Picker
+- Nested Loops Flash optimizations
+- Exposing Valve's Actual Kv
+- Added "Invert Selection" to Edit menu (Classic UI)
+- Zoom+Center on mouse double-click
+- Fixed object cloning
+- Fixed an issue with Air Cooler model (#421)
+- Flowsheet zooming/centering fixes
+- Fixed issue with Liquid Cp calculation
+- Fixed a bug with Valve's Kv/Cv calculation mode
+- Other minor fixes
+
+Version 8.4.2
+
+- Updated Cheméo parser to get data from new API endpoint
+- Smart Object Solver disabled by default
+- Added button to view all log messages
+- Japanese translation review
+- Fixed Dashboard window size for high-dpi displays
+- Fixed System.ValueTuple version mismatch
+- Fixed bug with OpenGL renderer (Classic UI)
+- Fixed Excel Add-In not working
+- Fixed PFR pressure drop calculation when Ntubes > 1 (discussion #445)
+- Fixed bug #422: Error in CoolProp PH flash
+- Fixed bug #444: Incorrect refrigerant outlet temperature
+- Fixed bug #446: Large temperature drop across splitter
 
 Version 8.4.1
 

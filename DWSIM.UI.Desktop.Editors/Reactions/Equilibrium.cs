@@ -44,10 +44,32 @@ namespace DWSIM.UI.Desktop.Editors
 
             container.CreateAndAddStringEditorRow2("Name", "", rx.Name, (sender, e) => { rx.Name = sender.Text; });
 
+            container.CreateAndAddStringEditorRow2("Description", "", rx.Description, (sender, e) => { rx.Description = sender.Text; });
+
             container.CreateAndAddLabelRow("Compounds and Stoichiometry (Include / Name / Heat of Formation (kJ/kg) / Stoich. Coeff.)");
 
+            DynamicLayout p1, p2;
+
+            TableLayout t1;
+
+            p1 = UI.Shared.Common.GetDefaultContainer();
+            p2 = UI.Shared.Common.GetDefaultContainer();
+
+            //p1.Width = 420;
+
+            t1 = new TableLayout();
+            t1.Rows.Add(new TableRow(p1, p2));
+
+            t1.Rows[0].Cells[0].ScaleWidth = true;
+            t1.Rows[0].Cells[1].ScaleWidth = true;
+
             var compcontainer = new DynamicLayout();
-            //compcontainer.BackgroundColor = Colors.White;
+
+            List<string> toremove = new List<string>();
+            foreach (var comp in rx.Components)
+                if (!flowsheet.SelectedCompounds.ContainsKey(comp.Key)) toremove.Add(comp.Key);
+            foreach (var comp in toremove)
+                rx.Components.Remove(comp);
 
             Double val;
 
@@ -95,15 +117,15 @@ namespace DWSIM.UI.Desktop.Editors
                 compcontainer.Add(new TableRow(chk, null, hf, sc));
             }
 
-            container.CreateAndAddControlRow(compcontainer);
-            container.CreateAndAddEmptySpace();
+            p1.CreateAndAddControlRow(compcontainer);
+            p1.CreateAndAddEmptySpace();
 
             var comps = flowsheet.SelectedCompounds.Values.Select((x) => x.Name).ToList();
             comps.Insert(0, "");
 
-            container.CreateAndAddLabelRow("Base Compound");
+            p1.CreateAndAddLabelRow("Base Compound");
 
-            var basecompselector = container.CreateAndAddDropDownRow("Base Compound", comps, 0, null);
+            var basecompselector = p1.CreateAndAddDropDownRow("Base Compound", comps, 0, null);
 
             var basecomp = rx.Components.Values.Where((x) => x.IsBaseReactant).FirstOrDefault();
 
@@ -130,22 +152,22 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             };
 
-            container.CreateAndAddLabelRow("Reaction Balance");
+            p1.CreateAndAddLabelRow("Reaction Balance");
 
             txtEquation = container.CreateAndAddLabelRow2("");
 
-            container.CreateAndAddLabelRow("Temperature Limits");
+            p1.CreateAndAddLabelRow("Temperature Limits");
 
             var nf = flowsheet.FlowsheetOptions.NumberFormat;
             var su = flowsheet.FlowsheetOptions.SelectedUnitSystem;
 
-            container.CreateAndAddTextBoxRow(nf, "Minimum Temperature (" + su.temperature + ")", rx.Tmin.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Tmin = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
-            container.CreateAndAddTextBoxRow(nf, "Maximum Temperature (" + su.temperature + ")", rx.Tmax.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Tmax = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
-            container.CreateAndAddTextBoxRow(nf, "Approach (" + su.temperature + ")", rx.Approach.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Approach = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
+            p1.CreateAndAddTextBoxRow(nf, "Minimum Temperature (" + su.temperature + ")", rx.Tmin.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Tmin = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
+            p1.CreateAndAddTextBoxRow(nf, "Maximum Temperature (" + su.temperature + ")", rx.Tmax.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Tmax = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
+            p1.CreateAndAddTextBoxRow(nf, "Approach (" + su.temperature + ")", rx.Approach.ConvertFromSI(su.temperature), (sender, e) => { if (sender.Text.IsValidDouble()) rx.Approach = sender.Text.ToDoubleFromCurrent().ConvertToSI(su.temperature); });
 
-            container.CreateAndAddLabelRow("Reaction Basis");
+            p2.CreateAndAddLabelRow("Reaction Basis");
 
-            var rxbasisselector = container.CreateAndAddDropDownRow("Reaction Basis", Shared.StringArrays.reactionbasis().ToList(), 0, null);
+            var rxbasisselector = p2.CreateAndAddDropDownRow("Reaction Basis", Shared.StringArrays.reactionbasis().ToList(), 0, null);
 
             switch (rx.ReactionBasis)
             {
@@ -200,40 +222,56 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             };
 
-            container.CreateAndAddLabelRow("Reaction Phase");
+            p2.CreateAndAddLabelRow("Reaction Phase");
 
-            var rxphaseselector = container.CreateAndAddDropDownRow("Reaction Phase", Shared.StringArrays.reactionphase().ToList(), 0, null);
+            var rxphaseselector = p2.CreateAndAddDropDownRow("Reaction Phase", Shared.StringArrays.reactionphase().ToList(), 0, null);
 
-            switch (rx.ReactionPhase)
-            {
-                case Interfaces.Enums.PhaseName.Mixture:
-                    rxphaseselector.SelectedIndex = (0);
-                    break;
-                case Interfaces.Enums.PhaseName.Vapor:
-                    rxphaseselector.SelectedIndex = (1);
-                    break;
-                case Interfaces.Enums.PhaseName.Liquid:
-                    rxphaseselector.SelectedIndex = (2);
-                    break;
-            }
+            rxphaseselector.SelectedIndex = (int)rx.ReactionPhase;
 
             rxphaseselector.SelectedIndexChanged += (sender, e) =>
             {
-                switch (rxphaseselector.SelectedIndex)
-                {
-                    case 0:
-                        rx.ReactionPhase = Interfaces.Enums.PhaseName.Mixture;
-                        break;
-                    case 1:
-                        rx.ReactionPhase = Interfaces.Enums.PhaseName.Vapor;
-                        break;
-                    case 2:
-                        rx.ReactionPhase = Interfaces.Enums.PhaseName.Liquid;
-                        break;
-                }
+                rx.ReactionPhase = rxphaseselector.SelectedIndex.ToEnum<Interfaces.Enums.ReactionPhase>();
             };
 
+            p2.CreateAndAddLabelRow("Equilibrim Constant");
+
+            TextBox tb1 = null, tb2 = null;
+
+            p2.CreateAndAddDropDownRow("Calculation Mode",
+                new List<string> { "Gibbs Energy of Formation", "T-Dep. Expression (ln Keq [f(T)] = ?)", "Constant Value" },
+                (int)rx.KExprType, 
+                (dd, e) => {
+                    rx.KExprType = dd.SelectedIndex.ToEnum<Interfaces.Enums.KOpt>();
+                    if (dd.SelectedIndex == 0)
+                    {
+                        tb1.Enabled = false;
+                        tb2.Enabled = false;
+                    }
+                    else if (dd.SelectedIndex == 1)
+                    {
+                        tb1.Enabled = true;
+                        tb2.Enabled = false;
+                    }
+                    else if (dd.SelectedIndex == 2)
+                    {
+                        tb1.Enabled = false;
+                        tb2.Enabled = true;
+                    }
+                });
+
+            tb1 = p2.CreateAndAddStringEditorRow2("Expression","", rx.Expression, (tb, e) => rx.Expression = tb.Text);
+            tb2 = p2.CreateAndAddStringEditorRow2("Constant Value", "", rx.ConstantKeqValue.ToString(),
+                (tb, e) =>
+                {
+                    if (tb.Text.IsValidDouble())
+                    {
+                        rx.ConstantKeqValue = tb.Text.ToDoubleFromCurrent();
+                    }
+                });
+
             UpdateEquation();
+
+            container.Add(t1);
 
         }
 

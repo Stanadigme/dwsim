@@ -18,6 +18,8 @@ Public Class EditingForm_HydroelectricTurbine
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Sub UpdateInfo()
@@ -271,6 +273,8 @@ Public Class EditingForm_HydroelectricTurbine
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
+
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"
@@ -283,6 +287,8 @@ Public Class EditingForm_HydroelectricTurbine
     Private Sub gridInput_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles gridInput.CellValueChanged
 
         If Loaded Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             Dim su = SimObject.FlowSheet.FlowsheetOptions.SelectedUnitSystem
 

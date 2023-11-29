@@ -720,6 +720,7 @@ Namespace UnitOperations.Auxiliary.SepOps
             Component_Recovery = 6
             Stream_Ratio = 7
             Temperature = 8
+            Feed_Recovery = 9
         End Enum
 
         Private m_stagenumber As Integer = 0
@@ -1111,9 +1112,9 @@ Namespace UnitOperations
                     Case "Reboiler_Calculated_Value"
                         value = Me.Specs("R").CalculatedValue
                     Case "Estimated Height"
-                        value = EstimatedHeight
+                        value = EstimatedHeight.ConvertFromSI(su.diameter)
                     Case "Estimated Diameter"
-                        value = EstimatedDiameter
+                        value = EstimatedDiameter.ConvertFromSI(su.diameter)
                 End Select
 
                 If prop.Contains("Stage_Pressure_") Then
@@ -1599,9 +1600,9 @@ Namespace UnitOperations
 
                 Select Case prop
                     Case "Estimated Height"
-                        value = EstimatedHeight
+                        value = EstimatedHeight.ConvertFromSI(su.diameter)
                     Case "Estimated Diameter"
-                        value = EstimatedDiameter
+                        value = EstimatedDiameter.ConvertFromSI(su.diameter)
                     Case "Number of Stages"
                         value = NumberOfStages
                 End Select
@@ -2847,7 +2848,7 @@ Namespace UnitOperations
             Dim Lflash = fflash(0)
             Dim Vflash = fflash(1)
 
-            Dim Kref = pp.DW_CalcKvalue(fflash(2), fflash(3), Tref, Pref)
+            Dim Kref = fflash(9)
 
             Dim Vprops = pp.DW_GetConstantProperties()
 
@@ -2955,6 +2956,27 @@ Namespace UnitOperations
                             End If
                         Else
                             distrate = sumF - SystemsOfUnits.Converter.ConvertToSI(Me.Specs("R").SpecUnit, Me.Specs("R").SpecValue) - sum0_
+                            vaprate = 0.0
+                        End If
+                    End If
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    Dim cvalue = Specs("R").SpecValue / 100.0
+                    Dim pval = sumF * cvalue
+                    If TypeOf Me Is DistillationColumn AndAlso DirectCast(Me, DistillationColumn).ReboiledAbsorber Then
+                        vaprate = sumF - pval - sum0_
+                        distrate = 0.0
+                    Else
+                        If Me.CondenserType = condtype.Full_Reflux Then
+                            vaprate = sumF - pval - sum0_
+                            distrate = 0.0
+                        ElseIf Me.CondenserType = condtype.Partial_Condenser Then
+                            If Me.Specs("C").SType = ColumnSpec.SpecType.Product_Molar_Flow_Rate Then
+                                distrate = SystemsOfUnits.Converter.ConvertToSI(Me.Specs("C").SpecUnit, Me.Specs("C").SpecValue)
+                            Else
+                                distrate = sumF - pval - sum0_ - vaprate
+                            End If
+                        Else
+                            distrate = sumF - pval - sum0_
                             vaprate = 0.0
                         End If
                     End If
@@ -3683,7 +3705,20 @@ Namespace UnitOperations
 
             If TypeOf Me Is DistillationColumn Then
                 Dim solvererror = True
-                If SolvingMethodName.Contains("Bubble") Then
+                If SolvingMethodName.Contains("Modified") Then
+                    Try
+                        SetColumnSolver(New SolvingMethods.WangHenkeMethod2())
+                        so = Solver.SolveColumn(inputdata)
+                        solvererror = False
+                    Catch ex As Exception
+                    End Try
+                    If solvererror Then
+                        FlowSheet.ShowMessage(GraphicObject.Tag + ": Column Solver did not converge. Will reset some parameters and try again shortly...", IFlowsheet.MessageType.Warning)
+                        'try to solve with auto-generated initial estimates.
+                        SetColumnSolver(New SolvingMethods.WangHenkeMethod2())
+                        so = Solver.SolveColumn(GetSolverInputData(True))
+                    End If
+                ElseIf SolvingMethodName.Contains("Bubble") Then
                     Try
                         SetColumnSolver(New SolvingMethods.WangHenkeMethod())
                         so = Solver.SolveColumn(inputdata)
@@ -3962,8 +3997,14 @@ Namespace UnitOperations
                                 subst.MassFraction = pp.AUX_CONVERT_MOL_TO_MASS(yf(0))(i)
                                 i += 1
                             Next
-                            .CopyCompositions(PhaseLabel.Mixture, PhaseLabel.Vapor)
-                            .Phases(2).Properties.molarfraction = 1.0
+                            If llextractor Then
+                                .CopyCompositions(PhaseLabel.Mixture, PhaseLabel.Liquid1)
+                                .Phases(3).Properties.molarfraction = 1.0
+                                .Phases(1).Properties.molarfraction = 1.0
+                            Else
+                                .CopyCompositions(PhaseLabel.Mixture, PhaseLabel.Vapor)
+                                .Phases(2).Properties.molarfraction = 1.0
+                            End If
                             .AtEquilibrium = True
                         End With
                     Case StreamInformation.Behavior.BottomsLiquid
@@ -4199,7 +4240,8 @@ Namespace UnitOperations
 
                     reporter.AppendLine(String.Format("{0,-8}{1,16:G6}{2,16:G6}{3,16:G6}{4,16:G6}{5,16:G6}{6,16:G6}" +
                                                    "{7,16:G6}{8,16:G6}{9,16:G6}{10,16:G6}{11,16:G6}{12,16:G6}{13,16:G6}",
-                                                   i + 1, Pi, Ti, mV, wV, rhoV, etaV, kV, mL, wL, rhoL, etaL, kL, sigma))
+                                                   i + 1, Pi.ConvertFromSI(units.pressure), Ti.ConvertFromSI(units.temperature),
+                                                   mV, wV, rhoV, etaV, kV, mL, wL, rhoL, etaL, kL, sigma))
 
                 Else
 
@@ -4207,13 +4249,15 @@ Namespace UnitOperations
 
                         reporter.AppendLine(String.Format("{0,-8}{1,16:G6}{2,16:G6}{3,16:G6}{4,16:G6}{5,16:G6}{6,16:G6}" +
                                                    "{7,16:G6}{8,16:G6}{9,16:G6}{10,16:G6}{11,16:G6}{12,16:G6}",
-                                                   i + 1, Pi, Ti, mL, wL, rhoL, etaL, kL, mV, wV, rhoV, etaV, kV))
+                                                   i + 1, Pi.ConvertFromSI(units.pressure), Ti.ConvertFromSI(units.temperature),
+                                                   mL, wL, rhoL, etaL, kL, mV, wV, rhoV, etaV, kV))
 
                     Else
 
                         reporter.AppendLine(String.Format("{0,-8}{1,16:G6}{2,16:G6}{3,16:G6}{4,16:G6}{5,16:G6}{6,16:G6}" +
                                                    "{7,16:G6}{8,16:G6}{9,16:G6}{10,16:G6}{11,16:G6}{12,16:G6}{13,16:G6}",
-                                                   i + 1, Pi, Ti, mV, wV, rhoV, etaV, kV, mL, wL, rhoL, etaL, kL, sigma))
+                                                   i + 1, Pi.ConvertFromSI(units.pressure), Ti.ConvertFromSI(units.temperature),
+                                                   mV, wV, rhoV, etaV, kV, mL, wL, rhoL, etaL, kL, sigma))
 
                     End If
 

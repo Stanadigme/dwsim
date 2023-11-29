@@ -16,6 +16,8 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
+Imports DWSIM.Interfaces.Enums
+
 <InterfaceType(ComInterfaceType.InterfaceIsIDispatch)> Public Interface IRecycle
 
     ReadOnly Property Errors As Dictionary(Of String, Double)
@@ -55,6 +57,10 @@ End Interface
 
 <InterfaceType(ComInterfaceType.InterfaceIsIDispatch)> Public Interface ISpec
 
+    Property SpecCalculationMode As SpecCalcMode2
+
+    Property ReferenceObjectID As String
+
 End Interface
 
 <InterfaceType(ComInterfaceType.InterfaceIsIDispatch)> Public Interface IAdjust
@@ -83,5 +89,11 @@ End Interface
     Property PropertyName As String
     Property UnitsType As Enums.UnitOfMeasure
     Property Units As String
+
+End Interface
+
+<InterfaceType(ComInterfaceType.InterfaceIsIDispatch)> Public Interface IControllableObject
+
+    Property ControlPanel As Object
 
 End Interface

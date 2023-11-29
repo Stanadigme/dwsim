@@ -282,6 +282,10 @@ Namespace UnitOperations
                 esin = args(2)
             End If
 
+            If msin.Phases(1).Properties.molarfraction.GetValueOrDefault() > 0.001 Then
+                FlowSheet.ShowMessage(GraphicObject.Tag + ": " + FlowSheet.GetTranslatedString("Liquid phase detected in compressor inlet"), IFlowsheet.MessageType.Warning)
+            End If
+
             If msin.GetMassFlow() = 0.0 Then
                 DeltaT = 0.0
                 If CalcMode <> CalculationMode.PowerRequired Then
@@ -428,19 +432,19 @@ Namespace UnitOperations
 
                         If LHead.Count > 0 Then
                             ' head has priority over power
-                            ires = Interpolation.Interpolate(LHeadSpeed.ToArray, LHead.ToArray(), Speed)
+                            ires = MathNet.Numerics.Interpolate.Linear(LHeadSpeed.ToArray, LHead.ToArray()).Interpolate(Speed)
                             Me.CurvePower = Double.NegativeInfinity
                             Me.CurveHead = ires
                         Else
                             'power
-                            ires = Interpolation.Interpolate(LPowerSpeed.ToArray, LPower.ToArray(), Speed)
+                            ires = MathNet.Numerics.Interpolate.Linear(LPowerSpeed.ToArray, LPower.ToArray()).Interpolate(Speed)
                             Me.CurveHead = Double.NegativeInfinity
                             Me.CurvePower = ires
                         End If
 
                         If LEff.Count > 0 Then
                             'efficiency
-                            ires = Interpolation.Interpolate(LEffSpeed.ToArray, LEff.ToArray(), Speed)
+                            ires = MathNet.Numerics.Interpolate.Linear(LEffSpeed.ToArray, LEff.ToArray()).Interpolate(Speed)
                             Me.CurveEff = ires * 100
                         Else
                             Me.CurveEff = Double.NegativeInfinity

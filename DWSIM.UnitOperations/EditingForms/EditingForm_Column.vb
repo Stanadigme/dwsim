@@ -26,6 +26,8 @@ Public Class EditingForm_Column
 
         UpdateInfo()
 
+        ChangeDefaultFont()
+
     End Sub
 
     Sub UpdateInfo()
@@ -98,6 +100,7 @@ Public Class EditingForm_Column
             If TypeOf SimObject Is DistillationColumn Then
                 cbSolvingMethod.Items.Add("Wang-Henke (Bubble Point)")
                 cbSolvingMethod.Items.Add("Napthali-Sandholm (Simultaneous Correction)")
+                cbSolvingMethod.Items.Add("Modified Wang-Henke (Bubble Point)")
             ElseIf TypeOf SimObject Is AbsorptionColumn Then
                 cbSolvingMethod.Items.Add("Burningham-Otto (Sum Rates)")
                 cbSolvingMethod.Items.Add("Napthali-Sandholm (Simultaneous Correction)")
@@ -151,6 +154,12 @@ Public Class EditingForm_Column
             cbColPDrop.Items.AddRange(units.GetUnitSet(Interfaces.Enums.UnitOfMeasure.deltaP).ToArray)
             cbColPDrop.SelectedItem = units.deltaP
 
+            cbTS.Items.Clear()
+            cbTS.Items.AddRange(units.GetUnitSet(Interfaces.Enums.UnitOfMeasure.distance).ToArray)
+            cbTS.SelectedItem = units.distance
+
+            tbTS.Text = .TraySpacing.ConvertFromSI(units.distance).ToString(nf)
+
             tbColPDrop.Text = su.Converter.ConvertFromSI(units.deltaP, .ColumnPressureDrop).ToString(nf)
 
             tbNStages.Text = .NumberOfStages
@@ -192,6 +201,9 @@ Public Class EditingForm_Column
                     cbCondComp.Enabled = False
                 Case ColumnSpec.SpecType.Temperature
                     cunits = New String() {"K", "R", "C", "F"}
+                    cbCondComp.Enabled = False
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    cunits = New String() {"%"}
                     cbCondComp.Enabled = False
             End Select
             cbCondSpecUnits.Items.Clear()
@@ -239,6 +251,9 @@ Public Class EditingForm_Column
                     cbRebComp.Enabled = False
                 Case ColumnSpec.SpecType.Temperature
                     runits = New String() {"K", "R", "C", "F"}
+                    cbRebComp.Enabled = False
+                Case ColumnSpec.SpecType.Feed_Recovery
+                    runits = New String() {"%"}
                     cbRebComp.Enabled = False
             End Select
             cbRebSpecUnits.Items.Clear()
@@ -354,7 +369,7 @@ Public Class EditingForm_Column
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -364,12 +379,13 @@ Public Class EditingForm_Column
 
     Sub RequestCalc()
 
-        'SimObject.FlowSheet.RequestCalculation(SimObject)
+        'SimObject.FlowSheet.RequestCalculation3(SimObject, False)
 
     End Sub
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.PropertyPackage = SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -414,6 +430,8 @@ Public Class EditingForm_Column
     Private Sub tbNStages_TextChanged(sender As Object, e As KeyEventArgs) Handles tbNStages.KeyDown
 
         If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             SimObject.NumberOfStages = tbNStages.Text
 
@@ -484,6 +502,8 @@ Public Class EditingForm_Column
 
         If Loaded And e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             SimObject.MaxIterations = Convert.ToInt32(Double.Parse(tbMaxIt.Text))
 
         End If
@@ -493,6 +513,8 @@ Public Class EditingForm_Column
     Private Sub tbConvTol_TextChanged(sender As Object, e As KeyEventArgs) Handles tbConvTol.KeyDown
 
         If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             SimObject.ExternalLoopTolerance = Double.Parse(tbConvTol.Text)
             SimObject.InternalLoopTolerance = Double.Parse(tbConvTol.Text)
@@ -505,6 +527,8 @@ Public Class EditingForm_Column
 
         If Loaded Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             DirectCast(SimObject, AbsorptionColumn).OperationMode = cbAbsorberMode.SelectedIndex
 
         End If
@@ -512,6 +536,8 @@ Public Class EditingForm_Column
     End Sub
 
     Private Sub cbCondType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCondType.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
         SimObject.CondenserType = cbCondType.SelectedIndex
 
@@ -566,6 +592,9 @@ Public Class EditingForm_Column
             Case ColumnSpec.SpecType.Temperature
                 cunits = New String() {"K", "R", "C", "F"}
                 cbCondComp.Enabled = False
+            Case ColumnSpec.SpecType.Feed_Recovery
+                cunits = New String() {"%"}
+                cbCondComp.Enabled = False
         End Select
         cbCondSpecUnits.Items.Clear()
         cbCondSpecUnits.Items.AddRange(cunits)
@@ -576,6 +605,8 @@ Public Class EditingForm_Column
     Private Sub tbCondPressure_TextChanged(sender As Object, e As KeyEventArgs) Handles tbCondPressure.KeyDown
 
         If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             SimObject.Stages(0).P = su.Converter.ConvertToSI(units.pressure, tbCondPressure.Text)
 
@@ -589,6 +620,8 @@ Public Class EditingForm_Column
     Private Sub tbCondPDrop_TextChanged(sender As Object, e As KeyEventArgs) Handles tbCondPDrop.KeyDown
 
         If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             SimObject.CondenserDeltaP = su.Converter.ConvertToSI(units.deltaP, tbCondPDrop.Text)
 
@@ -678,6 +711,9 @@ Public Class EditingForm_Column
             Case ColumnSpec.SpecType.Temperature
                 cunits = New String() {"K", "R", "C", "F"}
                 cbRebComp.Enabled = False
+            Case ColumnSpec.SpecType.Feed_Recovery
+                cunits = New String() {"%"}
+                cbRebComp.Enabled = False
         End Select
         cbRebSpecUnits.Items.Clear()
         cbRebSpecUnits.Items.AddRange(cunits)
@@ -739,7 +775,7 @@ Public Class EditingForm_Column
 
     Private Sub tbNStages_TextChanged(sender As Object, e As EventArgs) Handles tbNStages.TextChanged, tbCondPDrop.TextChanged, tbCondPressure.TextChanged, tbCondSpec.TextChanged, tbCondVapFlow.TextChanged,
                                                                                 tbConvTol.TextChanged, tbMaxIt.TextChanged, tbNStages.TextChanged, tbRebSpecValue.TextChanged, tbNStages.KeyDown,
-                                                                                tbSubcooling.TextChanged, tbColPDrop.TextChanged
+                                                                                tbSubcooling.TextChanged, tbColPDrop.TextChanged, tbTS.TextChanged
         Dim tbox = DirectCast(sender, TextBox)
 
         If Loaded Then
@@ -751,6 +787,7 @@ Public Class EditingForm_Column
     End Sub
 
     Private Sub chkNoCondenser_CheckedChanged(sender As Object, e As EventArgs) Handles chkNoCondenser.CheckedChanged
+        SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         PanelCondenser.Enabled = Not chkNoCondenser.Checked
         If TypeOf SimObject Is DistillationColumn Then
             DirectCast(SimObject, DistillationColumn).ReboiledAbsorber = chkNoCondenser.Checked
@@ -758,6 +795,7 @@ Public Class EditingForm_Column
     End Sub
 
     Private Sub chkNoReboiler_CheckedChanged(sender As Object, e As EventArgs) Handles chkNoReboiler.CheckedChanged
+        SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         PanelReboiler.Enabled = Not chkNoReboiler.Checked
         If TypeOf SimObject Is DistillationColumn Then
             DirectCast(SimObject, DistillationColumn).RefluxedAbsorber = chkNoReboiler.Checked
@@ -766,6 +804,7 @@ Public Class EditingForm_Column
 
     Private Sub cbExternalSolver_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbExternalSolver.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             Dim selectedsolver = SimObject.FlowSheet.ExternalSolvers.Values.Where(
                 Function(s) s.DisplayText = cbExternalSolver.SelectedItem.ToString()).FirstOrDefault()
             If selectedsolver IsNot Nothing Then
@@ -791,6 +830,8 @@ Public Class EditingForm_Column
     End Sub
 
     Private Sub cbSolvingMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSolvingMethod.SelectedIndexChanged
+
+        SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         SimObject.SolvingMethodName = cbSolvingMethod.SelectedItem.ToString()
         If cbSolvingMethod.SelectedIndex = 1 Then
             cbExternalSolver.Enabled = True
@@ -804,6 +845,8 @@ Public Class EditingForm_Column
     Private Sub cbSubcooling_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSubcooling.SelectedIndexChanged
 
         If Loaded Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             tbSubcooling.Text = su.Converter.Convert(cbSubcooling.SelectedItem.ToString(),
                                                  units.deltaT, tbSubcooling.Text.ParseExpressionToDouble)
@@ -819,6 +862,8 @@ Public Class EditingForm_Column
 
         If Loaded And e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             DirectCast(SimObject, DistillationColumn).TotalCondenserSubcoolingDeltaT =
                 su.Converter.ConvertToSI(units.deltaT, tbSubcooling.Text.ParseExpressionToDouble)
 
@@ -829,6 +874,8 @@ Public Class EditingForm_Column
     Private Sub tbColPDrop_KeyDown(sender As Object, e As KeyEventArgs) Handles tbColPDrop.KeyDown
 
         If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             SimObject.ColumnPressureDrop = su.Converter.ConvertToSI(units.deltaP, tbColPDrop.Text)
 
@@ -865,9 +912,25 @@ Public Class EditingForm_Column
 
     End Sub
 
+    Private Sub tbTS_KeyDown(sender As Object, e As KeyEventArgs) Handles tbTS.KeyDown
+
+        If Loaded And e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
+            SimObject.TraySpacing = su.Converter.ConvertToSI(units.distance, tbTS.Text)
+
+            UpdateInfo()
+
+        End If
+
+    End Sub
+
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
 
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()

@@ -443,6 +443,10 @@ Namespace Reactors
 
             ni0 = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Mixture).MultiplyConstY(ims.Phases(0).Properties.molarflow.GetValueOrDefault)
 
+            'Reactants Enthalpy (kJ/kg * kg/s = kW)
+
+            Dim Hr0 = ims.Phases(0).Properties.enthalpy.GetValueOrDefault * ims.Phases(0).Properties.massflow.GetValueOrDefault
+
             Dim rxn As Reaction
 
             'loop through conversion reaction groups (parallel/sequential) as defined in the reaction set
@@ -589,18 +593,30 @@ Namespace Reactors
                                               scBC = rxn.Components(BC).StoichCoeff
 
                                               Select Case rxn.ReactionPhase
-                                                  Case PhaseName.Liquid
+                                                  Case ReactionPhase.Liquid
                                                       m0 = ims.Phases(1).Properties.molarflow.GetValueOrDefault
                                                       nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Liquid).MultiplyConstY(m0)
                                                       nBC = ims.Phases(1).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
-                                                  Case PhaseName.Vapor
+                                                  Case ReactionPhase.Vapor
                                                       m0 = ims.Phases(2).Properties.molarflow.GetValueOrDefault
                                                       nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Vapor).MultiplyConstY(m0)
                                                       nBC = ims.Phases(2).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
-                                                  Case PhaseName.Mixture
+                                                  Case ReactionPhase.Mixture
                                                       m0 = ims.Phases(0).Properties.molarflow.GetValueOrDefault
                                                       nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Mixture).MultiplyConstY(m0)
                                                       nBC = ims.Phases(0).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                                                  Case ReactionPhase.Solid
+                                                      m0 = ims.Phases(7).Properties.molarflow.GetValueOrDefault
+                                                      nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Solid).MultiplyConstY(m0)
+                                                      nBC = ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                                                  Case ReactionPhase.Liquid_Solid
+                                                      m0 = ims.Phases(1).Properties.molarflow.GetValueOrDefault + ims.Phases(7).Properties.molarflow.GetValueOrDefault
+                                                      nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Liquid).MultiplyConstY(m0).AddY(ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Solid).MultiplyConstY(m0))
+                                                      nBC = ims.Phases(1).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault() + ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                                                  Case ReactionPhase.Vapor_Solid
+                                                      m0 = ims.Phases(2).Properties.molarflow.GetValueOrDefault + ims.Phases(7).Properties.molarflow.GetValueOrDefault
+                                                      nif = ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Vapor).MultiplyConstY(m0).AddY(ims.PropertyPackage.RET_VMOL(PropertyPackages.Phase.Solid).MultiplyConstY(m0))
+                                                      nBC = ims.Phases(2).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault() + ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
                                               End Select
 
                                               'delta mole flows
@@ -640,6 +656,8 @@ Namespace Reactors
                 ' at this point, the xf vector holds the final conversion values as calculated 
                 ' by the simplex solver, and the energy balance can be calculated (again). 
 
+                DHr = 0.0
+
                 i = 0
                 Do
 
@@ -649,12 +667,18 @@ Namespace Reactors
                     scBC = rxn.Components(BC).StoichCoeff
 
                     Select Case rxn.ReactionPhase
-                        Case PhaseName.Liquid
+                        Case ReactionPhase.Liquid
                             nBC = ims.Phases(1).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
-                        Case PhaseName.Vapor
+                        Case ReactionPhase.Vapor
                             nBC = ims.Phases(2).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
-                        Case PhaseName.Mixture
+                        Case ReactionPhase.Mixture
                             nBC = ims.Phases(0).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                        Case ReactionPhase.Solid
+                            nBC = ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                        Case ReactionPhase.Liquid_Solid
+                            nBC = ims.Phases(1).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault() + ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
+                        Case ReactionPhase.Vapor_Solid
+                            nBC = ims.Phases(2).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault() + ims.Phases(7).Compounds(rxn.BaseReactant).MolarFlow.GetValueOrDefault()
                     End Select
 
                     If Not Me.Conversions.ContainsKey(rxn.ID) Then
@@ -673,10 +697,10 @@ Namespace Reactors
                         End If
                     Next
 
-                    Dim DNbr = -xf(i) * nBC
+                    Dim DNbr = -xf(i) * rxn.Components(rxn.BaseReactant).StoichCoeff / scBC * nBC
 
                     'Heat released (or absorbed) (kJ/s = kW) (Ideal Gas)
-                    If Abs(DNbr) > 0.0 Then DHr += rxn.ReactionHeat * Abs(DNbr) / 1000
+                    DHr += rxn.ReactionHeat * Abs(DNbr) / 1000
 
                     i += 1
 
@@ -761,7 +785,7 @@ Namespace Reactors
                         IObj2?.Paragraphs.Add(String.Format("Products Enthalpy: {0} kJ/kg", Hp))
 
                         'Heat (kW)
-                        Me.DeltaQ += DHr + Hid_r - Hr - Hid_p
+                        Me.DeltaQ += DHr
 
                         Me.DeltaT = 0
 
@@ -785,7 +809,7 @@ Namespace Reactors
                         IObj2?.Paragraphs.Add(String.Format("Products Enthalpy: {0} kJ/kg", Hp))
 
                         'Heat (kW)
-                        Me.DeltaQ += DHr + Hid_r - Hr - Hid_p
+                        Me.DeltaQ += DHr
 
                         IObj2?.Paragraphs.Add(String.Format("Heat Balance: {0} kW", DeltaQ))
 
@@ -805,7 +829,7 @@ Namespace Reactors
 
                 Case OperationMode.Isothermic, OperationMode.OutletTemperature
 
-                    Me.DeltaQ += Hp
+                    Me.DeltaQ += Hp + Hid_r - Hr0 - Hid_p
 
             End Select
 

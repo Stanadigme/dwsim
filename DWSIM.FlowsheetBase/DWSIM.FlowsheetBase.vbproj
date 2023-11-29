@@ -51,6 +51,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
@@ -145,6 +148,9 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -212,7 +218,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Strings\Properties.resx" />
-    <EmbeddedResource Include="Strings\Strings.resx" />
+    <EmbeddedResource Include="Strings\Strings.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -283,6 +291,10 @@
     <ProjectReference Include="..\DWSIM.Thermodynamics.AdvancedEOS.PRSRKTDep\DWSIM.Thermodynamics.AdvancedEOS.PRSRKTDep.vbproj">
       <Project>{46fd1720-09ce-4edb-b2c5-378be32859fb}</Project>
       <Name>DWSIM.Thermodynamics.AdvancedEOS.PRSRKTDep</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DWSIM.Thermodynamics.ThermoC\DWSIM.Thermodynamics.ThermoC.csproj">
+      <Project>{da169354-7c6f-437a-8c32-1a2cb84eab5a}</Project>
+      <Name>DWSIM.Thermodynamics.ThermoC</Name>
     </ProjectReference>
     <ProjectReference Include="..\DWSIM.Thermodynamics\DWSIM.Thermodynamics.vbproj">
       <Project>{369bc7af-836b-4de1-93e3-b051bc148b23}</Project>

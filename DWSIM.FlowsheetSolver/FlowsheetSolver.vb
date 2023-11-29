@@ -80,6 +80,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                     End If
                                 End If
 
+                                For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                                    Dim spec = DirectCast(obj, ISpec)
+                                    If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = myUnitOp.Name Then
+                                        obj.Solve()
+                                    End If
+                                Next
+
                                 If fbag.DynamicMode Then
                                     myUnitOp.RunDynamicModel()
                                 Else
@@ -98,6 +105,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                         fbag.SimulationObjects(myUnitOp.AttachedSpecId).Solve()
                                     End If
                                 End If
+
+                                For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                                    Dim spec = DirectCast(obj, ISpec)
+                                    If spec.SpecCalculationMode = SpecCalcMode2.AfterObject And spec.ReferenceObjectID = myUnitOp.Name Then
+                                        obj.Solve()
+                                    End If
+                                Next
 
                                 fgui.ShowMessage(gobj.Tag & ": " & fgui.GetTranslatedString("Calculadocomsucesso"), IFlowsheet.MessageType.Information)
                             Else
@@ -262,12 +276,24 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                             fbag.SimulationObjects(myObj.AttachedSpecId).Solve()
                         End If
                     End If
+                    For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                        Dim spec = DirectCast(obj, ISpec)
+                        If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = objArgs.Name Then
+                            obj.Solve()
+                        End If
+                    Next
                     myObj.Solve()
                     If myObj.IsSpecAttached = True Then
                         If myObj.SpecVarType = SpecVarType.Source And fbag.FlowsheetOptions.SpecCalculationMode = SpecCalcMode.AfterSourceObject Then
                             fbag.SimulationObjects(myObj.AttachedSpecId).Solve()
                         End If
                     End If
+                    For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                        Dim spec = DirectCast(obj, ISpec)
+                        If spec.SpecCalculationMode = SpecCalcMode2.AfterObject And spec.ReferenceObjectID = objArgs.Name Then
+                            obj.Solve()
+                        End If
+                    Next
                     myObj.Calculated = True
                 Case Else
                     Dim myObj As ISimulationObject = fbag.SimulationObjects(objArgs.Name)
@@ -277,6 +303,12 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                             fbag.SimulationObjects(myObj.AttachedSpecId).Solve()
                         End If
                     End If
+                    For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                        Dim spec = DirectCast(obj, ISpec)
+                        If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = objArgs.Name Then
+                            obj.Solve()
+                        End If
+                    Next
                     If fbag.DynamicMode Then
                         myObj.RunDynamicModel()
                     Else
@@ -291,6 +323,12 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                             fbag.SimulationObjects(myObj.AttachedSpecId).Solve()
                         End If
                     End If
+                    For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                        Dim spec = DirectCast(obj, ISpec)
+                        If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = objArgs.Name Then
+                            obj.Solve()
+                        End If
+                    Next
                     RaiseEvent UnitOpCalculationFinished(fobj, New System.EventArgs(), objArgs)
             End Select
             fgui.ProcessScripts(Scripts.EventType.ObjectCalculationFinished, Scripts.ObjectType.FlowsheetObject, objArgs.Name)
@@ -324,6 +362,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
             End If
         End If
 
+        For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+            Dim spec = DirectCast(obj, ISpec)
+            If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = ms.Name Then
+                obj.Solve()
+            End If
+        Next
+
         If fbag.DynamicMode Then
             ms.RunDynamicModel()
         Else
@@ -335,6 +380,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 fbag.SimulationObjects(ms.AttachedSpecId).Solve()
             End If
         End If
+
+        For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+            Dim spec = DirectCast(obj, ISpec)
+            If spec.SpecCalculationMode = SpecCalcMode2.AfterObject And spec.ReferenceObjectID = ms.Name Then
+                obj.Solve()
+            End If
+        Next
 
         fgui.ShowMessage(ms.GraphicObject.Tag & ": " & fgui.GetTranslatedString("Calculadocomsucesso"), IFlowsheet.MessageType.Information)
 
@@ -383,6 +435,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
             End If
         End If
 
+        For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+            Dim spec = DirectCast(obj, ISpec)
+            If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = ms.Name Then
+                obj.Solve()
+            End If
+        Next
+
         If fbag.DynamicMode Then
             ms.RunDynamicModel()
         Else
@@ -399,6 +458,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
             End If
         End If
 
+        For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+            Dim spec = DirectCast(obj, ISpec)
+            If spec.SpecCalculationMode = SpecCalcMode2.BeforeObject And spec.ReferenceObjectID = ms.Name Then
+                obj.Solve()
+            End If
+        Next
+
         ms.LastUpdated = Date.Now
         ms.Calculated = True
 
@@ -409,26 +475,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
     ''' </summary>
     ''' <param name="fobj">Flowsheet to be calculated (FormChild object)</param>
     ''' <remarks></remarks>
-    Public Shared Function ProcessCalculationQueue(ByVal fobj As Object, Optional ByVal Isolated As Boolean = False,
-                                              Optional ByVal FlowsheetSolverMode As Boolean = False,
-                                              Optional ByVal mode As Integer = 0,
-                                              Optional orderedlist As Object = Nothing,
-                                              Optional ByVal ct As Threading.CancellationToken = Nothing,
+    Public Shared Function ProcessCalculationQueue(ByVal fobj As Object, Optional ByVal ct As Threading.CancellationToken = Nothing,
                                               Optional ByVal Adjusting As Boolean = False) As List(Of Exception)
 
         Dim exlist As New List(Of Exception)
 
-        'If mode = 0 Or mode = 1 Then
-        'bg thread
-
         exlist = ProcessQueueInternalAsync(fobj, ct)
         If Not Adjusting Then SolveSimultaneousAdjustsAsync(fobj, ct)
-
-        'ElseIf mode = 2 Then
-        '    'bg parallel threads
-        '    exlist = ProcessQueueInternalAsyncParallel(fobj, orderedlist, ct)
-        '    If Not Adjusting Then SolveSimultaneousAdjustsAsync(fobj, ct)
-        'End If
 
         Return exlist
 
@@ -939,17 +992,17 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                     If lists.ContainsKey(listidx) Then
                         filteredlist.Add(listidx, New List(Of String)(lists(listidx).ToArray))
                         For Each o As String In lists(listidx)
-                            If Not objstack.Contains(o) Then
-                                objstack.Add(o)
-                            Else
-                                filteredlist(listidx).Remove(o)
-                            End If
+                            objstack.Add(o)
                         Next
                     Else
                         Exit Do
                     End If
                     listidx += 1
                 Loop Until listidx > maxidx
+
+                objstack.Reverse()
+                objstack = objstack.Distinct().ToList()
+                objstack.Reverse()
 
             End If
 
@@ -1188,16 +1241,9 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                 Return New List(Of Exception)({ex})
             End Try
 
-            'declare a filteredlist dictionary. this will hold the sequence of grouped objects that can be calculated 
-            'this way if the user selects the background parallel threads solver option
-
-            Dim filteredlist2 As New Dictionary(Of Integer, List(Of CalculationArgs))
-
             'assign the list of objects, the filtered list (which contains no duplicate elements) and the object stack
             'which contains the ordered list of objects to be calculated.
 
-            Dim lists As Dictionary(Of Integer, List(Of String)) = objl(1)
-            Dim filteredlist As Dictionary(Of Integer, List(Of String)) = objl(2)
             Dim objstack As List(Of String) = objl(0)
 
             If ChangeCalcOrder Then
@@ -1336,8 +1382,9 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                                       'calc specs
 
                                                       If fbag.FlowsheetOptions.SpecCalculationMode = SpecCalcMode.BeforeFlowsheet Then
-                                                          For Each obj In fbag.SimulationObjects.Values
-                                                              If obj.GraphicObject.ObjectType = ObjectType.OT_Spec Then
+                                                          For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                                                              Dim spec = DirectCast(obj, ISpec)
+                                                              If spec.SpecCalculationMode = SpecCalcMode2.GlobalSetting Or spec.SpecCalculationMode = SpecCalcMode2.BeforeFlowsheet Then
                                                                   obj.Solve()
                                                               End If
                                                           Next
@@ -1387,45 +1434,43 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                                           End With
                                                       Next
 
-                                                      filteredlist2.Clear()
-
-                                                      For Each li In filteredlist
-                                                          Dim objcalclist As New List(Of CalculationArgs)
-                                                          For Each o In li.Value
-                                                              obj = fbag.SimulationObjects(o)
-                                                              objcalclist.Add(New CalculationArgs() With {.Sender = "FlowsheetSolver", .Name = obj.Name, .ObjectType = obj.GraphicObject.ObjectType, .Tag = obj.GraphicObject.Tag})
-                                                          Next
-                                                          filteredlist2.Add(li.Key, objcalclist)
-                                                      Next
-
-                                                      exlist = ProcessCalculationQueue(fobj, True, True, mode, filteredlist2,
-                                                                             Settings.TaskCancellationTokenSource.Token, Adjusting)
+                                                      exlist = ProcessCalculationQueue(fobj, Settings.TaskCancellationTokenSource.Token, Adjusting)
 
                                                       'calc specs
 
                                                       If fbag.FlowsheetOptions.SpecCalculationMode = SpecCalcMode.AfterFlowsheet Then
 
-                                                          For Each obj In fbag.SimulationObjects.Values
-                                                              If obj.GraphicObject.ObjectType = ObjectType.OT_Spec Then
+                                                          For Each obj In fbag.SimulationObjects.Values.Where(Function(o) TypeOf o Is ISpec)
+                                                              Dim spec = DirectCast(obj, ISpec)
+                                                              If spec.SpecCalculationMode = SpecCalcMode2.GlobalSetting Or spec.SpecCalculationMode = SpecCalcMode2.AfterFlowsheet Then
                                                                   obj.Solve()
                                                               End If
                                                           Next
 
                                                           'calc again
 
-                                                          filteredlist2.Clear()
+                                                          'add the objects to the calculation queue.
 
-                                                          For Each li In filteredlist
-                                                              Dim objcalclist As New List(Of CalculationArgs)
-                                                              For Each o In li.Value
+                                                          For Each o As String In objstack
+                                                              If fbag.SimulationObjects.ContainsKey(o) Then
                                                                   obj = fbag.SimulationObjects(o)
-                                                                  objcalclist.Add(New CalculationArgs() With {.Sender = "FlowsheetSolver", .Name = obj.Name, .ObjectType = obj.GraphicObject.ObjectType, .Tag = obj.GraphicObject.Tag})
-                                                              Next
-                                                              filteredlist2.Add(li.Key, objcalclist)
+                                                                  If obj.GraphicObject.ObjectType = ObjectType.MaterialStream Then
+                                                                      Dim ms As IMaterialStream = fbag.SimulationObjects(obj.Name)
+                                                                      ms.AtEquilibrium = False
+                                                                  End If
+                                                                  objargs = New CalculationArgs
+                                                                  With objargs
+                                                                      .Sender = "FlowsheetSolver"
+                                                                      .Calculated = True
+                                                                      .Name = obj.Name
+                                                                      .ObjectType = obj.GraphicObject.ObjectType
+                                                                      .Tag = obj.GraphicObject.Tag
+                                                                      fqueue.CalculationQueue.Enqueue(objargs)
+                                                                  End With
+                                                              End If
                                                           Next
 
-                                                          exlist = ProcessCalculationQueue(fobj, True, True, mode, filteredlist2,
-                                                                                 Settings.TaskCancellationTokenSource.Token, Adjusting)
+                                                          exlist = ProcessCalculationQueue(fobj, Settings.TaskCancellationTokenSource.Token, Adjusting)
 
                                                       End If
 
@@ -1466,9 +1511,13 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                                           avgerr *= 100
                                                           avgerr /= rcount
 
+                                                          fgui.ClearLog()
+
                                                           fgui.ShowMessage("Recycle loop #" & (icount + 1) & ", average recycle error: " & Format(avgerr, "N") & "%", IFlowsheet.MessageType.Information)
 
                                                           fgui.UpdateInterface()
+
+                                                          fgui.UpdateOpenEditForms()
 
                                                       End If
 
@@ -1521,8 +1570,6 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                                                       If frompgrid Then
                                                           Try
                                                               objl = GetSolvingList(fobj, False)
-                                                              lists = objl(1)
-                                                              filteredlist = objl(2)
                                                               objstack = objl(0)
                                                           Catch ex As Exception
                                                               GlobalSettings.Settings.CalculatorBusy = False
@@ -1541,12 +1588,18 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                             maintask.Wait(500)
                             fgui.UpdateInterface()
                             If Settings.TaskCancellationTokenSource.IsCancellationRequested Then
-                                Throw New OperationCanceledException()
+                                Throw New OperationCanceledException("Flowsheet solving stopped by the user.")
                             End If
                             If maintask.Status = TaskStatus.RanToCompletion Then Exit While
                         End While
                         fgui.UpdateInterface()
-                        If maintask.Status = TaskStatus.Running Then Throw New TimeoutException(fgui.GetTranslatedString("SolverTimeout"))
+                        If maintask.Status = TaskStatus.Running Then
+                            If GlobalSettings.Settings.IsRunningOnMono() Then
+                                Throw New OperationCanceledException(fgui.GetTranslatedString("SolverTimeout"))
+                            Else
+                                Throw New TimeoutException(fgui.GetTranslatedString("SolverTimeout"))
+                            End If
+                        End If
                         If maintask.IsFaulted Then Throw maintask.Exception
                         If exlist.Count > 0 Then Throw New AggregateException(exlist)
                     Catch agex As AggregateException
@@ -1569,7 +1622,6 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                     'clears the object lists.
 
                     objstack.Clear()
-                    lists.Clear()
                     recycles.Clear()
 
                     'Case 3
@@ -1686,7 +1738,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
                     IObj?.Paragraphs.Add(baseexception.Message)
                 Next
 
-                fgui.ShowMessage(fgui.GetTranslatedString("If Anonymous Analytics Sharing is enabled, the developers will be notified shortly about the errors. Thank you for your contribution!"), IFlowsheet.MessageType.GeneralError)
+                'fgui.ShowMessage(fgui.GetTranslatedString("If Anonymous Analytics Sharing is enabled, the developers will be notified shortly about the errors. Thank you for your contribution!"), IFlowsheet.MessageType.GeneralError)
 
                 fs.Solved = False
                 If baseexception IsNot Nothing Then fs.ErrorMessage = baseexception.ToString
@@ -1799,6 +1851,7 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
 
             fqueue.CalculationQueue.Enqueue(objargs)
 
+            'Return SolveFlowsheet(fobj, Settings.SolverMode, Nothing, False, False, Nothing, Nothing, Nothing)
             Return SolveFlowsheet(fobj, Settings.SolverMode, Nothing, True)
 
         Else

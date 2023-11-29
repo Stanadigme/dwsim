@@ -153,6 +153,7 @@ namespace DWSIM.UI.Desktop.WinForms
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
+            fbase?.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout);
             _lastTouchX = e.X;
             _lastTouchY = e.Y;
             fsurface.InputPress((int)_lastTouchX, (int)_lastTouchY);
@@ -184,8 +185,11 @@ namespace DWSIM.UI.Desktop.WinForms
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
         {
+            fbase?.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout);
+            var oldzoom = fsurface.Zoom;
             fsurface.Zoom += e.Delta / 4 / 100.0f;
             if (fsurface.Zoom < 0.05) fsurface.Zoom = 0.05f;
+            fsurface.CenterTo(oldzoom, e.X, e.Y, Width, Height);
             this.Invalidate();
         }
 

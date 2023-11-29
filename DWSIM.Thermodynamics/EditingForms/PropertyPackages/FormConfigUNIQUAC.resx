@@ -121,6 +121,10 @@
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>881, 398</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="b12.Width" type="System.Int32, mscorlib">
+    <value>103</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Button1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
@@ -155,6 +159,9 @@
   <data name="Label3.Location" type="System.Drawing.Point, System.Drawing">
     <value>8, 22</value>
   </data>
+  <data name="c12.Width" type="System.Int32, mscorlib">
+    <value>114</value>
+  </data>
   <data name="&gt;&gt;Button2.Type" xml:space="preserve">
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -170,24 +177,20 @@
   <data name="&gt;&gt;DataGridViewTextBoxColumn3.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="&gt;&gt;FaTabStripItem2.Name" xml:space="preserve">
     <value>FaTabStripItem2</value>
   </data>
-  <data name="chkTdep.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="Column5.Width" type="System.Int32, mscorlib">
+    <value>88</value>
   </data>
   <data name="dgvu1.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
   <data name="&gt;&gt;FaTabStripItem1.Type" xml:space="preserve">
     <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="LabelWithDivider3.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Segoe UI, 8.25pt</value>
   </data>
   <data name="&gt;&gt;FaTabStripItem1.Name" xml:space="preserve">
     <value>FaTabStripItem1</value>
@@ -203,9 +206,6 @@
   </data>
   <data name="Button5.Location" type="System.Drawing.Point, System.Drawing">
     <value>320, 17</value>
-  </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>96, 96</value>
   </data>
   <data name="LabelWithDivider3.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 48</value>
@@ -253,7 +253,7 @@
     <value>Opções Gerais</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>DWSIM.Thermodynamics.FormConfigPropertyPackageBase, DWSIM.Thermodynamics, Version=8.3.0.0, Culture=neutral, PublicKeyToken=null</value>
+    <value>DWSIM.Thermodynamics.FormConfigPropertyPackageBase, DWSIM.Thermodynamics, Version=8.6.5.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;Button1.ZOrder" xml:space="preserve">
     <value>4</value>
@@ -306,6 +306,15 @@
   <data name="&gt;&gt;Column4.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="FaTabStripItem3.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="Label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="Column3.Width" type="System.Int32, mscorlib">
+    <value>49</value>
+  </data>
   <data name="LabelWithDivider2.Size" type="System.Drawing.Size, System.Drawing">
     <value>854, 10</value>
   </data>
@@ -333,8 +342,11 @@
   <data name="chkTdep.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
-  <data name="Label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
+  <data name="Column6.Width" type="System.Int32, mscorlib">
+    <value>88</value>
+  </data>
+  <data name="Button6.Text" xml:space="preserve">
+    <value>Estimar (MODFAC-NIST)</value>
   </data>
   <data name="GroupBox2.Text" xml:space="preserve">
     <value>Parâmetros de Interação</value>
@@ -354,9 +366,6 @@
   <data name="&gt;&gt;c12.Name" xml:space="preserve">
     <value>c12</value>
   </data>
-  <data name="Button6.Text" xml:space="preserve">
-    <value>Estimar (MODFAC-NIST)</value>
-  </data>
   <data name="&gt;&gt;Label3.Parent" xml:space="preserve">
     <value>GroupBox2</value>
   </data>
@@ -375,14 +384,23 @@
   <data name="Button2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
+  <data name="Column4.Width" type="System.Int32, mscorlib">
+    <value>49</value>
+  </data>
   <data name="GroupBox3.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="db.ToolTipText" xml:space="preserve">
     <value>IPs in User Databases</value>
   </data>
+  <data name="Button2.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
   <data name="Column6.HeaderText" xml:space="preserve">
     <value>a21 (cal/mol)</value>
+  </data>
+  <data name="Button3.Text" xml:space="preserve">
+    <value>Estimar</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Configurar Pacote de Propriedades UNIQUAC</value>
@@ -423,8 +441,8 @@
   <data name="&gt;&gt;KryptonDataGridView2.Parent" xml:space="preserve">
     <value>GroupBox2</value>
   </data>
-  <data name="dgvu1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>96, 96</value>
   </data>
   <data name="FaTabStripItem2.Title" xml:space="preserve">
     <value>Peng-Robinson</value>
@@ -477,8 +495,8 @@
   <data name="&gt;&gt;Button6.Parent" xml:space="preserve">
     <value>GroupBox3</value>
   </data>
-  <data name="chkTdep.Location" type="System.Drawing.Point, System.Drawing">
-    <value>258, 21</value>
+  <data name="b21.Width" type="System.Int32, mscorlib">
+    <value>103</value>
   </data>
   <data name="LabelWithDivider2.Font" type="System.Drawing.Font, System.Drawing">
     <value>Segoe UI, 8.25pt</value>
@@ -501,6 +519,9 @@
   <data name="&gt;&gt;Button6.Type" xml:space="preserve">
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="chkTdep.Location" type="System.Drawing.Point, System.Drawing">
+    <value>258, 21</value>
+  </data>
   <data name="Label2.Font" type="System.Drawing.Font, System.Drawing">
     <value>Segoe UI, 8.25pt</value>
   </data>
@@ -510,8 +531,11 @@
   <data name="&gt;&gt;KryptonDataGridView2.Name" xml:space="preserve">
     <value>KryptonDataGridView2</value>
   </data>
-  <data name="Button3.Text" xml:space="preserve">
-    <value>Estimar</value>
+  <data name="&gt;&gt;GroupBox3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="c21.Width" type="System.Int32, mscorlib">
+    <value>114</value>
   </data>
   <data name="&gt;&gt;LabelWithDivider2.ZOrder" xml:space="preserve">
     <value>2</value>
@@ -624,8 +648,8 @@
   <data name="LabelWithDivider3.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="&gt;&gt;GroupBox3.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="LabelWithDivider3.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 8.25pt</value>
   </data>
   <data name="LabelWithDivider3.Size" type="System.Drawing.Size, System.Drawing">
     <value>854, 10</value>
@@ -696,8 +720,8 @@
   <data name="&gt;&gt;LabelWithDivider3.Parent" xml:space="preserve">
     <value>GroupBox3</value>
   </data>
-  <data name="Button2.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
+  <data name="dgvu1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="&gt;&gt;db.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewComboBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -744,8 +768,8 @@
   <data name="LabelWithDivider2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="FaTabStripItem3.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
+  <data name="chkTdep.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
   <data name="Button5.Text" xml:space="preserve">
     <value>Estimar (UNIFAC-LL)</value>

@@ -2629,7 +2629,14 @@ Public Class FormCompoundCreator
     End Sub
 
     Private Sub cbEqCPLiquid_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cbEqCPLiquid.SelectedIndexChanged
-        If mycase.EqCPLiquid Then mycase.cp.LiquidHeatCapacityEquation = cbEqCPLiquid.SelectedItem.ToString.Split(":")(0)
+        If mycase.EqCPLiquid Then
+            mycase.cp.LiquidHeatCapacityEquation = cbEqCPLiquid.SelectedItem.ToString.Split(":")(0)
+            If mycase.cp.LiquidHeatCapacityEquation = "1000" Then
+                tbUserDefCPLEq.Enabled = True
+            Else
+                tbUserDefCPLEq.Enabled = False
+            End If
+        End If
     End Sub
 
     Private Sub cbEqLIQDENS_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbEqLIQDENS.SelectedIndexChanged
@@ -3426,45 +3433,67 @@ Public Class FormCompoundCreator
 
         sb.Append("")
 
+        tbStatus.BackColor = Color.LightBlue
+
         With mycase.cp
 
-            If .Molar_Weight = 0.0 Then sb.Append("Undefined Molecular Weight; ")
-            If .Normal_Boiling_Point = 0.0 Then sb.Append("No Normal Boiling Point defined; ")
-            If .UNIFACGroups.Count = 0.0 Then sb.Append("No UNIFAC structure defined, won't work with UNIFAC-based models; ")
-            If .IdealgasCpEquation = "" Then sb.Append("Ideal gas Cp: no equation or UNIFAC structure defined; ")
-            If .UNIQUAC_Q = 0.0 And .UNIQUAC_R = 0.0 Then sb.Append("No UNIQUAC parameters defined, won't work with UNIQUAC model; ")
+            If .Molar_Weight = 0.0 Then
+                sb.Append("Please enter the Molecular Weight; ")
+            End If
+            If .Normal_Boiling_Point = 0.0 Then
+                sb.Append("Please enter the Normal Boiling Point; ")
+            End If
             If .Critical_Pressure = 0.0 And .Critical_Temperature = 0.0 And .Acentric_Factor = 0.0 Then
-                sb.Append("No Tc/Pc/w defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Properties (Temperature, Pressure, Acentric Factor); ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure = 0.0 And .Critical_Temperature = 0.0 And .Acentric_Factor > 0.0 Then
-                sb.Append("No Tc/Pc defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Properties (Temperature, Pressure); ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure = 0.0 And .Critical_Temperature > 0.0 And .Acentric_Factor = 0.0 Then
-                sb.Append("No Pc/w defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Properties (Pressure, Acentric Factor); ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure > 0.0 And .Critical_Temperature = 0.0 And .Acentric_Factor = 0.0 Then
-                sb.Append("No Tc/w defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Properties (Temperature, Acentric Factor); ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure > 0.0 And .Critical_Temperature > 0.0 And .Acentric_Factor = 0.0 Then
-                sb.Append("No Acentric Factor defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Acentric Factor; ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure = 0.0 And .Critical_Temperature > 0.0 And .Acentric_Factor > 0.0 Then
-                sb.Append("No Critical Pressure defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Pressure; ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
             ElseIf .Critical_Pressure > 0.0 And .Critical_Temperature = 0.0 And .Acentric_Factor > 0.0 Then
-                sb.Append("No Critical Temperature defined, EOS models won't work with this compound; ")
+                sb.Append("Please enter the Critical Temperature; ")
                 If .VaporPressureEquation = "" Then sb.Append("Needs Vapor Pressure eq. coeffs or Tc/Pc/w to estimate using Lee-Kesler; ")
-            End If
-            If .EnthalpyOfFusionAtTf = 0.0 And .TemperatureOfFusion = 0.0 Then
-                sb.Append("No solid phase data defined (Tf/Hf), won't be able to calculate SLE; ")
             End If
             If .IG_Enthalpy_of_Formation_25C = 0.0 And .IG_Gibbs_Energy_of_Formation_25C Then
                 sb.Append("No formation data defined (DHf/DGf), won't be able to reaction heat balances; ")
             End If
+            If .IdealgasCpEquation = "" Then
+                sb.Append("Ideal gas Cp: no equation or UNIFAC structure defined; ")
+            End If
+            If .EnthalpyOfFusionAtTf = 0.0 And .TemperatureOfFusion = 0.0 Then
+                sb.Append("No solid phase data defined (Tf/Hf), won't be able to calculate SLE; ")
+            End If
+            If .UNIQUAC_Q = 0.0 And .UNIQUAC_R = 0.0 Then
+                sb.Append("No UNIQUAC parameters defined, won't work with UNIQUAC model; ")
+            End If
+            If .UNIFACGroups.Count = 0.0 Then
+                sb.Append("No UNIFAC structure defined, won't work with UNIFAC-based models; ")
+            End If
 
-            Dim text = sb.ToString
-
+            Dim text = sb.ToString()
             If text = "" Then text = "All OK!"
+
+            If text.Contains("Critical") Or text.Contains("Acentric") Or text.Contains("Normal Boiling") Or text.Contains("Molecular") Or text.Contains("Ideal gas") Then
+                tbStatus.BackColor = Color.DarkRed
+                tbStatus.ForeColor = Color.White
+            ElseIf text.Contains("formation") Or text.Contains("UNIQUAC") Or text.Contains("UNIFAC") Or text.Contains("solid") Then
+                tbStatus.BackColor = Color.LightYellow
+                tbStatus.ForeColor = Color.DarkRed
+            Else
+                tbStatus.BackColor = Color.LightSteelBlue
+                tbStatus.ForeColor = Color.DarkBlue
+            End If
 
             tbStatus.Text = text
 

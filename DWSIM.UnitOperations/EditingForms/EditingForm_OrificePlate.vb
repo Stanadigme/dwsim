@@ -155,7 +155,7 @@ Public Class EditingForm_OrificePlate
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -227,7 +227,7 @@ Public Class EditingForm_OrificePlate
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation2(False)
 
     End Sub
 
@@ -246,6 +246,8 @@ Public Class EditingForm_OrificePlate
     Private Sub TextBoxKeyDown(sender As Object, e As KeyEventArgs) Handles tbOrificeDiameter.KeyDown, tbCorrF.KeyDown, tbIntPipeDiameter.KeyDown
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
+
+            If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
             UpdateProps(sender)
 
@@ -377,6 +379,8 @@ Public Class EditingForm_OrificePlate
 
     Private Sub rbCorner_CheckedChanged(sender As Object, e As EventArgs) Handles rbCorner.CheckedChanged, rbFlange.CheckedChanged, rbRadius.CheckedChanged
 
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
         If sender Is rbCorner Then
             If rbCorner.Checked Then SimObject.OrifType = UnitOperations.OrificePlate.OrificeType.CornerTaps
         ElseIf sender Is rbFlange Then
@@ -390,6 +394,8 @@ Public Class EditingForm_OrificePlate
     Private Sub lblTag_KeyPress(sender As Object, e As KeyEventArgs) Handles lblTag.KeyUp
 
         If e.KeyCode = Keys.Enter Then
+
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
 
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()

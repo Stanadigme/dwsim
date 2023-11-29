@@ -17,15 +17,14 @@
 
 Imports DWSIM.Thermodynamics.BaseClasses
 Imports System.IO
-Imports Cudafy
-Imports Cudafy.Host
-Imports System.Threading.Tasks
 
 Public Class FormOptions
 
     Inherits UserControl
 
     Private loaded As Boolean = False
+
+    Public AddMoreTabs As Action(Of TabControl)
 
     Private Sub FormOptions_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -38,6 +37,8 @@ Public Class FormOptions
             btnSelectPythonPath.Enabled = False
             Button4.Enabled = False
             Button7.Enabled = False
+            btnDownPy.Enabled = False
+            tbPythonPath.Enabled = False
         End If
 
         Me.chkEnableParallelCalcs.Checked = My.Settings.EnableParallelProcessing
@@ -68,7 +69,6 @@ Public Class FormOptions
 
         chkHideSolidPhaseCO.Checked = My.Settings.HideSolidPhase_CO
 
-        cbRenderer.SelectedIndex = My.Settings.FlowsheetRenderer
         chkAA.Checked = My.Settings.FlowsheetAntiAliasing
 
         'solver
@@ -104,7 +104,16 @@ Public Class FormOptions
 
         chkUpdates.Checked = Settings.CheckForUpdates
 
+        If Not FormMain.IsPro Then
+            gbLoadExtensions.Visible = True
+            chkLoadExtensions.Checked = My.Settings.LoadExtensionsAndPlugins
+        Else
+            gbLoadExtensions.Visible = False
+        End If
+
         loaded = True
+
+        AddMoreTabs?.Invoke(FaTabStrip1)
 
         FormMain.TranslateFormFunction?.Invoke(Me)
 
@@ -123,6 +132,7 @@ Public Class FormOptions
             Me.KryptonTextBox1.Enabled = False
             Me.TrackBar1.Enabled = False
         End If
+        If FormMain.IsPro Then KryptonButton1.Enabled = False
     End Sub
 
     Private Sub KryptonButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles KryptonButton1.Click
@@ -450,11 +460,6 @@ Public Class FormOptions
         My.Application.MainWindowForm.tsbInspector.Checked = chkEnableInspector.Checked
     End Sub
 
-    Private Sub cbRenderer_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbRenderer.SelectedIndexChanged
-        My.Settings.FlowsheetRenderer = cbRenderer.SelectedIndex
-        GlobalSettings.Settings.FlowsheetRenderer = Settings.SkiaCanvasRenderer.CPU
-    End Sub
-
     Private Sub chkAA_CheckedChanged(sender As Object, e As EventArgs) Handles chkAA.CheckedChanged
         My.Settings.FlowsheetAntiAliasing = chkAA.Checked
         GlobalSettings.Settings.DrawingAntiAlias = chkAA.Checked
@@ -489,4 +494,11 @@ Public Class FormOptions
         Settings.CheckForUpdates = chkUpdates.Checked
     End Sub
 
+    Private Sub chkLoadExtensions_CheckedChanged(sender As Object, e As EventArgs) Handles chkLoadExtensions.CheckedChanged
+        My.Settings.LoadExtensionsAndPlugins = chkLoadExtensions.Checked
+    End Sub
+
+    Private Sub btnDownPy_Click(sender As Object, e As EventArgs) Handles btnDownPy.Click
+        Process.Start("https://winpython.github.io/")
+    End Sub
 End Class

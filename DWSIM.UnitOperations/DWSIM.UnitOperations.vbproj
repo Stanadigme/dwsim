@@ -57,6 +57,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -254,12 +257,6 @@
     <Compile Include="EditingForms\Dynamics\EditingForm_SeparatorFiller.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditingForms\EditingForm_AirCooler.designer.vb">
-      <DependentUpon>EditingForm_AirCooler.vb</DependentUpon>
-    </Compile>
-    <Compile Include="EditingForms\EditingForm_AirCooler.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="EditingForms\EditingForm_AnalogGauge.Designer.vb">
       <DependentUpon>EditingForm_AnalogGauge.vb</DependentUpon>
     </Compile>
@@ -270,12 +267,6 @@
       <DependentUpon>EditingForm_CAPEOPENUO.vb</DependentUpon>
     </Compile>
     <Compile Include="EditingForms\EditingForm_CAPEOPENUO.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditingForms\EditingForm_Emixer.designer.vb">
-      <DependentUpon>EditingForm_Emixer.vb</DependentUpon>
-    </Compile>
-    <Compile Include="EditingForms\EditingForm_Emixer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditingForms\EditingForm_HydroelectricTurbine.Designer.vb">
@@ -557,6 +548,12 @@
     <Compile Include="EditingForms\Supporting\EditingForm_Pipe_HydraulicProfileEditor.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="EditingForms\Supporting\EditingForm_Pipe_HydraulicProfileImportFromTabularData.Designer.vb">
+      <DependentUpon>EditingForm_Pipe_HydraulicProfileImportFromTabularData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EditingForms\Supporting\EditingForm_Pipe_HydraulicProfileImportFromTabularData.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="EditingForms\Supporting\EditingForm_Pipe_UserDefinedU.Designer.vb">
       <DependentUpon>EditingForm_Pipe_UserDefinedU.vb</DependentUpon>
     </Compile>
@@ -731,9 +728,7 @@
     <Compile Include="SupportClasses\ComboBoxColumnTemplates.vb" />
     <Compile Include="TypeResolver\Resolver.vb" />
     <Compile Include="CAPE-OPEN\CustomUO_CO.vb" />
-    <Compile Include="UnitOperations\AirCooler2.vb" />
     <Compile Include="UnitOperations\CleanEnergies\CleanEnergyUnitOpBase.vb" />
-    <Compile Include="UnitOperations\CleanEnergies\EnergyMixer.vb" />
     <Compile Include="UnitOperations\CleanEnergies\HydroelectricTurbine.vb" />
     <Compile Include="UnitOperations\CleanEnergies\PEMFC_Amphlett.vb" />
     <None Include="UnitOperations\CleanEnergies\PEMFC_ChamberlineKim.vb" />
@@ -758,6 +753,7 @@
     <Compile Include="UnitOperations\Recompletor.vb" />
     <Compile Include="UnitOperations\RigorousColumn.vb" />
     <Compile Include="UnitOperations\RigorousColumnSolvers\BubblePoint.vb" />
+    <Compile Include="UnitOperations\RigorousColumnSolvers\BubblePoint2.vb" />
     <Compile Include="UnitOperations\RigorousColumnSolvers\NewtonRaphson.vb" />
     <Compile Include="UnitOperations\RigorousColumnSolvers\SumRates.vb" />
     <Compile Include="UnitOperations\RigorousColumnSolvers\Tomich.vb" />
@@ -786,9 +782,6 @@
     <EmbeddedResource Include="EditingForms\EditingForm_Adjust.de.resx">
       <DependentUpon>EditingForm_Adjust.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditingForms\EditingForm_AirCooler.resx">
-      <DependentUpon>EditingForm_AirCooler.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="EditingForms\EditingForm_AnalogGauge.en.resx">
       <DependentUpon>EditingForm_AnalogGauge.vb</DependentUpon>
     </EmbeddedResource>
@@ -812,12 +805,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EditingForms\EditingForm_CustomUO.de.resx">
       <DependentUpon>EditingForm_CustomUO.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditingForms\EditingForm_Emixer.en.resx">
-      <DependentUpon>EditingForm_Emixer.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditingForms\EditingForm_Emixer.resx">
-      <DependentUpon>EditingForm_Emixer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditingForms\EditingForm_HydroelectricTurbine.resx">
       <DependentUpon>EditingForm_HydroelectricTurbine.vb</DependentUpon>
@@ -1179,6 +1166,9 @@
     <EmbeddedResource Include="EditingForms\Supporting\EditingForm_Pipe_HydraulicProfileEditor.resx">
       <DependentUpon>EditingForm_Pipe_HydraulicProfileEditor.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditingForms\Supporting\EditingForm_Pipe_HydraulicProfileImportFromTabularData.resx">
+      <DependentUpon>EditingForm_Pipe_HydraulicProfileImportFromTabularData.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditingForms\Supporting\EditingForm_Pipe_UserDefinedU.resx">
       <DependentUpon>EditingForm_Pipe_UserDefinedU.vb</DependentUpon>
     </EmbeddedResource>
@@ -1450,6 +1440,10 @@
     <ProjectReference Include="..\DWSIM.SkiaSharp.Views.Desktop\DWSIM.SkiaSharp.Views.Desktop.csproj">
       <Project>{f4e6f3e7-532c-4091-a82f-1dd7d191a13b}</Project>
       <Name>DWSIM.SkiaSharp.Views.Desktop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DWSIM.Thermodynamics.ReaktoroPropertyPackage\DWSIM.Thermodynamics.ReaktoroPropertyPackage.vbproj">
+      <Project>{d670c3b0-1ee1-47d4-99c6-8820cfb072f7}</Project>
+      <Name>DWSIM.Thermodynamics.ReaktoroPropertyPackage</Name>
     </ProjectReference>
     <ProjectReference Include="..\DWSIM.Thermodynamics\DWSIM.Thermodynamics.vbproj">
       <Project>{369bc7af-836b-4de1-93e3-b051bc148b23}</Project>
@@ -1848,7 +1842,15 @@
   <ItemGroup>
     <None Include="Resources\lightning.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\table_80px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\square_240px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\box_important_48px.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

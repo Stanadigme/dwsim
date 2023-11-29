@@ -174,9 +174,15 @@ Public Class EditingForm_Column_Connections_New
         Dim cbST As New DataGridViewComboBoxCell
 
         cbMS.Items.Add("")
-        cbMS.Items.AddRange(rc.GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = Enums.GraphicObjects.ObjectType.MaterialStream).Select(Function(x2) x2.GraphicObject.Tag).OrderBy(Function(x) x).ToArray)
+        Try
+            cbMS.Items.AddRange(rc.GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = Enums.GraphicObjects.ObjectType.MaterialStream).Select(Function(x2) x2.GraphicObject.Tag).OrderBy(Function(x) x).ToArray)
+        Catch ex As Exception
+        End Try
         cbES.Items.Add("")
-        cbES.Items.AddRange(rc.GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = Enums.GraphicObjects.ObjectType.EnergyStream).Select(Function(x2) x2.GraphicObject.Tag).OrderBy(Function(x) x).ToArray)
+        Try
+            cbES.Items.AddRange(rc.GetFlowsheet.SimulationObjects.Values.Where(Function(x) x.GraphicObject.ObjectType = Enums.GraphicObjects.ObjectType.EnergyStream).Select(Function(x2) x2.GraphicObject.Tag).OrderBy(Function(x) x).ToArray)
+        Catch ex As Exception
+        End Try
         cbST.Items.AddRange(stageNames.ToArray)
 
         DirectCast(gridFeeds.Columns(2), DataGridViewComboBoxColumn).CellTemplate = cbMS
@@ -301,6 +307,7 @@ Public Class EditingForm_Column_Connections_New
 
     Private Sub gridSideDrawSpecs_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles gridSideDrawSpecs.CellValueChanged
         If loaded Then
+            rc.FlowSheet.RegisterSnapshot(Enums.SnapshotType.ObjectData, rc)
             Dim id = gridSideDrawSpecs.Rows(e.RowIndex).Cells(0).Value
             Dim value = gridSideDrawSpecs.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
             If rc.MaterialStreams.ContainsKey(id) Then
@@ -325,6 +332,7 @@ Public Class EditingForm_Column_Connections_New
 
     Private Sub gridAssociations_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles gridAssociations.CellValueChanged
         If loaded Then
+            rc.FlowSheet.RegisterSnapshot(Enums.SnapshotType.ObjectData, rc)
             Dim id = gridAssociations.Rows(e.RowIndex).Cells(0).Value
             Dim value = gridAssociations.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
             If rc.MaterialStreams.ContainsKey(id) Then

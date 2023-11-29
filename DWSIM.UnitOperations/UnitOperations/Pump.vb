@@ -524,6 +524,10 @@ Namespace UnitOperations
                 esin = args(2)
             End If
 
+            If msin.Phases(2).Properties.molarfraction.GetValueOrDefault() > 0.001 Then
+                FlowSheet.ShowMessage(GraphicObject.Tag + ": " + FlowSheet.GetTranslatedString("Vapor phase detected in pump inlet"), IFlowsheet.MessageType.Warning)
+            End If
+
             Me.PropertyPackage.CurrentMaterialStream = msin
 
             Me.PropertyPackage.CurrentMaterialStream.Validate()
@@ -708,6 +712,8 @@ Namespace UnitOperations
 
                     Me.DeltaP = P2 - Pi
 
+                    Pout = P2
+
                     If DebugMode Then AppendDebugLine(String.Format("Outlet Pressure: {0} Pa", P2))
 
                     Dim tmp As IFlashCalculationResult
@@ -806,6 +812,8 @@ Namespace UnitOperations
 
                     If DebugMode Then AppendDebugLine(String.Format("Doing a bubble point flash to calculate NPSH... T = {0} K, VF = 0", Ti))
 
+                    Pout = P2
+
                     Try
                         IObj?.SetCurrent()
                         Pbub = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.TemperatureVaporFraction, Ti, 0.0#, Pi).CalculatedPressure
@@ -871,6 +879,8 @@ Namespace UnitOperations
                     P2 = Pi + Me.DeltaP.GetValueOrDefault
                     CheckSpec(P2, True, "outlet pressure")
 
+                    Pout = P2
+
                     Me.DeltaQ = (P2 - Pi) / rho_li / 1000 / (Me.Eficiencia.GetValueOrDefault / 100) * Wi
 
                     H2 = Hi + Me.DeltaQ / Wi
@@ -880,11 +890,12 @@ Namespace UnitOperations
 
                     IObj?.SetCurrent()
                     If P2 / Pi > 10 Then
-                        Dim P2it As Double = Pi + DeltaP / 10.0
-                        While P2it <= P2
-                            Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2it, H2, Ti)
+                        Dim H2it As Double = Hi + (H2 - Hi) / 10.0
+                        T2 = Ti
+                        While H2it <= H2
+                            Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2it, T2)
                             T2 = tmp.CalculatedTemperature.GetValueOrDefault
-                            P2it += DeltaP / 10.0
+                            H2it += (H2 - Hi) / 10.0
                         End While
                     Else
                         Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2, Ti)
@@ -933,11 +944,12 @@ Namespace UnitOperations
 
                     IObj?.SetCurrent()
                     If P2 / Pi > 10 Then
-                        Dim P2it As Double = Pi + DeltaP / 10.0
-                        While P2it <= P2
-                            Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2it, H2, Ti)
+                        Dim H2it As Double = Hi + (H2 - Hi) / 10.0
+                        T2 = Ti
+                        While H2it <= H2
+                            Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2it, T2)
                             T2 = tmp.CalculatedTemperature.GetValueOrDefault
-                            P2it += DeltaP / 10.0
+                            H2it += (H2 - Hi) / 10.0
                         End While
                     Else
                         Dim tmp = Me.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, P2, H2, Ti)

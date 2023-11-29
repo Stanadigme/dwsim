@@ -15,6 +15,8 @@ Public Class ObjectEditorForm
 
     Private DisplayTime As DateTime
 
+    Public Overridable ReadOnly Property Modular As Boolean = False
+
     Public Function GetAllChildren(control As Control) As IEnumerable(Of Control)
         Dim controls = control.Controls.Cast(Of Control)
         Return controls.SelectMany(Function(ctrl) GetAllChildren(ctrl)).Concat(controls)
@@ -104,21 +106,6 @@ Public Class ObjectEditorForm
         Width = 500
 
         Me.AutoScaleMode = AutoScaleMode.Dpi
-
-        Dim controls = GetAllChildren(Me)
-
-        For Each control As Control In controls
-            control.Font = Drawing.SystemFonts.MessageBoxFont
-            If GlobalSettings.Settings.DpiScale > 1.0 Then
-                If TypeOf control Is DataGridView Then
-                    Dim dgv = DirectCast(control, DataGridView)
-                    dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None
-                    dgv.AllowUserToResizeRows = False
-                    dgv.RowTemplate.Height = 23 * GlobalSettings.Settings.DpiScale
-                    dgv.ColumnHeadersHeight *= GlobalSettings.Settings.DpiScale
-                End If
-            End If
-        Next
 
     End Sub
 

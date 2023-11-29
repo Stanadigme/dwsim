@@ -2,7 +2,6 @@
 Imports Converter = DWSIM.SharedClasses.SystemsOfUnits.Converter
 Imports WeifenLuo.WinFormsUI.Docking
 Imports su = DWSIM.SharedClasses.SystemsOfUnits
-Imports Eto.Drawing
 
 Public Class MaterialStreamEditor
 
@@ -426,6 +425,22 @@ Public Class MaterialStreamEditor
                     TabPageInputComposition.Enabled = True
                 End If
 
+                If .GraphicObject.OutputConnectors(0).IsAttached And .FlowSheet.FlowsheetOptions.SingleUnitOpMode Then
+
+                    Dim conn_to = .GraphicObject.OutputConnectors(0).AttachedConnector.AttachedTo.Owner
+
+                    If conn_to.Name = .FlowSheet.FlowsheetOptions.SingleUnitOpID Then
+
+                        UpdateEditableStatus()
+                        tbMassFlow.Enabled = True
+                        tbMoleFlow.Enabled = True
+                        tbVolFlow.Enabled = True
+                        TabPageInputComposition.Enabled = True
+
+                    End If
+
+                End If
+
             Else
 
                 tbTemp.Enabled = True
@@ -458,6 +473,8 @@ Public Class MaterialStreamEditor
                 End If
 
             End If
+
+            cbCompBasis.Enabled = True
 
         End With
 
@@ -669,8 +686,8 @@ Public Class MaterialStreamEditor
                 .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("DewTemp"), val, units.temperature})
             End If
 
-            If p.Name.Contains("Overall") Then
-                refval = MatStream.Phases(0).Properties.surfaceTension.GetValueOrDefault
+            If p.Name.Contains("Liquid") Then
+                refval = p.Properties.surfaceTension.GetValueOrDefault()
                 If refval.HasValue Then val = Converter.ConvertFromSI(units.surfaceTension, refval)
                 .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("Tensosuperficial"), val, units.surfaceTension})
             End If
@@ -715,6 +732,33 @@ Public Class MaterialStreamEditor
 
                 End If
 
+                If MatStream.PropertyPackage IsNot Nothing AndAlso MatStream.PropertyPackage.IsAmineModel Then
+
+                    refval = MatStream.Phases(3).Properties.pH.GetValueOrDefault
+                    .Add(New Object() {"pH", refval, ""})
+
+                    refval = MatStream.Phases(3).Properties.CO2loading.GetValueOrDefault
+                    .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("CO2 Loading"), refval, ""})
+
+                    refval = MatStream.Phases(3).Properties.H2Sloading.GetValueOrDefault
+                    .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("H2S Loading"), refval, ""})
+
+                End If
+
+            ElseIf p.Name = "Vapor" Then
+
+                If MatStream.PropertyPackage IsNot Nothing AndAlso MatStream.PropertyPackage.IsAmineModel Then
+
+                    refval = MatStream.Phases(2).Properties.CO2partialpressure.GetValueOrDefault
+                    val = Converter.ConvertFromSI(units.pressure, refval)
+                    .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("CO2 Partial Pressure"), val, units.pressure})
+
+                    refval = MatStream.Phases(2).Properties.H2Spartialpressure.GetValueOrDefault
+                    val = Converter.ConvertFromSI(units.pressure, refval)
+                    .Add(New Object() {MatStream.FlowSheet.GetTranslatedString("H2S Partial Pressure"), val, units.pressure})
+
+                End If
+
             End If
 
         End With
@@ -723,6 +767,8 @@ Public Class MaterialStreamEditor
             row.Cells(0).Style.BackColor = Drawing.Color.FromKnownColor(Drawing.KnownColor.Control)
             row.Cells(2).Style.BackColor = Drawing.Color.FromKnownColor(Drawing.KnownColor.Control)
         Next
+
+        grid.Sort(grid.Columns(0), System.ComponentModel.ListSortDirection.Ascending)
 
     End Sub
 
@@ -805,12 +851,13 @@ Public Class MaterialStreamEditor
 
     Private Sub btnCompAcceptChanges_Click(sender As Object, e As EventArgs) Handles btnCompAcceptChanges.Click
 
-
         Dim W, Q As Double
 
         MatStream.PropertyPackage.CurrentMaterialStream = MatStream
 
         If Me.ValidateData() Then
+
+            MatStream.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, MatStream)
 
             Dim mmtotal As Double = 0
             Dim mtotal As Double = 0
@@ -1156,6 +1203,61 @@ Public Class MaterialStreamEditor
 
     End Sub
 
+    Sub UpdatePhaseTotal(cb As ComboBox, grid As DataGridView, phase As Interfaces.IPhase)
+
+        Dim W, Q As Double, suffix As String = ""
+        W = phase.Properties.massflow.GetValueOrDefault
+        Q = phase.Properties.molarflow.GetValueOrDefault
+        Dim phaseamount As Double
+        Select Case cb.SelectedIndex
+            Case 0
+                If chkShowAsPercentage.Checked Then
+                    phaseamount = phase.Properties.molarfraction.GetValueOrDefault() * 100.0
+                Else
+                    phaseamount = phase.Properties.molarfraction.GetValueOrDefault()
+                End If
+                If phase.Name = "Mixture" Then phaseamount = 1.0
+            Case 1
+                If chkShowAsPercentage.Checked Then
+                    phaseamount = phase.Properties.massfraction.GetValueOrDefault() * 100.0
+                Else
+                    phaseamount = phase.Properties.massfraction.GetValueOrDefault()
+                End If
+                If phase.Name = "Mixture" Then phaseamount = 1.0
+            Case 2
+                suffix = units.molarflow
+                phaseamount = phase.Properties.molarflow.GetValueOrDefault().ConvertFromSI(units.molarflow)
+            Case 3
+                suffix = units.massflow
+                phaseamount = phase.Properties.massflow.GetValueOrDefault().ConvertFromSI(units.massflow)
+            Case 5
+                'molarity = mol solute per liter solution
+                phaseamount = 0
+                For Each row As DataGridViewRow In grid.Rows
+                    phaseamount += phase.Compounds(row.Cells(0).Value).Molarity.GetValueOrDefault / 1000
+                Next
+                suffix = "mol/L"
+            Case 6
+                'molality = mol solute per kg solvent
+                phaseamount = 0
+                For Each row As DataGridViewRow In grid.Rows
+                    phaseamount += phase.Compounds(row.Cells(0).Value).Molality.GetValueOrDefault
+                Next
+                suffix = "mol/kg solv."
+            Case 4
+                'liquid vol. frac
+                phaseamount = Double.NaN
+        End Select
+
+        gridPhaseTotal.Rows.Clear()
+        If suffix <> "" Then
+            gridPhaseTotal.Rows.Add(New Object() {String.Format("{0} ({1})", MatStream.FlowSheet.GetTranslatedString("Phase Total"), suffix), phaseamount.ToString(nf)})
+        Else
+            gridPhaseTotal.Rows.Add(New Object() {MatStream.FlowSheet.GetTranslatedString("Phase Total"), phaseamount.ToString(nf)})
+        End If
+
+    End Sub
+
 
     Private Sub TextBoxKeyDown(sender As Object, e As KeyEventArgs) Handles tbTemp.KeyDown, tbPressure.KeyDown, tbEnth.KeyDown, tbEntr.KeyDown,
                                                                             tbFracSpec.KeyDown, tbMassFlow.KeyDown, tbMoleFlow.KeyDown, tbVolFlow.KeyDown
@@ -1180,6 +1282,8 @@ Public Class MaterialStreamEditor
     End Sub
 
     Sub UpdateProps(sender As Object)
+
+        MatStream.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, MatStream)
 
         Dim oldvalue, newvalue As Double, propname As String = ""
 
@@ -1251,17 +1355,6 @@ Public Class MaterialStreamEditor
             propname = "PROP_MS_27"
         End If
 
-        Try
-            MatStream.FlowSheet.AddUndoRedoAction(New SharedClasses.UndoRedoAction() With {.AType = Interfaces.Enums.UndoRedoActionType.SimulationObjectPropertyChanged,
-                                                            .ObjID = MatStream.Name,
-                                                            .OldValue = oldvalue,
-                                                            .NewValue = newvalue,
-                                                            .PropertyName = propname,
-                                                            .Tag = MatStream.FlowSheet.FlowsheetOptions.SelectedUnitSystem,
-                                                            .Name = String.Format(MatStream.FlowSheet.GetTranslatedString("UndoRedo_FlowsheetObjectPropertyChanged"), MatStream.GraphicObject.Tag, MatStream.FlowSheet.GetTranslatedString(.PropertyName), .OldValue, .NewValue)})
-        Catch ex As Exception
-        End Try
-
         RequestCalc()
 
     End Sub
@@ -1278,7 +1371,7 @@ Public Class MaterialStreamEditor
         SaveViewState()
 
         If Not IsAccumulationStream Then
-            MatStream.FlowSheet.RequestCalculation(MatStream)
+            MatStream.FlowSheet.RequestCalculation3(MatStream, False)
         End If
 
     End Sub
@@ -1310,6 +1403,8 @@ Public Class MaterialStreamEditor
         Else
             chkShowAsPercentage.Enabled = False
         End If
+
+        TabPhaseComps_TabIndexChanged(sender, e)
 
     End Sub
 
@@ -1541,7 +1636,8 @@ Public Class MaterialStreamEditor
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        MatStream.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).FirstOrDefault.DisplayGroupedEditingForm()
+        Dim pp = MatStream.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).FirstOrDefault()
+        pp?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub rtbAnnotations_RtfChanged(sender As Object, e As EventArgs) Handles rtbAnnotations.RtfChanged
@@ -1710,6 +1806,63 @@ Public Class MaterialStreamEditor
         If Loaded Then
 
             cbCalculatedAmountsBasis_SelectedIndexChanged(sender, e)
+
+        End If
+
+    End Sub
+
+    Private Sub TabPhaseComps_TabIndexChanged(sender As Object, e As EventArgs) Handles TabPhaseComps.SelectedIndexChanged
+
+        If TabPhaseComps.SelectedTab Is Nothing Then
+            'mix
+            UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompMixture, MatStream.Phases(0))
+            Exit Sub
+        End If
+
+        Select Case TabPhaseComps.SelectedTab.Name
+            Case "tabCompMix"
+                'mix
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompMixture, MatStream.Phases(0))
+            Case "tabCompVapor"
+                'vap
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompVapor, MatStream.Phases(2))
+            Case "tabCompLiqMix"
+                'liq mix
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompLiqMix, MatStream.Phases(1))
+            Case "tabCompLiq1"
+                'liq1
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompLiq1, MatStream.Phases(3))
+            Case "tabCompLiq2"
+                'liq2
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompLiq2, MatStream.Phases(4))
+            Case "tabCompSolid"
+                'solid
+                UpdatePhaseTotal(cbCalculatedAmountsBasis, gridCompSolid, MatStream.Phases(7))
+        End Select
+
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        If Me.ValidateData() Then
+
+            Dim ri = gridInputComposition.SelectedCells(0).RowIndex
+            Dim i As Integer, sum As Double
+
+            Select Case cbCompBasis.SelectedIndex
+
+                Case 0, 1
+
+                    i = 0
+                    For Each row As DataGridViewRow In Me.gridInputComposition.Rows
+                        If i <> ri Then
+                            sum += gridInputComposition.Rows(i).Cells(1).Value.ToString().ToDoubleFromCurrent()
+                        End If
+                        i += 1
+                    Next
+                    gridInputComposition.Rows(ri).Cells(1).Value = 1.0 - sum
+
+            End Select
 
         End If
 

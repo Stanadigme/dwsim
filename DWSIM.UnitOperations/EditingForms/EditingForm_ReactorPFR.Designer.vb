@@ -44,13 +44,13 @@ Partial Class EditingForm_ReactorPFR
         Me.Label11 = New System.Windows.Forms.Label()
         Me.rtbAnnotations = New Extended.Windows.Forms.RichTextBoxExtended()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.btnConfigExtSolver = New System.Windows.Forms.Button()
-        Me.cbExternalSolver = New System.Windows.Forms.ComboBox()
-        Me.LabelExternalSolver = New System.Windows.Forms.Label()
         Me.btnConfigurePP = New System.Windows.Forms.Button()
         Me.cbPropPack = New System.Windows.Forms.ComboBox()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.btnConfigExtSolver = New System.Windows.Forms.Button()
+        Me.cbExternalSolver = New System.Windows.Forms.ComboBox()
+        Me.LabelExternalSolver = New System.Windows.Forms.Label()
+        Me.GroupBoxParameters = New System.Windows.Forms.GroupBox()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -87,12 +87,14 @@ Partial Class EditingForm_ReactorPFR
         Me.tbCatDiam = New System.Windows.Forms.TextBox()
         Me.TabPage8 = New System.Windows.Forms.TabPage()
         Me.TabPage9 = New System.Windows.Forms.TabPage()
+        Me.cbSlurryVisc = New System.Windows.Forms.ComboBox()
+        Me.Label21 = New System.Windows.Forms.Label()
         Me.lblPDrop = New System.Windows.Forms.Label()
         Me.tbUserDefDP = New System.Windows.Forms.TextBox()
         Me.chkUseUserDefDP = New System.Windows.Forms.CheckBox()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label20 = New System.Windows.Forms.Label()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxConnections = New System.Windows.Forms.GroupBox()
         Me.btnCreateAndConnectEnergy = New System.Windows.Forms.Button()
         Me.btnCreateAndConnectOutlet1 = New System.Windows.Forms.Button()
         Me.btnCreateAndConnectInlet1 = New System.Windows.Forms.Button()
@@ -106,7 +108,7 @@ Partial Class EditingForm_ReactorPFR
         Me.cbInlet1 = New System.Windows.Forms.ComboBox()
         Me.Label19 = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxResults = New System.Windows.Forms.GroupBox()
         Me.tabstrip1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.gridResults = New System.Windows.Forms.DataGridView()
@@ -125,10 +127,11 @@ Partial Class EditingForm_ReactorPFR
         Me.DataGridViewTextBoxColumn7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.ZedGraphControl1 = New ZedGraph.ZedGraphControl()
+        Me.btnExportProfile = New System.Windows.Forms.Button()
         Me.ToolTipChangeTag = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
+        Me.GroupBoxParameters.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.TabPage6.SuspendLayout()
@@ -136,8 +139,8 @@ Partial Class EditingForm_ReactorPFR
         Me.TabPage7.SuspendLayout()
         Me.TabPage8.SuspendLayout()
         Me.TabPage9.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.GroupBox6.SuspendLayout()
+        Me.GroupBoxConnections.SuspendLayout()
+        Me.GroupBoxResults.SuspendLayout()
         Me.tabstrip1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         CType(Me.gridResults, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -227,7 +230,7 @@ Partial Class EditingForm_ReactorPFR
         resources.ApplyResources(Me.rtbAnnotations, "rtbAnnotations")
         Me.rtbAnnotations.Name = "rtbAnnotations"
         Me.rtbAnnotations.Rtf = "{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1046{\fonttbl{\f0\fnil Microsoft " &
-    "Sans Serif;}}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "{\*\generator Riched20 10.0.19041}\viewkind4\uc1 " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "\pard\f0\fs17\" &
+    "Sans Serif;}}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "{\*\generator Riched20 10.0.22621}\viewkind4\uc1 " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "\pard\f0\fs17\" &
     "par" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         Me.rtbAnnotations.ShowRedo = False
         Me.rtbAnnotations.ShowUndo = False
@@ -239,9 +242,6 @@ Partial Class EditingForm_ReactorPFR
         'GroupBox3
         '
         resources.ApplyResources(Me.GroupBox3, "GroupBox3")
-        Me.GroupBox3.Controls.Add(Me.btnConfigExtSolver)
-        Me.GroupBox3.Controls.Add(Me.cbExternalSolver)
-        Me.GroupBox3.Controls.Add(Me.LabelExternalSolver)
         Me.GroupBox3.Controls.Add(Me.btnConfigurePP)
         Me.GroupBox3.Controls.Add(Me.cbPropPack)
         Me.GroupBox3.Controls.Add(Me.Label9)
@@ -250,34 +250,6 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipChangeTag.SetToolTip(Me.GroupBox3, resources.GetString("GroupBox3.ToolTip"))
         Me.ToolTipValues.SetToolTip(Me.GroupBox3, resources.GetString("GroupBox3.ToolTip1"))
         Me.ToolTip1.SetToolTip(Me.GroupBox3, resources.GetString("GroupBox3.ToolTip2"))
-        '
-        'btnConfigExtSolver
-        '
-        resources.ApplyResources(Me.btnConfigExtSolver, "btnConfigExtSolver")
-        Me.btnConfigExtSolver.BackgroundImage = Global.DWSIM.UnitOperations.My.Resources.Resources.cog
-        Me.btnConfigExtSolver.Name = "btnConfigExtSolver"
-        Me.ToolTip1.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip"))
-        Me.ToolTipChangeTag.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip1"))
-        Me.ToolTipValues.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip2"))
-        Me.btnConfigExtSolver.UseVisualStyleBackColor = True
-        '
-        'cbExternalSolver
-        '
-        resources.ApplyResources(Me.cbExternalSolver, "cbExternalSolver")
-        Me.cbExternalSolver.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbExternalSolver.FormattingEnabled = True
-        Me.cbExternalSolver.Name = "cbExternalSolver"
-        Me.ToolTip1.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip1"))
-        Me.ToolTipChangeTag.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip2"))
-        '
-        'LabelExternalSolver
-        '
-        resources.ApplyResources(Me.LabelExternalSolver, "LabelExternalSolver")
-        Me.LabelExternalSolver.Name = "LabelExternalSolver"
-        Me.ToolTip1.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip"))
-        Me.ToolTipChangeTag.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip1"))
-        Me.ToolTipValues.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip2"))
         '
         'btnConfigurePP
         '
@@ -307,15 +279,43 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipChangeTag.SetToolTip(Me.Label9, resources.GetString("Label9.ToolTip1"))
         Me.ToolTipValues.SetToolTip(Me.Label9, resources.GetString("Label9.ToolTip2"))
         '
-        'GroupBox2
+        'btnConfigExtSolver
         '
-        resources.ApplyResources(Me.GroupBox2, "GroupBox2")
-        Me.GroupBox2.Controls.Add(Me.TabControl1)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.TabStop = False
-        Me.ToolTipChangeTag.SetToolTip(Me.GroupBox2, resources.GetString("GroupBox2.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me.GroupBox2, resources.GetString("GroupBox2.ToolTip1"))
-        Me.ToolTip1.SetToolTip(Me.GroupBox2, resources.GetString("GroupBox2.ToolTip2"))
+        resources.ApplyResources(Me.btnConfigExtSolver, "btnConfigExtSolver")
+        Me.btnConfigExtSolver.BackgroundImage = Global.DWSIM.UnitOperations.My.Resources.Resources.cog
+        Me.btnConfigExtSolver.Name = "btnConfigExtSolver"
+        Me.ToolTip1.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip"))
+        Me.ToolTipChangeTag.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip1"))
+        Me.ToolTipValues.SetToolTip(Me.btnConfigExtSolver, resources.GetString("btnConfigExtSolver.ToolTip2"))
+        Me.btnConfigExtSolver.UseVisualStyleBackColor = True
+        '
+        'cbExternalSolver
+        '
+        resources.ApplyResources(Me.cbExternalSolver, "cbExternalSolver")
+        Me.cbExternalSolver.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbExternalSolver.FormattingEnabled = True
+        Me.cbExternalSolver.Name = "cbExternalSolver"
+        Me.ToolTip1.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me.cbExternalSolver, resources.GetString("cbExternalSolver.ToolTip2"))
+        '
+        'LabelExternalSolver
+        '
+        resources.ApplyResources(Me.LabelExternalSolver, "LabelExternalSolver")
+        Me.LabelExternalSolver.Name = "LabelExternalSolver"
+        Me.ToolTip1.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip"))
+        Me.ToolTipChangeTag.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip1"))
+        Me.ToolTipValues.SetToolTip(Me.LabelExternalSolver, resources.GetString("LabelExternalSolver.ToolTip2"))
+        '
+        'GroupBoxParameters
+        '
+        resources.ApplyResources(Me.GroupBoxParameters, "GroupBoxParameters")
+        Me.GroupBoxParameters.Controls.Add(Me.TabControl1)
+        Me.GroupBoxParameters.Name = "GroupBoxParameters"
+        Me.GroupBoxParameters.TabStop = False
+        Me.ToolTipChangeTag.SetToolTip(Me.GroupBoxParameters, resources.GetString("GroupBoxParameters.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.GroupBoxParameters, resources.GetString("GroupBoxParameters.ToolTip1"))
+        Me.ToolTip1.SetToolTip(Me.GroupBoxParameters, resources.GetString("GroupBoxParameters.ToolTip2"))
         '
         'TabControl1
         '
@@ -334,8 +334,11 @@ Partial Class EditingForm_ReactorPFR
         'TabPage5
         '
         resources.ApplyResources(Me.TabPage5, "TabPage5")
+        Me.TabPage5.Controls.Add(Me.btnConfigExtSolver)
         Me.TabPage5.Controls.Add(Me.Label4)
+        Me.TabPage5.Controls.Add(Me.cbExternalSolver)
         Me.TabPage5.Controls.Add(Me.cbReacSet)
+        Me.TabPage5.Controls.Add(Me.LabelExternalSolver)
         Me.TabPage5.Controls.Add(Me.Label2)
         Me.TabPage5.Controls.Add(Me.cbCalcMode)
         Me.TabPage5.Controls.Add(Me.cbTemp)
@@ -672,6 +675,8 @@ Partial Class EditingForm_ReactorPFR
         'TabPage9
         '
         resources.ApplyResources(Me.TabPage9, "TabPage9")
+        Me.TabPage9.Controls.Add(Me.cbSlurryVisc)
+        Me.TabPage9.Controls.Add(Me.Label21)
         Me.TabPage9.Controls.Add(Me.lblPDrop)
         Me.TabPage9.Controls.Add(Me.tbUserDefDP)
         Me.TabPage9.Controls.Add(Me.chkUseUserDefDP)
@@ -682,6 +687,25 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipValues.SetToolTip(Me.TabPage9, resources.GetString("TabPage9.ToolTip1"))
         Me.ToolTipChangeTag.SetToolTip(Me.TabPage9, resources.GetString("TabPage9.ToolTip2"))
         Me.TabPage9.UseVisualStyleBackColor = True
+        '
+        'cbSlurryVisc
+        '
+        resources.ApplyResources(Me.cbSlurryVisc, "cbSlurryVisc")
+        Me.cbSlurryVisc.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbSlurryVisc.FormattingEnabled = True
+        Me.cbSlurryVisc.Items.AddRange(New Object() {resources.GetString("cbSlurryVisc.Items"), resources.GetString("cbSlurryVisc.Items1")})
+        Me.cbSlurryVisc.Name = "cbSlurryVisc"
+        Me.ToolTip1.SetToolTip(Me.cbSlurryVisc, resources.GetString("cbSlurryVisc.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.cbSlurryVisc, resources.GetString("cbSlurryVisc.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me.cbSlurryVisc, resources.GetString("cbSlurryVisc.ToolTip2"))
+        '
+        'Label21
+        '
+        resources.ApplyResources(Me.Label21, "Label21")
+        Me.Label21.Name = "Label21"
+        Me.ToolTip1.SetToolTip(Me.Label21, resources.GetString("Label21.ToolTip"))
+        Me.ToolTipChangeTag.SetToolTip(Me.Label21, resources.GetString("Label21.ToolTip1"))
+        Me.ToolTipValues.SetToolTip(Me.Label21, resources.GetString("Label21.ToolTip2"))
         '
         'lblPDrop
         '
@@ -724,26 +748,26 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipChangeTag.SetToolTip(Me.Label20, resources.GetString("Label20.ToolTip1"))
         Me.ToolTipValues.SetToolTip(Me.Label20, resources.GetString("Label20.ToolTip2"))
         '
-        'GroupBox1
+        'GroupBoxConnections
         '
-        resources.ApplyResources(Me.GroupBox1, "GroupBox1")
-        Me.GroupBox1.Controls.Add(Me.btnCreateAndConnectEnergy)
-        Me.GroupBox1.Controls.Add(Me.btnCreateAndConnectOutlet1)
-        Me.GroupBox1.Controls.Add(Me.btnCreateAndConnectInlet1)
-        Me.GroupBox1.Controls.Add(Me.btnDisconnectEnergy)
-        Me.GroupBox1.Controls.Add(Me.Label14)
-        Me.GroupBox1.Controls.Add(Me.cbEnergy)
-        Me.GroupBox1.Controls.Add(Me.btnDisconnectOutlet1)
-        Me.GroupBox1.Controls.Add(Me.btnDisconnect1)
-        Me.GroupBox1.Controls.Add(Me.Label7)
-        Me.GroupBox1.Controls.Add(Me.cbOutlet1)
-        Me.GroupBox1.Controls.Add(Me.cbInlet1)
-        Me.GroupBox1.Controls.Add(Me.Label19)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.TabStop = False
-        Me.ToolTipChangeTag.SetToolTip(Me.GroupBox1, resources.GetString("GroupBox1.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me.GroupBox1, resources.GetString("GroupBox1.ToolTip1"))
-        Me.ToolTip1.SetToolTip(Me.GroupBox1, resources.GetString("GroupBox1.ToolTip2"))
+        resources.ApplyResources(Me.GroupBoxConnections, "GroupBoxConnections")
+        Me.GroupBoxConnections.Controls.Add(Me.btnCreateAndConnectEnergy)
+        Me.GroupBoxConnections.Controls.Add(Me.btnCreateAndConnectOutlet1)
+        Me.GroupBoxConnections.Controls.Add(Me.btnCreateAndConnectInlet1)
+        Me.GroupBoxConnections.Controls.Add(Me.btnDisconnectEnergy)
+        Me.GroupBoxConnections.Controls.Add(Me.Label14)
+        Me.GroupBoxConnections.Controls.Add(Me.cbEnergy)
+        Me.GroupBoxConnections.Controls.Add(Me.btnDisconnectOutlet1)
+        Me.GroupBoxConnections.Controls.Add(Me.btnDisconnect1)
+        Me.GroupBoxConnections.Controls.Add(Me.Label7)
+        Me.GroupBoxConnections.Controls.Add(Me.cbOutlet1)
+        Me.GroupBoxConnections.Controls.Add(Me.cbInlet1)
+        Me.GroupBoxConnections.Controls.Add(Me.Label19)
+        Me.GroupBoxConnections.Name = "GroupBoxConnections"
+        Me.GroupBoxConnections.TabStop = False
+        Me.ToolTipChangeTag.SetToolTip(Me.GroupBoxConnections, resources.GetString("GroupBoxConnections.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.GroupBoxConnections, resources.GetString("GroupBoxConnections.ToolTip1"))
+        Me.ToolTip1.SetToolTip(Me.GroupBoxConnections, resources.GetString("GroupBoxConnections.ToolTip2"))
         '
         'btnCreateAndConnectEnergy
         '
@@ -859,15 +883,16 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipChangeTag.SetToolTip(Me.Label19, resources.GetString("Label19.ToolTip1"))
         Me.ToolTipValues.SetToolTip(Me.Label19, resources.GetString("Label19.ToolTip2"))
         '
-        'GroupBox6
+        'GroupBoxResults
         '
-        resources.ApplyResources(Me.GroupBox6, "GroupBox6")
-        Me.GroupBox6.Controls.Add(Me.tabstrip1)
-        Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.TabStop = False
-        Me.ToolTipChangeTag.SetToolTip(Me.GroupBox6, resources.GetString("GroupBox6.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me.GroupBox6, resources.GetString("GroupBox6.ToolTip1"))
-        Me.ToolTip1.SetToolTip(Me.GroupBox6, resources.GetString("GroupBox6.ToolTip2"))
+        resources.ApplyResources(Me.GroupBoxResults, "GroupBoxResults")
+        Me.GroupBoxResults.Controls.Add(Me.tabstrip1)
+        Me.GroupBoxResults.Controls.Add(Me.btnExportProfile)
+        Me.GroupBoxResults.Name = "GroupBoxResults"
+        Me.GroupBoxResults.TabStop = False
+        Me.ToolTipChangeTag.SetToolTip(Me.GroupBoxResults, resources.GetString("GroupBoxResults.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.GroupBoxResults, resources.GetString("GroupBoxResults.ToolTip1"))
+        Me.ToolTip1.SetToolTip(Me.GroupBoxResults, resources.GetString("GroupBoxResults.ToolTip2"))
         '
         'tabstrip1
         '
@@ -1066,6 +1091,15 @@ Partial Class EditingForm_ReactorPFR
         Me.ToolTipChangeTag.SetToolTip(Me.ZedGraphControl1, resources.GetString("ZedGraphControl1.ToolTip1"))
         Me.ToolTipValues.SetToolTip(Me.ZedGraphControl1, resources.GetString("ZedGraphControl1.ToolTip2"))
         '
+        'btnExportProfile
+        '
+        resources.ApplyResources(Me.btnExportProfile, "btnExportProfile")
+        Me.btnExportProfile.Name = "btnExportProfile"
+        Me.ToolTip1.SetToolTip(Me.btnExportProfile, resources.GetString("btnExportProfile.ToolTip"))
+        Me.ToolTipChangeTag.SetToolTip(Me.btnExportProfile, resources.GetString("btnExportProfile.ToolTip1"))
+        Me.ToolTipValues.SetToolTip(Me.btnExportProfile, resources.GetString("btnExportProfile.ToolTip2"))
+        Me.btnExportProfile.UseVisualStyleBackColor = True
+        '
         'ToolTipChangeTag
         '
         Me.ToolTipChangeTag.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info
@@ -1075,20 +1109,20 @@ Partial Class EditingForm_ReactorPFR
         '
         resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.Controls.Add(Me.GroupBox6)
+        Me.Controls.Add(Me.GroupBoxResults)
         Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.GroupBoxConnections)
         Me.Controls.Add(Me.GroupBox5)
-        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBoxParameters)
         Me.Name = "EditingForm_ReactorPFR"
-        Me.ToolTipChangeTag.SetToolTip(Me, resources.GetString("$this.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me, resources.GetString("$this.ToolTip1"))
-        Me.ToolTip1.SetToolTip(Me, resources.GetString("$this.ToolTip2"))
+        Me.ToolTipValues.SetToolTip(Me, resources.GetString("$this.ToolTip"))
+        Me.ToolTip1.SetToolTip(Me, resources.GetString("$this.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me, resources.GetString("$this.ToolTip2"))
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBoxParameters.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage5.ResumeLayout(False)
         Me.TabPage5.PerformLayout()
@@ -1100,9 +1134,9 @@ Partial Class EditingForm_ReactorPFR
         Me.TabPage8.ResumeLayout(False)
         Me.TabPage9.ResumeLayout(False)
         Me.TabPage9.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
-        Me.GroupBox6.ResumeLayout(False)
+        Me.GroupBoxConnections.ResumeLayout(False)
+        Me.GroupBoxConnections.PerformLayout()
+        Me.GroupBoxResults.ResumeLayout(False)
         Me.tabstrip1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         CType(Me.gridResults, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1125,9 +1159,9 @@ Partial Class EditingForm_ReactorPFR
     Public WithEvents GroupBox3 As System.Windows.Forms.GroupBox
     Public WithEvents cbPropPack As System.Windows.Forms.ComboBox
     Public WithEvents Label9 As System.Windows.Forms.Label
-    Public WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Public WithEvents GroupBoxParameters As System.Windows.Forms.GroupBox
     Public WithEvents btnConfigurePP As System.Windows.Forms.Button
-    Public WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Public WithEvents GroupBoxConnections As System.Windows.Forms.GroupBox
     Public WithEvents btnDisconnectEnergy As System.Windows.Forms.Button
     Public WithEvents Label14 As System.Windows.Forms.Label
     Public WithEvents cbEnergy As System.Windows.Forms.ComboBox
@@ -1139,7 +1173,7 @@ Partial Class EditingForm_ReactorPFR
     Public WithEvents Label19 As System.Windows.Forms.Label
     Public WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Public WithEvents lblTag As System.Windows.Forms.TextBox
-    Public WithEvents GroupBox6 As System.Windows.Forms.GroupBox
+    Public WithEvents GroupBoxResults As System.Windows.Forms.GroupBox
     Public WithEvents tabstrip1 As System.Windows.Forms.TabControl
     Public WithEvents TabPage1 As System.Windows.Forms.TabPage
     Public WithEvents TabPage2 As System.Windows.Forms.TabPage
@@ -1206,4 +1240,7 @@ Partial Class EditingForm_ReactorPFR
     Public WithEvents lblPDrop As Label
     Public WithEvents tbUserDefDP As TextBox
     Friend WithEvents chkUseUserDefDP As CheckBox
+    Friend WithEvents btnExportProfile As Button
+    Friend WithEvents cbSlurryVisc As ComboBox
+    Friend WithEvents Label21 As Label
 End Class

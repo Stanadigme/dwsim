@@ -274,4 +274,10 @@ Imports DWSIM.Interfaces.Enums
 
     Sub CheckDirtyStatus()
 
+    Function GetEditingForm() As System.Windows.Forms.Form
+
+    Function GetPreferredGraphicObjectWidth() As Double
+
+    Function GetPreferredGraphicObjectHeight() As Double
+
 End Interface

@@ -696,9 +696,9 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                     reporter?.AppendLine("========================================================")
                     reporter?.AppendLine()
 
-                    reporter?.AppendLine(String.Format("{0,-16}{1,26}{2,26}{3,26}{4,26}", "Iteration", "Temperature Error", "Composition Error"))
+                    reporter?.AppendLine(String.Format("{0,-16}{1,26}{2,26}", "Iteration", "Temperature Error", "Composition Error"))
                     For i = 0 To t_error_hist.Count - 1
-                        reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}{2,26:G6}{3,26:G6}{4,26:G6}", i + 1, t_error_hist(i), comp_error_hist(i)))
+                        reporter?.AppendLine(String.Format("{0,-16}{1,26:G6}{2,26:G6}", i + 1, t_error_hist(i), comp_error_hist(i)))
                     Next
 
                     reporter?.AppendLine("========================================================")
@@ -733,7 +733,7 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                 Next
 
                 reporter?.AppendLine()
-                reporter?.AppendLine("Stage Molar Fractions - Vapor/Liquid 1")
+                reporter?.AppendLine("Stage Molar Fractions - Liquid")
                 reporter?.Append("Stage".PadRight(20))
                 For j = 0 To nc - 1
                     reporter?.Append(names(j).PadLeft(20))
@@ -748,7 +748,7 @@ Namespace UnitOperations.Auxiliary.SepOps.SolvingMethods
                 Next
 
                 reporter?.AppendLine()
-                reporter?.AppendLine("Stage Molar Fractions - Vapor")
+                reporter?.AppendLine("Stage Molar Fractions - Vapor/Liquid2")
                 reporter?.Append("Stage".PadRight(20))
                 For j = 0 To nc - 1
                     reporter?.Append(names(j).PadLeft(20))

@@ -95,6 +95,9 @@ Partial Class EditingForm_Column
         Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TabContainerAll = New System.Windows.Forms.TabControl()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.cbTS = New System.Windows.Forms.ComboBox()
+        Me.tbTS = New System.Windows.Forms.TextBox()
+        Me.Label17 = New System.Windows.Forms.Label()
         Me.tbColPDrop = New System.Windows.Forms.TextBox()
         Me.cbColPDrop = New System.Windows.Forms.ComboBox()
         Me.Label18 = New System.Windows.Forms.Label()
@@ -409,7 +412,7 @@ Partial Class EditingForm_Column
         Me.cbCondSpec.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbCondSpec.DropDownWidth = 250
         Me.cbCondSpec.FormattingEnabled = True
-        Me.cbCondSpec.Items.AddRange(New Object() {resources.GetString("cbCondSpec.Items"), resources.GetString("cbCondSpec.Items1"), resources.GetString("cbCondSpec.Items2"), resources.GetString("cbCondSpec.Items3"), resources.GetString("cbCondSpec.Items4"), resources.GetString("cbCondSpec.Items5"), resources.GetString("cbCondSpec.Items6"), resources.GetString("cbCondSpec.Items7"), resources.GetString("cbCondSpec.Items8")})
+        Me.cbCondSpec.Items.AddRange(New Object() {resources.GetString("cbCondSpec.Items"), resources.GetString("cbCondSpec.Items1"), resources.GetString("cbCondSpec.Items2"), resources.GetString("cbCondSpec.Items3"), resources.GetString("cbCondSpec.Items4"), resources.GetString("cbCondSpec.Items5"), resources.GetString("cbCondSpec.Items6"), resources.GetString("cbCondSpec.Items7"), resources.GetString("cbCondSpec.Items8"), resources.GetString("cbCondSpec.Items9")})
         Me.cbCondSpec.Name = "cbCondSpec"
         Me.ToolTip1.SetToolTip(Me.cbCondSpec, resources.GetString("cbCondSpec.ToolTip"))
         Me.ToolTipValues.SetToolTip(Me.cbCondSpec, resources.GetString("cbCondSpec.ToolTip1"))
@@ -481,7 +484,7 @@ Partial Class EditingForm_Column
         Me.cbRebSpec.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbRebSpec.DropDownWidth = 250
         Me.cbRebSpec.FormattingEnabled = True
-        Me.cbRebSpec.Items.AddRange(New Object() {resources.GetString("cbRebSpec.Items"), resources.GetString("cbRebSpec.Items1"), resources.GetString("cbRebSpec.Items2"), resources.GetString("cbRebSpec.Items3"), resources.GetString("cbRebSpec.Items4"), resources.GetString("cbRebSpec.Items5"), resources.GetString("cbRebSpec.Items6"), resources.GetString("cbRebSpec.Items7"), resources.GetString("cbRebSpec.Items8")})
+        Me.cbRebSpec.Items.AddRange(New Object() {resources.GetString("cbRebSpec.Items"), resources.GetString("cbRebSpec.Items1"), resources.GetString("cbRebSpec.Items2"), resources.GetString("cbRebSpec.Items3"), resources.GetString("cbRebSpec.Items4"), resources.GetString("cbRebSpec.Items5"), resources.GetString("cbRebSpec.Items6"), resources.GetString("cbRebSpec.Items7"), resources.GetString("cbRebSpec.Items8"), resources.GetString("cbRebSpec.Items9")})
         Me.cbRebSpec.Name = "cbRebSpec"
         Me.ToolTip1.SetToolTip(Me.cbRebSpec, resources.GetString("cbRebSpec.ToolTip"))
         Me.ToolTipValues.SetToolTip(Me.cbRebSpec, resources.GetString("cbRebSpec.ToolTip1"))
@@ -761,6 +764,9 @@ Partial Class EditingForm_Column
         'TabPage6
         '
         resources.ApplyResources(Me.TabPage6, "TabPage6")
+        Me.TabPage6.Controls.Add(Me.cbTS)
+        Me.TabPage6.Controls.Add(Me.tbTS)
+        Me.TabPage6.Controls.Add(Me.Label17)
         Me.TabPage6.Controls.Add(Me.chkCreateConvReport)
         Me.TabPage6.Controls.Add(Me.tbColPDrop)
         Me.TabPage6.Controls.Add(Me.cbColPDrop)
@@ -789,6 +795,32 @@ Partial Class EditingForm_Column
         Me.ToolTipValues.SetToolTip(Me.TabPage6, resources.GetString("TabPage6.ToolTip1"))
         Me.ToolTipChangeTag.SetToolTip(Me.TabPage6, resources.GetString("TabPage6.ToolTip2"))
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'cbTS
+        '
+        resources.ApplyResources(Me.cbTS, "cbTS")
+        Me.cbTS.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbTS.FormattingEnabled = True
+        Me.cbTS.Name = "cbTS"
+        Me.ToolTip1.SetToolTip(Me.cbTS, resources.GetString("cbTS.ToolTip"))
+        Me.ToolTipValues.SetToolTip(Me.cbTS, resources.GetString("cbTS.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me.cbTS, resources.GetString("cbTS.ToolTip2"))
+        '
+        'tbTS
+        '
+        resources.ApplyResources(Me.tbTS, "tbTS")
+        Me.tbTS.Name = "tbTS"
+        Me.ToolTipValues.SetToolTip(Me.tbTS, resources.GetString("tbTS.ToolTip"))
+        Me.ToolTip1.SetToolTip(Me.tbTS, resources.GetString("tbTS.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me.tbTS, resources.GetString("tbTS.ToolTip2"))
+        '
+        'Label17
+        '
+        resources.ApplyResources(Me.Label17, "Label17")
+        Me.Label17.Name = "Label17"
+        Me.ToolTip1.SetToolTip(Me.Label17, resources.GetString("Label17.ToolTip"))
+        Me.ToolTipChangeTag.SetToolTip(Me.Label17, resources.GetString("Label17.ToolTip1"))
+        Me.ToolTipValues.SetToolTip(Me.Label17, resources.GetString("Label17.ToolTip2"))
         '
         'tbColPDrop
         '
@@ -840,7 +872,7 @@ Partial Class EditingForm_Column
         resources.ApplyResources(Me.cbSolvingMethod, "cbSolvingMethod")
         Me.cbSolvingMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbSolvingMethod.FormattingEnabled = True
-        Me.cbSolvingMethod.Items.AddRange(New Object() {resources.GetString("cbSolvingMethod.Items"), resources.GetString("cbSolvingMethod.Items1")})
+        Me.cbSolvingMethod.Items.AddRange(New Object() {resources.GetString("cbSolvingMethod.Items"), resources.GetString("cbSolvingMethod.Items1"), resources.GetString("cbSolvingMethod.Items2")})
         Me.cbSolvingMethod.Name = "cbSolvingMethod"
         Me.ToolTip1.SetToolTip(Me.cbSolvingMethod, resources.GetString("cbSolvingMethod.ToolTip"))
         Me.ToolTipValues.SetToolTip(Me.cbSolvingMethod, resources.GetString("cbSolvingMethod.ToolTip1"))
@@ -948,9 +980,9 @@ Partial Class EditingForm_Column
         Me.Controls.Add(Me.TabContainerAll)
         Me.Controls.Add(Me.GroupBox5)
         Me.Name = "EditingForm_Column"
-        Me.ToolTipChangeTag.SetToolTip(Me, resources.GetString("$this.ToolTip"))
-        Me.ToolTipValues.SetToolTip(Me, resources.GetString("$this.ToolTip1"))
-        Me.ToolTip1.SetToolTip(Me, resources.GetString("$this.ToolTip2"))
+        Me.ToolTipValues.SetToolTip(Me, resources.GetString("$this.ToolTip"))
+        Me.ToolTip1.SetToolTip(Me, resources.GetString("$this.ToolTip1"))
+        Me.ToolTipChangeTag.SetToolTip(Me, resources.GetString("$this.ToolTip2"))
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
         Me.TabContainerSpecification.ResumeLayout(False)
@@ -1056,4 +1088,7 @@ Partial Class EditingForm_Column
     Public WithEvents btnViewReport As Button
     Public WithEvents chkCreateConvReport As CheckBox
     Public WithEvents btnViewPropertiesReport As Button
+    Public WithEvents cbTS As ComboBox
+    Public WithEvents tbTS As TextBox
+    Public WithEvents Label17 As Label
 End Class

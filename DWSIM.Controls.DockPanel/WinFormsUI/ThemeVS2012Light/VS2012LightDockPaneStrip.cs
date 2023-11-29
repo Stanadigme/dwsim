@@ -112,8 +112,8 @@ namespace WeifenLuo.WinFormsUI.Docking
         private const int _DocumentIconGapBottom = 2;//2;
         private const int _DocumentIconGapLeft = 8;
         private const int _DocumentIconGapRight = 0;
-        private const int _DocumentIconHeight = 16;
-        private const int _DocumentIconWidth = 16;
+        private static int _DocumentIconHeight = 16;
+        private static int _DocumentIconWidth = 16;
         private const int _DocumentTextGapRight = 6;
 
         #endregion
@@ -621,13 +621,20 @@ namespace WeifenLuo.WinFormsUI.Docking
                 ButtonClose.Height + DocumentButtonGapTop + DocumentButtonGapBottom)
                 + DocumentStripGapBottom + DocumentStripGapTop;
 
-            //double dpi = 1.0;
-            //using (Graphics g = this.CreateGraphics())
-            //{
-            //    dpi = g.DpiX / 96.0;
-            //}
+            double dpi = 1.0;
+            using (Graphics g = this.CreateGraphics())
+            {
+                dpi = g.DpiX / 96.0;
+            }
 
-            return height; // * (int)dpi;
+            if (dpi > 1.0)
+            {
+                return height + 10;
+            }
+            else
+            {
+                return height + 4;
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -1176,10 +1183,12 @@ namespace WeifenLuo.WinFormsUI.Docking
             if (tab.TabWidth == 0)
                 return;
 
-            double dpi = 0.0;
-            dpi = g.DpiX / 96.0;
+            double dpi = g.DpiX / 96.0;
 
-            var rectCloseButton = GetCloseButtonRect(rect);
+            _DocumentIconHeight = rect.Height - 8;
+            _DocumentIconWidth = rect.Height - 8;
+
+            var rectCloseButton = GetCloseButtonRect(rect, tab);
             Rectangle rectIcon = new Rectangle(
                 rect.X + DocumentIconGapLeft,
                 rect.Y + rect.Height - DocumentIconGapBottom - DocumentIconHeight,
@@ -1195,10 +1204,10 @@ namespace WeifenLuo.WinFormsUI.Docking
             else
                 rectText.Width = rect.Width - DocumentIconGapLeft - DocumentTextGapRight - rectCloseButton.Width;
 
-            if (dpi > 1.0)
+            if (dpi == 1.0)
             {
-                rectText.Y = rectText.Y - 10 * (int)dpi;
-                rectText.Height = rectText.Height + 10 * (int)dpi;
+                rectText.Y = rectText.Y - 4 * (int)dpi;
+                rectText.Height = rectText.Height + 4 * (int)dpi;
             }
 
             Rectangle rectTab = DrawHelper.RtlTransform(this, rect);
@@ -1257,6 +1266,9 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             if (rectTab.Contains(rectIcon) && DockPane.DockPanel.ShowDocumentIcon)
                 g.DrawIcon(tab.Content.DockHandler.Icon, rectIcon);
+
+            g.DrawLine(new Pen(activeColor, 2.0f), new Point(rect.Right, rect.Top), new Point(rect.Right, rect.Bottom));
+
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
@@ -1274,20 +1286,22 @@ namespace WeifenLuo.WinFormsUI.Docking
         {
             var mousePos = PointToClient(MousePosition);
             var tabRect = GetTabRectangle(index);
-            var closeButtonRect = GetCloseButtonRect(tabRect);
+            var tab = Tabs[index] as TabVS2012Light;
+            var closeButtonRect = GetCloseButtonRect(tabRect, tab);
             var mouseRect = new Rectangle(mousePos, new Size(1, 1));
             if (closeButtonRect.IntersectsWith(mouseRect))
                 DockPane.CloseActiveContent();
         }
 
-        private Rectangle GetCloseButtonRect(Rectangle rectTab)
+        private Rectangle GetCloseButtonRect(Rectangle rectTab, TabVS2012Light tab)
         {
+
             if (Appearance != Docking.DockPane.AppearanceStyle.Document)
             {
                 return Rectangle.Empty;
             }
 
-            if (!this.DockPane.ActiveContent.DockHandler.CloseButtonVisible)
+            if (!tab.Content.DockHandler.CloseButtonVisible)
             {
                 return Rectangle.Empty;
             }
@@ -1300,8 +1314,9 @@ namespace WeifenLuo.WinFormsUI.Docking
                 dpi = g.DpiX / 96.0;
             }
 
-            int imageSize = 15 * (int)dpi;
-            return new Rectangle(rectTab.X + rectTab.Width - imageSize - gap - 1, rectTab.Y + gap, imageSize, imageSize);
+            int imageSize = rectTab.Height - 4;
+            var rc = new Rectangle(rectTab.X + rectTab.Width - imageSize - gap - 1, rectTab.Y + gap, imageSize, imageSize);
+            return rc;
         }
 
         private void WindowList_Click(object sender, EventArgs e)
@@ -1485,7 +1500,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 var mousePos = PointToClient(MousePosition);
                 var tabRect = GetTabRectangle(index);
-                var closeButtonRect = GetCloseButtonRect(tabRect);
+                var closeButtonRect = GetCloseButtonRect(tabRect, tab);
                 var mouseRect = new Rectangle(mousePos, new Size(1, 1));
                 buttonUpdate = SetActiveClose(closeButtonRect.IntersectsWith(mouseRect) ? closeButtonRect : Rectangle.Empty);
             }

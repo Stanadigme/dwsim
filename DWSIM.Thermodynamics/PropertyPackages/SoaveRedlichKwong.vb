@@ -36,6 +36,7 @@ Namespace PropertyPackages
         Private KijMatrix As Double(,)
 
         Public m_pr As New PropertyPackages.Auxiliary.SRK
+        Private m_id As New PropertyPackages.Auxiliary.Ideal
 
         Public Overrides ReadOnly Property Popular As Boolean = True
 
@@ -313,7 +314,10 @@ Namespace PropertyPackages
 
         Public Overrides Sub RunPostMaterialStreamSetRoutine()
 
-            If KijMatrix Is Nothing OrElse KijMatrix.Length = 0 Or Not Settings.LockModelParameters Then SetKijMatrix()
+            If AreModelParametersDirty Or KijMatrix Is Nothing OrElse KijMatrix.Length = 0 Or Not Settings.LockModelParameters Then
+                SetKijMatrix()
+                AreModelParametersDirty = False
+            End If
 
         End Sub
 
@@ -653,15 +657,6 @@ Namespace PropertyPackages
             Return Me.AUX_SURFTM(T)
         End Function
 
-        Public Overrides Sub DW_CalcTwoPhaseProps(ByVal Phase1 As PropertyPackages.Phase, ByVal Phase2 As PropertyPackages.Phase)
-
-            Dim T As Double
-
-            T = Me.CurrentMaterialStream.Phases(0).Properties.temperature.GetValueOrDefault
-            Me.CurrentMaterialStream.Phases(0).Properties.surfaceTension = Me.AUX_SURFTM(T)
-
-        End Sub
-
         Public Overrides Function DW_CalcViscosidadeDinamica_ISOL(ByVal Phase1 As PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
             If Phase1 = Phase.Liquid Then
                 Return Me.AUX_LIQVISCm(T, P)
@@ -820,7 +815,7 @@ Namespace PropertyPackages
 
             If OverrideEnthalpyCalculation Then
 
-                Return EnthalpyCalculationOverride.Invoke(Vx, T, P, st)
+                Return EnthalpyCalculationOverride.Invoke(Vx, T, P, st, Me)
 
             Else
 
@@ -837,11 +832,27 @@ Namespace PropertyPackages
                 IObj?.SetCurrent()
 
                 If st = State.Liquid Then
-                    H = Me.m_pr.H_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        H = Me.m_pr.H_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid)
+                    Else
+                        H = AUX_INT_CPDTm_L(298.15, T, Me.AUX_CONVERT_MOL_TO_MASS(Vx)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P)
+                    End If
                 ElseIf st = State.Vapor Then
-                    H = Me.m_pr.H_SRK_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        H = Me.m_pr.H_SRK_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid)
+                    Else
+                        H = RET_Hid_FromLiqCp(Vx, T, P)
+                    End If
                 ElseIf st = State.Solid Then
-                    H = Me.m_pr.H_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid) - Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T)
+                    If SolidPhaseEnthalpy_UsesCp Then
+                        H = CalcSolidEnthalpyFromCp(T, Vx, DW_GetConstantProperties)
+                    Else
+                        If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                            H = Me.m_pr.H_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Hid) - Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T)
+                        Else
+                            H = AUX_INT_CPDTm_L(298.15, T, Me.AUX_CONVERT_MOL_TO_MASS(Vx)) + P / 1000 / Me.AUX_LIQDENS(T, Vx, P) - RET_HFUSM(Me.AUX_CONVERT_MOL_TO_MASS(Vx), T)
+                        End If
+                    End If
                 End If
 
                 IObj?.Close()
@@ -874,7 +885,7 @@ Namespace PropertyPackages
 
             If OverrideEntropyCalculation Then
 
-                Return EntropyCalculationOverride.Invoke(Vx, T, P, st)
+                Return EntropyCalculationOverride.Invoke(Vx, T, P, st, Me)
 
             Else
 
@@ -891,11 +902,27 @@ Namespace PropertyPackages
                 IObj?.SetCurrent()
 
                 If st = State.Liquid Then
-                    S = Me.m_pr.S_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        S = Me.m_pr.S_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid)
+                    Else
+                        S = AUX_INT_CPDTm_L(298.15, T, Me.AUX_CONVERT_MOL_TO_MASS(Vx)) / T + P / 1000 / Me.AUX_LIQDENS(T, Vx, P) / T
+                    End If
                 ElseIf st = State.Vapor Then
-                    S = Me.m_pr.S_SRK_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid)
+                    If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                        S = Me.m_pr.S_SRK_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid)
+                    Else
+                        S = RET_Sid_FromLiqCp(Vx, T, P)
+                    End If
                 ElseIf st = State.Solid Then
-                    S = Me.m_pr.S_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid) - Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T) / T
+                    If SolidPhaseEnthalpy_UsesCp Then
+                        S = CalcSolidEnthalpyFromCp(T, Vx, DW_GetConstantProperties) / T
+                    Else
+                        If LiquidEnthalpyEntropyCpCvCalculationMode_EOS = LiquidEnthalpyEntropyCpCvCalcMode_EOS.EOS Then
+                            S = Me.m_pr.S_SRK_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Sid) - Me.RET_HFUSM(AUX_CONVERT_MOL_TO_MASS(Vx), T) / T
+                        Else
+                            S = AUX_INT_CPDTm_L(298.15, T, Me.AUX_CONVERT_MOL_TO_MASS(Vx)) / T - RET_HFUSM(Me.AUX_CONVERT_MOL_TO_MASS(Vx), T) / T + P / 1000 / Me.AUX_LIQDENS(T, Vx, P) / T
+                        End If
+                    End If
                 End If
 
                 IObj?.Close()

@@ -331,5 +331,21 @@ namespace DWSIM.Automation
             return Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.tmp");
         }
 
+        public override void CloseOpenEditForms()
+        {
+
+        }
+
+        public override IFlowsheet Clone()
+        {
+
+            var fs = new Flowsheet2(null, null);
+            fs.Initialize();
+            var xdoc = SaveToXML();
+            fs.LoadFromXML(xdoc);
+            return fs;
+
+        }
+
     }
 }

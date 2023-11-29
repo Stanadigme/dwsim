@@ -83,6 +83,10 @@ Partial Class FormSimulSettings
         Me.Column9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column5 = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.tsmiViewComp = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmiExportJSON = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmiReplace = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.TextBox2 = New System.Windows.Forms.TextBox()
         Me.Label9 = New System.Windows.Forms.Label()
@@ -135,6 +139,7 @@ Partial Class FormSimulSettings
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.GroupBox13 = New System.Windows.Forms.GroupBox()
+        Me.chkEnableUndoRedo = New System.Windows.Forms.CheckBox()
         Me.chkIncludeFlowsheetMessagesInFile = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.chkForceObjectCalculation = New System.Windows.Forms.CheckBox()
@@ -177,6 +182,7 @@ Partial Class FormSimulSettings
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         CType(Me.ogc1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStrip1.SuspendLayout()
         Me.GroupBox7.SuspendLayout()
         Me.GroupBox8.SuspendLayout()
         Me.GroupBox9.SuspendLayout()
@@ -554,6 +560,7 @@ Partial Class FormSimulSettings
         Me.ogc1.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle3
         Me.ogc1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.ogc1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Column11, Me.colAdd, Me.colName, Me.colTag, Me.casno, Me.Column8, Me.Column9, Me.Column7, Me.Column5})
+        Me.ogc1.ContextMenuStrip = Me.ContextMenuStrip1
         Me.ogc1.Name = "ogc1"
         Me.ogc1.RowHeadersVisible = False
         Me.ogc1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
@@ -627,6 +634,31 @@ Partial Class FormSimulSettings
         Me.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
         Me.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
         Me.Column5.TrueValue = "True"
+        '
+        'ContextMenuStrip1
+        '
+        resources.ApplyResources(Me.ContextMenuStrip1, "ContextMenuStrip1")
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmiViewComp, Me.tsmiExportJSON, Me.tsmiReplace})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ToolTip1.SetToolTip(Me.ContextMenuStrip1, resources.GetString("ContextMenuStrip1.ToolTip"))
+        '
+        'tsmiViewComp
+        '
+        resources.ApplyResources(Me.tsmiViewComp, "tsmiViewComp")
+        Me.tsmiViewComp.Image = Global.DWSIM.My.Resources.Resources.info_96px
+        Me.tsmiViewComp.Name = "tsmiViewComp"
+        '
+        'tsmiExportJSON
+        '
+        resources.ApplyResources(Me.tsmiExportJSON, "tsmiExportJSON")
+        Me.tsmiExportJSON.Image = Global.DWSIM.My.Resources.Resources.icons8_export
+        Me.tsmiExportJSON.Name = "tsmiExportJSON"
+        '
+        'tsmiReplace
+        '
+        resources.ApplyResources(Me.tsmiReplace, "tsmiReplace")
+        Me.tsmiReplace.Image = Global.DWSIM.My.Resources.Resources.replace_80px
+        Me.tsmiReplace.Name = "tsmiReplace"
         '
         'Label8
         '
@@ -1047,10 +1079,18 @@ Partial Class FormSimulSettings
         'GroupBox13
         '
         resources.ApplyResources(Me.GroupBox13, "GroupBox13")
+        Me.GroupBox13.Controls.Add(Me.chkEnableUndoRedo)
         Me.GroupBox13.Controls.Add(Me.chkIncludeFlowsheetMessagesInFile)
         Me.GroupBox13.Name = "GroupBox13"
         Me.GroupBox13.TabStop = False
         Me.ToolTip1.SetToolTip(Me.GroupBox13, resources.GetString("GroupBox13.ToolTip"))
+        '
+        'chkEnableUndoRedo
+        '
+        resources.ApplyResources(Me.chkEnableUndoRedo, "chkEnableUndoRedo")
+        Me.chkEnableUndoRedo.Name = "chkEnableUndoRedo"
+        Me.ToolTip1.SetToolTip(Me.chkEnableUndoRedo, resources.GetString("chkEnableUndoRedo.ToolTip"))
+        Me.chkEnableUndoRedo.UseVisualStyleBackColor = True
         '
         'chkIncludeFlowsheetMessagesInFile
         '
@@ -1364,6 +1404,7 @@ Partial Class FormSimulSettings
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.ogc1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.GroupBox7.ResumeLayout(False)
         Me.GroupBox8.ResumeLayout(False)
         Me.GroupBox9.ResumeLayout(False)
@@ -1453,7 +1494,6 @@ Partial Class FormSimulSettings
     Friend WithEvents chkUsePassword As System.Windows.Forms.CheckBox
     Public WithEvents tbPassword As System.Windows.Forms.TextBox
     Public WithEvents Button3 As System.Windows.Forms.Button
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
     Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
     Friend WithEvents GroupBox10 As System.Windows.Forms.GroupBox
     Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
@@ -1542,4 +1582,10 @@ Partial Class FormSimulSettings
     Friend WithEvents chkForceObjectCalculation As CheckBox
     Friend WithEvents GroupBox13 As GroupBox
     Friend WithEvents chkIncludeFlowsheetMessagesInFile As CheckBox
+    Public WithEvents TabControl1 As TabControl
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents tsmiViewComp As ToolStripMenuItem
+    Friend WithEvents tsmiExportJSON As ToolStripMenuItem
+    Friend WithEvents tsmiReplace As ToolStripMenuItem
+    Friend WithEvents chkEnableUndoRedo As CheckBox
 End Class

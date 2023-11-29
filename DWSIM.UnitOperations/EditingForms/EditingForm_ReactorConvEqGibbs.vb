@@ -22,6 +22,8 @@ Public Class EditingForm_ReactorConvEqGibbs
 
         Me.ShowHint = GlobalSettings.Settings.DefaultEditFormLocation
 
+        ChangeDefaultFont()
+
         UpdateInfo()
 
     End Sub
@@ -375,7 +377,7 @@ Public Class EditingForm_ReactorConvEqGibbs
     End Sub
 
     Private Sub btnConfigurePP_Click(sender As Object, e As EventArgs) Handles btnConfigurePP.Click
-        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault.DisplayGroupedEditingForm()
+        SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag =  cbPropPack.SelectedItem.ToString).FirstOrDefault()?.DisplayGroupedEditingForm()
     End Sub
 
     Private Sub lblTag_TextChanged(sender As Object, e As EventArgs) Handles lblTag.TextChanged
@@ -412,12 +414,13 @@ Public Class EditingForm_ReactorConvEqGibbs
 
     Sub RequestCalc()
 
-        SimObject.FlowSheet.RequestCalculation(SimObject)
+        SimObject.FlowSheet.RequestCalculation2(False)
 
     End Sub
 
     Private Sub cbPropPack_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPropPack.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.PropertyPackage = SimObject.FlowSheet.PropertyPackages.Values.Where(Function(x) x.Tag = cbPropPack.SelectedItem.ToString).SingleOrDefault
             RequestCalc()
         End If
@@ -590,6 +593,8 @@ Public Class EditingForm_ReactorConvEqGibbs
 
         If e.KeyCode = Keys.Enter And Loaded And DirectCast(sender, TextBox).ForeColor = System.Drawing.Color.Blue Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
+
             UpdateProps(sender)
 
             DirectCast(sender, TextBox).SelectAll()
@@ -615,12 +620,15 @@ Public Class EditingForm_ReactorConvEqGibbs
 
     Private Sub cbReacSet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbReacSet.SelectedIndexChanged
         If Loaded Then
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
             SimObject.ReactionSetID = SimObject.FlowSheet.ReactionSets.Values.Where(Function(x) x.Name = cbReacSet.SelectedItem.ToString).FirstOrDefault.ID
             RequestCalc()
         End If
     End Sub
 
     Private Sub cbCalcMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbCalcMode.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
 
         Select Case cbCalcMode.SelectedIndex
             Case 0
@@ -697,6 +705,8 @@ Public Class EditingForm_ReactorConvEqGibbs
 
         If e.KeyCode = Keys.Enter Then
 
+            SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout)
+
             If Loaded Then SimObject.GraphicObject.Tag = lblTag.Text
             If Loaded Then SimObject.FlowSheet.UpdateOpenEditForms()
             Me.Text = SimObject.GraphicObject.Tag & " (" & SimObject.GetDisplayName() & ")"
@@ -707,9 +717,12 @@ Public Class EditingForm_ReactorConvEqGibbs
     End Sub
 
     Private Sub chkGibbsUsePreviousSolution_CheckedChanged(sender As Object, e As EventArgs) Handles chkGibbsUsePreviousSolution.CheckedChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If TypeOf SimObject Is Reactors.Reactor_Gibbs And Loaded Then
             DirectCast(SimObject, Reactors.Reactor_Gibbs).InitializeFromPreviousSolution = chkGibbsUsePreviousSolution.Checked
         End If
+
     End Sub
 
     Private Sub btnDisconnectOutlet2_Click(sender As Object, e As EventArgs) Handles btnDisconnectOutlet2.Click
@@ -738,28 +751,40 @@ Public Class EditingForm_ReactorConvEqGibbs
     End Sub
 
     Private Sub btnConfigExtSolver_Click(sender As Object, e As EventArgs) Handles btnConfigExtSolver.Click
-        Dim selectedsolver = SimObject.FlowSheet.ExternalSolvers.Values.Where(
+        Try
+            Dim selectedsolver = SimObject.FlowSheet.ExternalSolvers.Values.Where(
                 Function(s) s.DisplayText = cbExternalSolver.SelectedItem.ToString()).FirstOrDefault()
-        If TryCast(selectedsolver, IExternalSolverConfiguration) IsNot Nothing Then
-            SimObject.ExternalSolverConfigData = DirectCast(selectedsolver, IExternalSolverConfiguration).Edit(SimObject.ExternalSolverConfigData)
-        End If
+            If TryCast(selectedsolver, IExternalSolverConfiguration) IsNot Nothing Then
+                SimObject.ExternalSolverConfigData = DirectCast(selectedsolver, IExternalSolverConfiguration).Edit(SimObject.ExternalSolverConfigData)
+            End If
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub chkGibbsUseIPOPT_CheckedChanged(sender As Object, e As EventArgs) Handles chkGibbsUseIPOPT.CheckedChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If TypeOf SimObject Is Reactors.Reactor_Gibbs And Loaded Then
             DirectCast(SimObject, Reactors.Reactor_Gibbs).UseIPOPTSolver = chkGibbsUseIPOPT.Checked
         End If
+
     End Sub
 
     Private Sub chkGibbsUseAlternSolver_CheckedChanged(sender As Object, e As EventArgs) Handles chkGibbsUseAlternSolver.CheckedChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If TypeOf SimObject Is Reactors.Reactor_Gibbs And Loaded Then
             DirectCast(SimObject, Reactors.Reactor_Gibbs).AlternateSolvingMethod = chkGibbsUseAlternSolver.Checked
         End If
+
     End Sub
 
     Private Sub cbReactivePhaseBehavior_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbReactivePhaseBehavior.SelectedIndexChanged
+
+        If Loaded Then SimObject.FlowSheet.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectData, SimObject)
         If TypeOf SimObject Is Reactors.Reactor_Gibbs And Loaded Then
             DirectCast(SimObject, Reactors.Reactor_Gibbs).ReactivePhaseBehavior = cbReactivePhaseBehavior.SelectedIndex
         End If
+
     End Sub
 End Class

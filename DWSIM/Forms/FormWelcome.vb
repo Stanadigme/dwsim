@@ -124,9 +124,13 @@ Public Class FormWelcome
             Me.lvlatestfolders.View = View.List
         End If
 
-        ExtensionMethods.ChangeDefaultFont(Me)
+        ChangeDefaultFont(Me)
 
-        NewsViewer.Source = New Uri("https://www.patreon.com/dwsim/posts")
+        NewsViewer.EnsureCoreWebView2Async(FormMain.WebView2Environment).ContinueWith(Sub()
+                                                                                          UIThread(Sub()
+                                                                                                       NewsViewer.Source = New Uri("https://www.patreon.com/dwsim/posts")
+                                                                                                   End Sub)
+                                                                                      End Sub)
 
         FormMain.TranslateFormFunction?.Invoke(Me)
 
@@ -481,11 +485,6 @@ Public Class FormWelcome
         Dim wform As New UI.Desktop.Editors.CompoundCreatorWizard(Nothing)
         wform.SetupAndDisplayPage(1)
 
-        'start dispatcher for WPF Interop
-        If Not GlobalSettings.Settings.IsRunningOnMono Then
-            System.Windows.Threading.Dispatcher.Run()
-        End If
-
     End Sub
 
     Private Sub LinkLabel7_LinkClicked_1(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel7.LinkClicked
@@ -504,7 +503,7 @@ Public Class FormWelcome
         Process.Start("https://dwsim.org/index.php/dwsim-pro/")
     End Sub
 
-    Private Sub LinkLabel15_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel15.LinkClicked
+    Private Sub LinkLabel15_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         Process.Start("https://dwsim.org/index.php/dwsim-social-responsibility-program/")
     End Sub
 
@@ -530,5 +529,19 @@ Public Class FormWelcome
     Private Sub LinkLabel9_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel9.LinkClicked
         Dim fqc As New FormCreateNewSolid()
         fqc.ShowDialog(Me)
+    End Sub
+
+    Private Sub LinkLabel15_LinkClicked_1(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel15.LinkClicked
+        If DWSIM.App.IsRunningOnMono Then
+            Dim p As New Process()
+            With p
+                .StartInfo.FileName = "xdg-open"
+                .StartInfo.Arguments = My.Application.Info.DirectoryPath & Path.DirectorySeparatorChar & "docs" & Path.DirectorySeparatorChar & "Pro_User_Guide.pdf"
+                .StartInfo.UseShellExecute = False
+                .Start()
+            End With
+        Else
+            Process.Start(My.Application.Info.DirectoryPath & Path.DirectorySeparatorChar & "docs" & Path.DirectorySeparatorChar & "Pro_User_Guide.pdf")
+        End If
     End Sub
 End Class

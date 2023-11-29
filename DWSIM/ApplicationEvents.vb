@@ -36,8 +36,6 @@ Namespace My
 
         Public UtilityPlugins As New Dictionary(Of String, Interfaces.IUtilityPlugin)
 
-        Public Property PushUndoRedoAction As Boolean = True
-
         Public Property ActiveSimulation As FormFlowsheet
 
         Public Property MainWindowForm As FormMain
@@ -171,13 +169,19 @@ Namespace My
             Logging.Logger.LogUnhandled("Unhandled Exception", e.Exception)
             If Not CommandLineMode Then
                 If Not GlobalSettings.Settings.AutomationMode Then
-                    Dim frmEx As New FormUnhandledException
-                    frmEx.ex = e.Exception
-                    frmEx.ShowDialog()
-                    e.ExitApplication = False
                     If FormMain.AnalyticsProvider IsNot Nothing Then
                         FormMain.AnalyticsProvider.RegisterError("Unhandled Exception", "", e.Exception, Nothing)
                     End If
+                    If ActiveSimulation IsNot Nothing Then
+                        Dim euid As String = Guid.NewGuid().ToString()
+                        ExceptionProcessing.ExceptionList.Exceptions.Add(euid, e.Exception)
+                        ActiveSimulation.ShowMessage(String.Format("Caught unhandled exception: {0}", e.Exception.Message), IFlowsheet.MessageType.GeneralError, euid)
+                    Else
+                        Dim frmEx As New FormUnhandledException
+                        frmEx.ex = e.Exception
+                        frmEx.ShowDialog()
+                    End If
+                    e.ExitApplication = False
                 End If
             Else
                 If Not GlobalSettings.Settings.AutomationMode Then

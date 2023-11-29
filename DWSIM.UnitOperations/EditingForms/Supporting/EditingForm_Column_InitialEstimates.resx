@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="&gt;&gt;ofd1.Name" xml:space="preserve">
-    <value>ofd1</value>
-  </data>
   <data name="&gt;&gt;Button2.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
@@ -130,6 +127,9 @@
   <data name="ToolStripButton7.ToolTipText" xml:space="preserve">
     <value>Destravar</value>
   </data>
+  <data name="&gt;&gt;ToolStrip2.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="&gt;&gt;ToolStripButton4.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -137,30 +137,30 @@
   <data name="DataGridView1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="Button4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>68, 17</value>
+  <data name="&gt;&gt;ToolStrip5.Parent" xml:space="preserve">
+    <value>FaTabStripItem5</value>
   </data>
   <data name="ToolStripButton24.ToolTipText" xml:space="preserve">
     <value>Travar</value>
   </data>
+  <data name="&gt;&gt;GroupBox1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="ToolStripButton2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="Button1.Location" type="System.Drawing.Point, System.Drawing">
     <value>38, 17</value>
   </data>
   <data name="ToolStripButton1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="ToolStrip3.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Left</value>
   </data>
-  <data name="ToolStripButton17.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
-    <value>Magenta</value>
-  </data>
-  <data name="ofd1.Filter" xml:space="preserve">
-    <value>Arquivo com Estimativas Iniciais para a Coluna de Destilação|*.dwcdi</value>
+  <data name="ToolStrip5.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
   </data>
   <data name="dgvcl.ToolTip" xml:space="preserve">
     <value />
@@ -173,9 +173,6 @@
   </data>
   <data name="&gt;&gt;ToolStrip1.Parent" xml:space="preserve">
     <value>FaTabStripItem1</value>
-  </data>
-  <data name="dgvcv.Location" type="System.Drawing.Point, System.Drawing">
-    <value>27, 0</value>
   </data>
   <data name="&gt;&gt;TextBox1.Name" xml:space="preserve">
     <value>TextBox1</value>
@@ -207,9 +204,6 @@
   <data name="ToolStripButton23.ToolTipText" xml:space="preserve">
     <value>Limpar</value>
   </data>
-  <data name="Column1.HeaderText" xml:space="preserve">
-    <value>Estágio</value>
-  </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
     <value>498, 416</value>
   </data>
@@ -220,7 +214,7 @@
     <value>Atualizar estimativas com solução atual</value>
   </data>
   <data name="ToolStripButton29.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="&gt;&gt;DataGridViewTextBoxColumn6.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -229,13 +223,13 @@
     <value>1</value>
   </data>
   <data name="ToolStripButton26.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="ToolStripButton22.ToolTipText" xml:space="preserve">
     <value>Colar</value>
   </data>
-  <data name="GroupBox2.Text" xml:space="preserve">
-    <value>Estimativas</value>
+  <data name="&gt;&gt;Button1.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
   <data name="ToolStrip4.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
@@ -273,8 +267,8 @@
   <data name="FaTabStrip2.ToolTip" xml:space="preserve">
     <value />
   </data>
-  <data name="sfd1.Title" xml:space="preserve">
-    <value>Salvar Arquivo com Estimativas Iniciais</value>
+  <data name="ToolStripButton17.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
   </data>
   <data name="&gt;&gt;Button4.Name" xml:space="preserve">
     <value>Button4</value>
@@ -309,6 +303,9 @@
   <data name="TextBox1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
   </data>
+  <data name="&gt;&gt;Button2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;ToolStripButton18.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -333,14 +330,11 @@
   <data name="&gt;&gt;ToolStripButton26.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="DataGridView2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>25, 0</value>
+  <data name="FaTabStripItem1.Title" xml:space="preserve">
+    <value>Variáveis</value>
   </data>
-  <data name="&gt;&gt;DataGridViewTextBoxColumn3.Name" xml:space="preserve">
-    <value>DataGridViewTextBoxColumn3</value>
-  </data>
-  <data name="DataGridView1.ToolTip" xml:space="preserve">
-    <value />
+  <data name="ToolStripButton23.Text" xml:space="preserve">
+    <value>ToolStripButton5</value>
   </data>
   <data name="Button3.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -363,14 +357,11 @@
   <data name="ToolStripButton11.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
+  <data name="ToolStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>24, 305</value>
+  </data>
   <data name="&gt;&gt;GroupBox2.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="&gt;&gt;sfd1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="ofd1.TrayLocation" type="System.Drawing.Point, System.Drawing">
-    <value>405, 17</value>
   </data>
   <data name="ToolStripButton19.ToolTipText" xml:space="preserve">
     <value>Travar</value>
@@ -393,14 +384,11 @@
   <data name="&gt;&gt;FaTabStripItem4.Name" xml:space="preserve">
     <value>FaTabStripItem4</value>
   </data>
-  <data name="&gt;&gt;ToolTip1.Name" xml:space="preserve">
-    <value>ToolTip1</value>
-  </data>
   <data name="ToolStripButton28.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="ToolStripButton5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="ToolStrip4.Size" type="System.Drawing.Size, System.Drawing">
     <value>24, 225</value>
@@ -415,7 +403,7 @@
     <value>Magenta</value>
   </data>
   <data name="GroupBox2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>489, 361</value>
+    <value>489, 350</value>
   </data>
   <data name="&gt;&gt;dgvv.Parent" xml:space="preserve">
     <value>FaTabStripItem1</value>
@@ -438,23 +426,14 @@
   <data name="ToolStrip5.Size" type="System.Drawing.Size, System.Drawing">
     <value>24, 246</value>
   </data>
-  <data name="FaTabStripItem1.Title" xml:space="preserve">
-    <value>Variáveis</value>
-  </data>
   <data name="dgvcv.ToolTip" xml:space="preserve">
     <value />
   </data>
   <data name="&gt;&gt;ToolStrip3.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ToolStripButton15.Text" xml:space="preserve">
-    <value>ToolStripButton7</value>
-  </data>
-  <data name="ToolStrip2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
   <data name="ToolStripSeparator2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 6</value>
+    <value>21, 6</value>
   </data>
   <data name="&gt;&gt;Button3.ZOrder" xml:space="preserve">
     <value>1</value>
@@ -483,8 +462,8 @@
   <data name="&gt;&gt;ToolStrip2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="FaTabStrip2.Text" xml:space="preserve">
-    <value>FaTabStrip2</value>
+  <data name="ToolStripButton3.ToolTipText" xml:space="preserve">
+    <value>Copiar</value>
   </data>
   <data name="&gt;&gt;ToolStripButton3.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -507,8 +486,8 @@
   <data name="&gt;&gt;Button1.Type" xml:space="preserve">
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ToolStripButton10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>21, 20</value>
+  <data name="&gt;&gt;dgvcv.Parent" xml:space="preserve">
+    <value>FaTabStripItem5</value>
   </data>
   <data name="FaTabStripItem3.ToolTip" xml:space="preserve">
     <value />
@@ -516,8 +495,8 @@
   <data name="ToolStrip2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Left</value>
   </data>
-  <data name="Button3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>25, 25</value>
+  <data name="&gt;&gt;FaTabStripItem5.Type" xml:space="preserve">
+    <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="Button2.Size" type="System.Drawing.Size, System.Drawing">
     <value>25, 25</value>
@@ -528,14 +507,11 @@
   <data name="&gt;&gt;FaTabStripItem5.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="FaTabStripItem3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>618, 246</value>
-  </data>
-  <data name="ToolStripButton6.Text" xml:space="preserve">
-    <value>ToolStripButton6</value>
-  </data>
   <data name="ToolStripButton18.ToolTipText" xml:space="preserve">
     <value>Limpar</value>
+  </data>
+  <data name="ToolStripButton6.ToolTipText" xml:space="preserve">
+    <value>Travar</value>
   </data>
   <data name="FaTabStrip1.Text" xml:space="preserve">
     <value>FaTabStrip1</value>
@@ -543,11 +519,17 @@
   <data name="ToolStripButton16.ToolTipText" xml:space="preserve">
     <value>Copiar</value>
   </data>
+  <data name="ToolStripButton24.Text" xml:space="preserve">
+    <value>ToolStripButton6</value>
+  </data>
   <data name="&gt;&gt;GroupBox2.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
   <data name="ToolStripButton5.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
+  </data>
+  <data name="Button4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>68, 17</value>
   </data>
   <data name="DataGridView2.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -588,6 +570,9 @@
   <data name="DataGridViewTextBoxColumn5.Width" type="System.Int32, mscorlib">
     <value>67</value>
   </data>
+  <data name="ToolStripButton10.Size" type="System.Drawing.Size, System.Drawing">
+    <value>21, 20</value>
+  </data>
   <data name="FaTabStripItem5.ToolTip" xml:space="preserve">
     <value />
   </data>
@@ -621,8 +606,8 @@
   <data name="ToolStripButton13.Text" xml:space="preserve">
     <value>ToolStripButton5</value>
   </data>
-  <data name="&gt;&gt;Button2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="GroupBox2.ToolTip" xml:space="preserve">
+    <value />
   </data>
   <data name="ToolStripButton14.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
@@ -642,6 +627,9 @@
   <data name="GroupBox1.Text" xml:space="preserve">
     <value>Arquivo</value>
   </data>
+  <data name="ToolStripButton19.Text" xml:space="preserve">
+    <value>ToolStripButton6</value>
+  </data>
   <data name="&gt;&gt;Button2.Name" xml:space="preserve">
     <value>Button2</value>
   </data>
@@ -660,26 +648,20 @@
   <data name="&gt;&gt;FaTabStripItem1.Parent" xml:space="preserve">
     <value>FaTabStrip1</value>
   </data>
-  <data name="ToolStripButton23.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
-    <value>Magenta</value>
+  <data name="ToolStrip3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>24, 246</value>
   </data>
   <data name="ToolStripButton22.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
-  <data name="&gt;&gt;sfd1.Name" xml:space="preserve">
-    <value>sfd1</value>
-  </data>
-  <data name="&gt;&gt;ToolStripButton4.Name" xml:space="preserve">
-    <value>ToolStripButton4</value>
+  <data name="FaTabStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
   </data>
   <data name="&gt;&gt;dgvcl.Name" xml:space="preserve">
     <value>dgvcl</value>
   </data>
-  <data name="&gt;&gt;DataGridView2.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="ToolStripButton7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="&gt;&gt;ToolStripButton27.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -699,8 +681,8 @@
   <data name="ToolStripButton15.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="GroupBox2.ToolTip" xml:space="preserve">
-    <value />
+  <data name="ToolStripButton12.ToolTipText" xml:space="preserve">
+    <value>Colar</value>
   </data>
   <data name="&gt;&gt;FaTabStripItem2.Type" xml:space="preserve">
     <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
@@ -714,8 +696,8 @@
   <data name="ToolStripButton18.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
-  <data name="ToolStrip5.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Left</value>
+  <data name="ToolStrip2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
   </data>
   <data name="&gt;&gt;Button4.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -741,11 +723,11 @@
   <data name="dgvcv.Size" type="System.Drawing.Size, System.Drawing">
     <value>591, 246</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton20.Name" xml:space="preserve">
-    <value>ToolStripButton20</value>
+  <data name="&gt;&gt;dgvcl.Parent" xml:space="preserve">
+    <value>FaTabStripItem2</value>
   </data>
-  <data name="FaTabStrip2.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
+  <data name="FaTabStripItem1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
   </data>
   <data name="Button2.ToolTip" xml:space="preserve">
     <value>Carregar estimativas do arquivo</value>
@@ -807,6 +789,9 @@
   <data name="ToolStrip3.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <data name="&gt;&gt;ToolStripButton7.Name" xml:space="preserve">
+    <value>ToolStripButton7</value>
+  </data>
   <data name="&gt;&gt;dgvv.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -822,14 +807,8 @@
   <data name="ToolStripButton14.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="&gt;&gt;Button1.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="&gt;&gt;FaTabStripItem5.Name" xml:space="preserve">
     <value>FaTabStripItem5</value>
-  </data>
-  <data name="&gt;&gt;ToolStrip4.Parent" xml:space="preserve">
-    <value>FaTabStripItem4</value>
   </data>
   <data name="&gt;&gt;ToolStripButton17.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -846,6 +825,9 @@
   <data name="ToolStripButton27.ToolTipText" xml:space="preserve">
     <value>Interpolar Vazão de Vapor</value>
   </data>
+  <data name="FaTabStripItem2.ToolTip" xml:space="preserve">
+    <value />
+  </data>
   <data name="ToolStripButton8.Text" xml:space="preserve">
     <value>ToolStripButton5</value>
   </data>
@@ -855,11 +837,11 @@
   <data name="ToolStripButton8.ToolTipText" xml:space="preserve">
     <value>Limpar</value>
   </data>
-  <data name="&gt;&gt;ToolStrip2.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="&gt;&gt;ToolStrip4.Parent" xml:space="preserve">
+    <value>FaTabStripItem4</value>
   </data>
   <data name="ToolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 6</value>
+    <value>21, 6</value>
   </data>
   <data name="ToolStripButton25.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
@@ -876,9 +858,6 @@
   <data name="ToolStripButton9.Text" xml:space="preserve">
     <value>ToolStripButton6</value>
   </data>
-  <data name="&gt;&gt;FaTabStripItem5.Type" xml:space="preserve">
-    <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
   <data name="FaTabStripItem2.Size" type="System.Drawing.Size, System.Drawing">
     <value>618, 246</value>
   </data>
@@ -892,13 +871,13 @@
     <value>21, 20</value>
   </data>
   <data name="FaTabStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>483, 342</value>
+    <value>483, 331</value>
   </data>
   <data name="Button2.Location" type="System.Drawing.Point, System.Drawing">
     <value>98, 17</value>
   </data>
-  <data name="&gt;&gt;dgvcl.Parent" xml:space="preserve">
-    <value>FaTabStripItem2</value>
+  <data name="ToolStripButton6.Text" xml:space="preserve">
+    <value>ToolStripButton6</value>
   </data>
   <data name="&gt;&gt;ToolStrip3.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -909,11 +888,8 @@
   <data name="&gt;&gt;DataGridViewTextBoxColumn5.Name" xml:space="preserve">
     <value>DataGridViewTextBoxColumn5</value>
   </data>
-  <data name="DataGridViewTextBoxColumn4.HeaderText" xml:space="preserve">
-    <value>Vazão de Vapor</value>
-  </data>
-  <data name="&gt;&gt;ofd1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="DataGridView2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 0</value>
   </data>
   <data name="&gt;&gt;ToolStripButton9.Name" xml:space="preserve">
     <value>ToolStripButton9</value>
@@ -927,11 +903,14 @@
   <data name="ToolStripButton25.ToolTipText" xml:space="preserve">
     <value>Destravar</value>
   </data>
+  <data name="Button3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>25, 25</value>
+  </data>
   <data name="ToolStripButton9.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton12.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;GroupBox2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;ToolStrip5.ZOrder" xml:space="preserve">
     <value>1</value>
@@ -941,9 +920,6 @@
   </data>
   <data name="ToolStripButton29.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
-  </data>
-  <data name="sfd1.Filter" xml:space="preserve">
-    <value>Arquivo com Estimativas Iniciais para a Coluna de Destilação|*.dwcdi</value>
   </data>
   <data name="&gt;&gt;ToolStrip5.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -996,6 +972,9 @@
   <data name="&gt;&gt;Button1.Parent" xml:space="preserve">
     <value>GroupBox1</value>
   </data>
+  <data name="ToolStrip5.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Left</value>
+  </data>
   <data name="dgvv.ToolTip" xml:space="preserve">
     <value />
   </data>
@@ -1023,20 +1002,23 @@
   <data name="Button3.Location" type="System.Drawing.Point, System.Drawing">
     <value>8, 17</value>
   </data>
-  <data name="&gt;&gt;DataGridView1.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="&gt;&gt;FaTabStripItem1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="&gt;&gt;DataGridViewTextBoxColumn6.Name" xml:space="preserve">
     <value>DataGridViewTextBoxColumn6</value>
   </data>
+  <data name="GroupBox2.Text" xml:space="preserve">
+    <value>Estimativas</value>
+  </data>
   <data name="&gt;&gt;FaTabStripItem3.Type" xml:space="preserve">
     <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
+  <data name="FaTabStrip2.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
   <data name="FaTabStripItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>481, 321</value>
+    <value>481, 305</value>
   </data>
   <data name="&gt;&gt;dgvcv.Name" xml:space="preserve">
     <value>dgvcv</value>
@@ -1044,8 +1026,8 @@
   <data name="ToolStripButton23.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="ToolStripButton24.Text" xml:space="preserve">
-    <value>ToolStripButton6</value>
+  <data name="ToolStripButton16.Size" type="System.Drawing.Size, System.Drawing">
+    <value>21, 20</value>
   </data>
   <data name="&gt;&gt;ToolStrip4.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -1077,17 +1059,11 @@
   <data name="&gt;&gt;FaTabStripItem5.Parent" xml:space="preserve">
     <value>FaTabStrip1</value>
   </data>
-  <data name="ToolStripButton3.ToolTipText" xml:space="preserve">
-    <value>Copiar</value>
-  </data>
   <data name="&gt;&gt;FaTabStripItem1.Type" xml:space="preserve">
     <value>FarsiLibrary.Win.FATabStripItem, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="Button4.ToolTip" xml:space="preserve">
     <value>Salvar estimativas em um arquivo</value>
-  </data>
-  <data name="FaTabStrip1.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
   </data>
   <data name="ToolStrip4.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Left</value>
@@ -1095,8 +1071,8 @@
   <data name="ToolStripButton19.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
-  <data name="ToolStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>24, 321</value>
+  <data name="&gt;&gt;DataGridView1.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="Column5.HeaderText" xml:space="preserve">
     <value>Estágio</value>
@@ -1104,17 +1080,11 @@
   <data name="&gt;&gt;dgvcv.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ToolStripButton12.ToolTipText" xml:space="preserve">
-    <value>Colar</value>
-  </data>
   <data name="dgvv.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
   <data name="&gt;&gt;ToolStripButton19.Name" xml:space="preserve">
     <value>ToolStripButton19</value>
-  </data>
-  <data name="&gt;&gt;ToolStripButton8.Name" xml:space="preserve">
-    <value>ToolStripButton8</value>
   </data>
   <data name="&gt;&gt;Column3.Name" xml:space="preserve">
     <value>Column3</value>
@@ -1125,8 +1095,11 @@
   <data name="&gt;&gt;ToolStripButton15.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="ToolStripButton23.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
+  </data>
   <data name="dgvv.Size" type="System.Drawing.Size, System.Drawing">
-    <value>454, 321</value>
+    <value>454, 305</value>
   </data>
   <data name="ToolStrip2.Text" xml:space="preserve">
     <value>ToolStrip2</value>
@@ -1134,14 +1107,11 @@
   <data name="&gt;&gt;FaTabStripItem2.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="ToolStripButton16.Size" type="System.Drawing.Size, System.Drawing">
-    <value>21, 20</value>
-  </data>
   <data name="ToolStripButton25.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="&gt;&gt;ToolStrip5.Parent" xml:space="preserve">
-    <value>FaTabStripItem5</value>
+  <data name="&gt;&gt;DataGridView2.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="ToolStripButton10.ToolTipText" xml:space="preserve">
     <value>Destravar</value>
@@ -1153,7 +1123,7 @@
     <value>Estágio</value>
   </data>
   <data name="ToolStripButton6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="ToolStripButton24.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
@@ -1161,17 +1131,14 @@
   <data name="&gt;&gt;ToolStripButton19.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="FaTabStripItem2.ToolTip" xml:space="preserve">
-    <value />
+  <data name="&gt;&gt;DataGridViewTextBoxColumn3.Name" xml:space="preserve">
+    <value>DataGridViewTextBoxColumn3</value>
   </data>
   <data name="&gt;&gt;Column4.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;ToolStrip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="ToolStrip5.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
   </data>
   <data name="ToolStripButton18.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
@@ -1188,14 +1155,14 @@
   <data name="ToolStripButton22.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="&gt;&gt;dgvcv.Parent" xml:space="preserve">
-    <value>FaTabStripItem5</value>
-  </data>
   <data name="&gt;&gt;ToolStripButton5.Name" xml:space="preserve">
     <value>ToolStripButton5</value>
   </data>
   <data name="&gt;&gt;FaTabStripItem3.Name" xml:space="preserve">
     <value>FaTabStripItem3</value>
+  </data>
+  <data name="&gt;&gt;ToolStripButton12.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;DataGridView2.Parent" xml:space="preserve">
     <value>FaTabStripItem4</value>
@@ -1248,23 +1215,29 @@
   <data name="FaTabStrip2.Font" type="System.Drawing.Font, System.Drawing">
     <value>Tahoma, 8.25pt</value>
   </data>
-  <data name="ToolStripButton23.Text" xml:space="preserve">
-    <value>ToolStripButton5</value>
+  <data name="GroupBox2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 53</value>
   </data>
   <data name="Button1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
+  <data name="DataGridViewTextBoxColumn4.HeaderText" xml:space="preserve">
+    <value>Vazão de Vapor</value>
+  </data>
   <data name="&gt;&gt;ToolStripButton16.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ToolStripButton19.Text" xml:space="preserve">
-    <value>ToolStripButton6</value>
+  <data name="FaTabStripItem3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>618, 246</value>
   </data>
   <data name="&gt;&gt;ToolStripSeparator2.Name" xml:space="preserve">
     <value>ToolStripSeparator2</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton11.Name" xml:space="preserve">
-    <value>ToolStripButton11</value>
+  <data name="DataGridView1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="&gt;&gt;ToolStripButton25.Name" xml:space="preserve">
+    <value>ToolStripButton25</value>
   </data>
   <data name="&gt;&gt;ToolStripButton10.Name" xml:space="preserve">
     <value>ToolStripButton10</value>
@@ -1272,8 +1245,8 @@
   <data name="dgvcl.Location" type="System.Drawing.Point, System.Drawing">
     <value>27, 0</value>
   </data>
-  <data name="ToolStripButton6.ToolTipText" xml:space="preserve">
-    <value>Travar</value>
+  <data name="ToolStripButton15.Text" xml:space="preserve">
+    <value>ToolStripButton7</value>
   </data>
   <data name="FaTabStrip2.Location" type="System.Drawing.Point, System.Drawing">
     <value>1, 20</value>
@@ -1281,8 +1254,8 @@
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>96, 96</value>
   </data>
-  <data name="&gt;&gt;GroupBox2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="ToolStripButton24.Size" type="System.Drawing.Size, System.Drawing">
+    <value>21, 20</value>
   </data>
   <data name="DataGridViewTextBoxColumn2.HeaderText" xml:space="preserve">
     <value>Temperatura</value>
@@ -1299,14 +1272,11 @@
   <data name="ToolStripButton7.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
-  <data name="ToolStripButton24.Size" type="System.Drawing.Size, System.Drawing">
-    <value>21, 20</value>
+  <data name="Column1.HeaderText" xml:space="preserve">
+    <value>Estágio</value>
   </data>
-  <data name="GroupBox2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 53</value>
-  </data>
-  <data name="sfd1.TrayLocation" type="System.Drawing.Point, System.Drawing">
-    <value>330, 17</value>
+  <data name="&gt;&gt;ToolStripButton20.Name" xml:space="preserve">
+    <value>ToolStripButton20</value>
   </data>
   <data name="&gt;&gt;ToolTip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -1323,8 +1293,8 @@
   <data name="&gt;&gt;ToolStripButton20.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="FaTabStripItem1.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+  <data name="&gt;&gt;FaTabStrip1.Parent" xml:space="preserve">
+    <value>GroupBox2</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.UserControl, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -1335,8 +1305,8 @@
   <data name="&gt;&gt;ToolStripButton24.Name" xml:space="preserve">
     <value>ToolStripButton24</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton25.Name" xml:space="preserve">
-    <value>ToolStripButton25</value>
+  <data name="dgvcv.Location" type="System.Drawing.Point, System.Drawing">
+    <value>27, 0</value>
   </data>
   <data name="&gt;&gt;ToolStripButton17.Name" xml:space="preserve">
     <value>ToolStripButton17</value>
@@ -1362,11 +1332,11 @@
   <data name="ToolStripButton3.Size" type="System.Drawing.Size, System.Drawing">
     <value>21, 20</value>
   </data>
-  <data name="&gt;&gt;GroupBox1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;ToolStripButton4.Name" xml:space="preserve">
+    <value>ToolStripButton4</value>
   </data>
-  <data name="ToolStrip3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>24, 246</value>
+  <data name="FaTabStrip2.Text" xml:space="preserve">
+    <value>FaTabStrip2</value>
   </data>
   <data name="&gt;&gt;DataGridViewTextBoxColumn1.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -1380,8 +1350,11 @@
   <data name="&gt;&gt;DataGridViewTextBoxColumn4.Name" xml:space="preserve">
     <value>DataGridViewTextBoxColumn4</value>
   </data>
+  <data name="&gt;&gt;ToolStripButton11.Name" xml:space="preserve">
+    <value>ToolStripButton11</value>
+  </data>
   <data name="ToolStripButton27.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>21, 20</value>
   </data>
   <data name="FaTabStripItem5.Title" xml:space="preserve">
     <value>Composições (Fase Vapor)</value>
@@ -1389,8 +1362,8 @@
   <data name="&gt;&gt;ToolStripButton6.Name" xml:space="preserve">
     <value>ToolStripButton6</value>
   </data>
-  <data name="&gt;&gt;FaTabStrip1.Parent" xml:space="preserve">
-    <value>GroupBox2</value>
+  <data name="&gt;&gt;ToolStripButton16.Name" xml:space="preserve">
+    <value>ToolStripButton16</value>
   </data>
   <data name="DataGridView1.Location" type="System.Drawing.Point, System.Drawing">
     <value>27, 0</value>
@@ -1398,8 +1371,8 @@
   <data name="&gt;&gt;FaTabStripItem1.Name" xml:space="preserve">
     <value>FaTabStripItem1</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton7.Name" xml:space="preserve">
-    <value>ToolStripButton7</value>
+  <data name="&gt;&gt;ToolTip1.Name" xml:space="preserve">
+    <value>ToolTip1</value>
   </data>
   <data name="ToolStripButton21.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
@@ -1407,14 +1380,11 @@
   <data name="Button1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="&gt;&gt;ToolStripButton16.Name" xml:space="preserve">
-    <value>ToolStripButton16</value>
+  <data name="&gt;&gt;ToolStripButton8.Name" xml:space="preserve">
+    <value>ToolStripButton8</value>
   </data>
   <data name="&gt;&gt;FaTabStrip1.Type" xml:space="preserve">
     <value>FarsiLibrary.Win.FATabStrip, TabStrip, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="ofd1.Title" xml:space="preserve">
-    <value>Carregar Arquivo com Estimativas Iniciais</value>
   </data>
   <data name="&gt;&gt;dgvv.Name" xml:space="preserve">
     <value>dgvv</value>
@@ -1423,6 +1393,9 @@
     <value>ToolStripButton18</value>
   </data>
   <metadata name="Column2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Column5.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="Column4.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -1440,19 +1413,10 @@
   <metadata name="ToolStrip5.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>0, 0</value>
   </metadata>
-  <metadata name="ToolStrip2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>0, 0</value>
-  </metadata>
   <metadata name="Column1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="ToolStrip4.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>0, 0</value>
-  </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="DataGridViewTextBoxColumn5.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -1461,16 +1425,22 @@
   <metadata name="DataGridViewTextBoxColumn6.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="DataGridViewTextBoxColumn3.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="DataGridViewTextBoxColumn4.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="DataGridViewTextBoxColumn1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="DataGridViewTextBoxColumn5.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="DataGridViewTextBoxColumn2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="DataGridViewTextBoxColumn3.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="ToolStrip4.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>0, 0</value>
+  </metadata>
+  <metadata name="DataGridViewTextBoxColumn1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="ToolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -1479,7 +1449,7 @@
   <metadata name="ToolStrip3.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>0, 0</value>
   </metadata>
-  <metadata name="Column5.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
+  <metadata name="ToolStrip2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>0, 0</value>
   </metadata>
 </root>

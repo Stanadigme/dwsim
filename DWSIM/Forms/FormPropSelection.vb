@@ -19,10 +19,10 @@ Public Class FormPropSelection
 
         formC = My.Application.ActiveSimulation
 
-        lvType.Sorting = SortOrder.Ascending
         lvObject.Sorting = SortOrder.Ascending
 
-        lvType.Items.AddRange(FormMain.ObjectList.Keys.Select(Function(x) New ListViewItem(x)).ToArray())
+        lvType.Items.Add("All Added Objects")
+        lvType.Items.AddRange(FormMain.ObjectList.Keys.OrderBy(Function(x) x).Select(Function(x) New ListViewItem(x)).ToArray())
 
         lvUnits.Enabled = ssmode
         If ssmode Then btnOK.Enabled = False
@@ -35,6 +35,14 @@ Public Class FormPropSelection
 
     Private Sub KryptonButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         Dim separator = ";"
+        If lvObject.SelectedItems.Count = 0 Then
+            MessageBox.Show("Please select an object.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
+        If lvProp.SelectedItems.Count = 0 Then
+            MessageBox.Show("Please select a property.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
         If ssmode Then
             Dim scell = ssheet.CurrentWorksheet.GetCell(ssheet.CurrentWorksheet.SelectionRange.StartPos)
             If scell Is Nothing Then scell = ssheet.CurrentWorksheet.CreateAndGetCell(ssheet.CurrentWorksheet.SelectionRange.StartPos)
@@ -72,12 +80,19 @@ Public Class FormPropSelection
     Private Sub lvType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lvType.SelectedIndexChanged
 
         If lvType.SelectedItems.Count > 0 Then
-            Dim obj = FormMain.ObjectList(lvType.SelectedItems(0).Text)
-            Dim objs = formC.SimulationObjects.Values.Where(Function(x) x.GetType().Equals(obj.GetType())).ToList()
-            lvObject.Items.Clear()
-            For Each obj In objs
-                lvObject.Items.Add(New ListViewItem(obj.GraphicObject.Tag) With {.Tag = obj.Name})
-            Next
+            If lvType.SelectedItems(0).Text = "All Added Objects" Then
+                lvObject.Items.Clear()
+                For Each obj In formC.SimulationObjects.Values.OrderBy(Function(o) o.GraphicObject.Tag)
+                    lvObject.Items.Add(New ListViewItem(obj.GraphicObject.Tag) With {.Tag = obj.Name})
+                Next
+            Else
+                Dim obj = FormMain.ObjectList(lvType.SelectedItems(0).Text)
+                Dim objs = formC.SimulationObjects.Values.Where(Function(x) x.GetType().Equals(obj.GetType())).ToList()
+                lvObject.Items.Clear()
+                For Each obj In objs
+                    lvObject.Items.Add(New ListViewItem(obj.GraphicObject.Tag) With {.Tag = obj.Name})
+                Next
+            End If
         End If
 
     End Sub
