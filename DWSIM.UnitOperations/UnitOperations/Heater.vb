@@ -658,7 +658,7 @@ Namespace UnitOperations
                     IObj?.Paragraphs.Add("Outlet Stream will be specified with Pressure and Enthalpy. Temperature will be calculated through a PH Flash call.")
 
                     IObj?.Paragraphs.Add("<m>H_2 = \frac{Q}{W}\frac{\eta}{100}+H_1</m>")
-
+                    esin = Me.GetInletEnergyStream(1)
                     Me.DeltaQ = esin?.EnergyFlow.GetValueOrDefault
                     If Wi > 0 Then
                         H2 = Me.DeltaQ.GetValueOrDefault * (Me.Eficiencia.GetValueOrDefault / 100) / Wi + Hi

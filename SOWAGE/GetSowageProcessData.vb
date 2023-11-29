@@ -1,12 +1,30 @@
 ﻿Imports System.Runtime.Remoting
+Imports DWSIM
 Imports DWSIM.SharedClasses.Charts
 Imports DWSIM.Thermodynamics.Utilities.Hypos.Methods
 Imports DWSIM.UnitOperations.UnitOperations
 Imports MongoDB.Bson
 Imports MongoDB.Bson.Serialization
 Imports MongoDB.Driver
+Imports DWSIM.Interfaces.Enums.GraphicObjects
 
-Module SowageProcessData
+
+Public Module SowageProcessData
+
+    Function PythonData(sim As IFlowsheet) As List(Of BsonDocument)
+        Dim data As List(Of XElement) = New List(Of XElement)
+        For Each so As SharedClasses.UnitOperations.BaseClass In sim.SimulationObjects.Values
+            Select Case so.GraphicObject.ObjectType
+                Case ObjectType.MaterialStream, ObjectType.Pipe, ObjectType.Heater, ObjectType.Cooler
+                    data.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
+            End Select
+        Next
+
+        Dim toWriteData As List(Of BsonDocument) = ConvertSimulationData(data)
+        toWriteData = StripBsonData(toWriteData)
+
+        Return toWriteData
+    End Function
 
     Function GetSowageProcessData(data As List(Of BsonDocument)
                                   ) As List(Of BsonDocument)
@@ -97,8 +115,17 @@ Module SowageProcessData
                         .Add(element.GetElement("Profile"))
                         .Add(element.GetElement("PressureDrop_Static"))
                         .Add(element.GetElement("PressureDrop_Friction"))
-                        .Add(element.GetElement("DeltaP"))
-                        .Add(element.GetElement("DeltaT"))
+                        Try
+                            .Add(element.GetElement("DeltaP"))
+                        Catch ex As Exception
+                            .Add(New BsonElement("DeltaP", 0))
+                        End Try
+                        Try
+                            .Add(element.GetElement("DeltaT"))
+                        Catch ex As Exception
+                            .Add(New BsonElement("DeltaT", 0))
+                        End Try
+
                     End With
                     toWriteData.Add(doc)
 

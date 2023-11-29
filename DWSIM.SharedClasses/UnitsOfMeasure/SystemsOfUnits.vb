@@ -607,7 +607,7 @@ Namespace SystemsOfUnits
                 .heatCapacityCv = "kJ/[kg.K]"
                 .jouleThomsonCoefficient = "K/Pa"
                 .logfugacityCoefficient = "-"
-                .massflow = "kg/h"
+                .massflow = "kg/s"
                 .massfraction = "-"
                 .molarflow = "kmol/h"
                 .molarfraction = "-"
@@ -631,7 +631,7 @@ Namespace SystemsOfUnits
                 .surfaceTension = "N/m"
                 .heatflow = "kW"
                 .head = "m"
-                .deltaP = "bar"
+                .deltaP = "Pa"
                 .deltaT = "C."
 
             End With

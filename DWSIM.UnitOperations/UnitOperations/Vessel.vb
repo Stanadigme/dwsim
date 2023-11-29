@@ -831,7 +831,7 @@ Namespace UnitOperations
                         'SOWAGE EDIT
                         ' Quand on attribue H = 0 à un Stream configuré en PH, DWSIM l'assigne aux Limits de PP
                         ' Ex : démarrage, Q_vap = 0 ==> H = inf
-                        Dim H_liq As Double = MixedStream.Phases(2).Properties.enthalpy.GetValueOrDefault
+                        Dim H_liq As Double = MixedStream.Phases(1).Properties.enthalpy.GetValueOrDefault
                         If H_liq = 0 Then .SetMassEnthalpy(MixedStream.Phases(0).Properties.enthalpy.GetValueOrDefault) Else .SetMassEnthalpy(H_liq)
                         '.SetMassEnthalpy(HL1)
                         Dim comp As BaseClasses.Compound

@@ -2644,11 +2644,11 @@ Namespace UnitOperations
 
                     StInCold.PropertyPackage.CurrentMaterialStream = StInCold
                     IObj?.SetCurrent()
-                    Dim tmp2 = StInCold.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, Pc2, Hc2, 0.0)
+                    Dim tmp2 = StInCold.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, Pc2, Hc2, Tc2)
                     Tc2 = tmp2.CalculatedTemperature
                     StInHot.PropertyPackage.CurrentMaterialStream = StInHot
                     IObj?.SetCurrent()
-                    tmp2 = StInHot.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, Ph2, Hh2, 0.0)
+                    tmp2 = StInHot.PropertyPackage.CalculateEquilibrium2(FlashCalculationType.PressureEnthalpy, Ph2, Hh2, Th2)
                     Th2 = tmp2.CalculatedTemperature
 
             End Select

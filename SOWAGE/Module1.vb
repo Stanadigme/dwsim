@@ -11,8 +11,18 @@ Imports MongoDB.Bson.Serialization
 Imports SOWAGE.SowageProcessData
 Imports System.Xml
 Imports DWSIM
+Imports DWSIM.SharedClasses.Charts
 
 Module Module1
+
+    Function Test()
+        Dim interf As New DWSIM.Automation.Automation3
+        Dim sim As Interfaces.IFlowsheet
+        sim = interf.LoadFlowsheet(String.Format("D:/git/sowage/{0}.dwxmz", "231018_test"))
+        interf.CalculateFlowsheet4(sim)
+        Dim pipeOut = sim.GetObject("1_pipe_out")
+        Console.WriteLine(pipeOut)
+    End Function
 
 
     Function SimpleCalculate()
@@ -239,9 +249,12 @@ Module Module1
 
     End Function
 
+
+
     Sub Main()
+        Test()
         'SimpleCalculate()
-        Calculate()
+        'Calculate()
         'ConvertCollection()
         'ConvertCollections()
 

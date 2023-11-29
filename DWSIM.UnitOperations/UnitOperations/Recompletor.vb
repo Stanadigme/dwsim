@@ -100,10 +100,17 @@ Namespace UnitOperations
             m_Cooler.SetFlowsheet(FlowSheet)
             m_Cooler.CalcMode = Cooler.CalculationMode.OutletVaporFraction
             m_Cooler.OutletVaporFraction = 0
+            m_Cooler.GraphicObject = New CoolerGraphic()
+
             m_Heater.CalcMode = Heater.CalculationMode.HeatAddedRemoved
             m_Heater.SetFlowsheet(FlowSheet)
+            m_Heater.GraphicObject = New HeaterGraphic()
+            m_Heater.SetDynamicProperty("Pressure Control", False)
+
             m_Mixer.PressureCalculation = Mixer.PressureBehavior.Minimum
             m_Mixer.SetFlowsheet(FlowSheet)
+            m_Mixer.GraphicObject = New MixerGraphic()
+
         End Function
 
         Protected m_TSec As Nullable(Of Double) = 2.5
@@ -119,9 +126,23 @@ Namespace UnitOperations
             AddDynamicProperty("Reset Content", "Empties the volume content on the next run.", False, UnitOfMeasure.none, True.GetType())
         End Sub
 
+        Public Function MetaCalculate()
+
+        End Function
+
         Public Overrides Sub RunDynamicModel()
             init()
             Dim Reset As Boolean = GetDynamicProperty("Reset Content")
+            If Reset Then
+                m_Cooler.DeltaQ = 0
+                m_Cooler.SetDynamicProperty("Volume", GetDynamicProperty("Cooler Volume"))
+                m_Cooler.AccumulationStream = Nothing
+
+                m_Heater.SetDynamicProperty("Volume", GetDynamicProperty("Heater Volume"))
+                m_Heater.AccumulationStream = Nothing
+
+                SetDynamicProperty("Reset Content", 0)
+            End If
 
             'Inputs
             Dim edmIn = Me.GetInletMaterialStream(0)
@@ -136,46 +157,25 @@ Namespace UnitOperations
             Dim recirculation = Me.GetOutletMaterialStream(3)
             Dim distillatOut = Me.GetOutletMaterialStream(4)
 
-            'edmIn.SetPressure(edmFlashLiq.GetPressure)
 
 
-            m_Cooler.GraphicObject = New CoolerGraphic()
             m_Cooler.metaIms = flashVap
             m_Cooler.metaOms = coolerOut
             m_Cooler.PropertyPackage = m_Cooler.metaIms.PropertyPackage
 
-            m_Heater.GraphicObject = New HeaterGraphic()
             m_Heater.metaIms = edmIn
             m_Heater.metaOms = heaterOut
             m_Heater.PropertyPackage = edmIn.PropertyPackage
-            m_Heater.SetDynamicProperty("Pressure Control", False)
 
-            m_Mixer.GraphicObject = New MixerGraphic()
+
             m_Mixer.PropertyPackage = flashLiq.PropertyPackage
 
 
             rejet.CopyFromMaterial(edmFlashLiq)
             recirculation.CopyFromMaterial(edmFlashLiq)
 
-
-            If Reset Then
-                m_Cooler.PropertyPackage = edmIn.PropertyPackage
-                m_Cooler.DeltaQ = 0
-                m_Cooler.SetDynamicProperty("Volume", GetDynamicProperty("Cooler Volume"))
-                m_Cooler.GraphicObject = New CoolerGraphic()
-                m_Cooler.AccumulationStream = Nothing
-
-                m_Heater.PropertyPackage = edmIn.PropertyPackage
-                m_Heater.SetDynamicProperty("Volume", GetDynamicProperty("Heater Volume"))
-                m_Heater.GraphicObject = New HeaterGraphic()
-                m_Heater.AccumulationStream = Nothing
-
-                SetDynamicProperty("Reset Content", 0)
-            End If
-
             m_Cooler.RunDynamicModel()
             Dim Pcond As Double = m_Cooler.DeltaQ.GetValueOrDefault
-            'Console.WriteLine(String.Format("Puiss condensation : {0}", Pcond))
 
             m_Mixer.metaMS = {coolerOut, flashLiq}
             m_Mixer.metaMSOut = distillatOut
@@ -184,7 +184,6 @@ Namespace UnitOperations
             Dim W As Double = 0
             Dim T2 = coolerOut.GetTemperature - m_TSec
             edmIn.SetMassFlow(W)
-
 
 
             If Pcond > 0 And flashVap.GetMassFlow > 0 Then
@@ -203,8 +202,7 @@ Namespace UnitOperations
 
                     'Pas de rejet pour conserver le max de chaleur
                     recirculation.SetMassFlow(edmFlashLiq.GetMassFlow)
-                    'rejet.SetMassFlow(0)
-                    'recirculation.SetMassFlow(rejet.GetMassFlow)
+
                 Else
                     ' Qdistillat < QEdmin
                     ' On fait rentrer plus d'eau pour pouvoir condenser à T2
@@ -241,8 +239,6 @@ Namespace UnitOperations
 
             m_Heater.RunDynamicModel()
 
-            Dim edm_hx_in As MaterialStream = FlowSheet.GetObject("edm_hx_in")
-
             If W > (edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) Then
 
                 recirculation.SetMassFlow(0)
@@ -252,13 +248,9 @@ Namespace UnitOperations
                 m_Mixer.metaMS = {tempHeaterOut, edmFlashLiq}
                 m_Mixer.metaMSOut = rejet
                 m_Mixer.Calculate()
-                Console.WriteLine("W > (edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow)")
 
             End If
 
-            If Math.Abs(edm_hx_in.GetMassFlow - (recirculation.GetMassFlow + heaterOut.GetMassFlow)) > 0.001 Then
-                Console.WriteLine("Math.Abs(edm_hx_in.GetMassFlow - (recirculation.GetMassFlow + heaterOut.GetMassFlow)) > 0.001")
-            End If
 
         End Sub
 
@@ -279,6 +271,7 @@ Namespace UnitOperations
 
 
         Public Overrides Sub Calculate(Optional ByVal args As Object = Nothing)
+            init()
             'Inputs
             Dim edmIn = Me.GetInletMaterialStream(0)
             Dim edmFlashLiq = Me.GetInletMaterialStream(1)
@@ -292,17 +285,14 @@ Namespace UnitOperations
             Dim recirculation = Me.GetOutletMaterialStream(3)
             Dim distillatOut = Me.GetOutletMaterialStream(4)
 
-            m_Cooler.GraphicObject = New CoolerGraphic()
             m_Cooler.metaIms = flashVap
             m_Cooler.metaOms = coolerOut
             m_Cooler.PropertyPackage = m_Cooler.metaIms.PropertyPackage
 
-            m_Heater.GraphicObject = New HeaterGraphic()
             m_Heater.metaIms = edmIn
             m_Heater.metaOms = heaterOut
             m_Heater.PropertyPackage = edmIn.PropertyPackage
 
-            m_Mixer.GraphicObject = New MixerGraphic()
             m_Mixer.PropertyPackage = flashLiq.PropertyPackage
 
 
@@ -311,7 +301,6 @@ Namespace UnitOperations
 
             m_Cooler.Calculate()
             Dim Pcond As Double = m_Cooler.DeltaQ.GetValueOrDefault
-            Console.WriteLine(String.Format("Puiss condensation : {0}", Pcond))
 
             m_Mixer.metaMS = {coolerOut, flashLiq}
             m_Mixer.metaMSOut = distillatOut
@@ -320,7 +309,7 @@ Namespace UnitOperations
             Dim W As Double = 0
             Dim T2 = coolerOut.GetTemperature - m_TSec
             edmIn.SetMassFlow(W)
-
+            edmIn.SetPressure(edmFlashLiq.GetPressure())
 
 
             If Pcond > 0 Then
@@ -337,8 +326,8 @@ Namespace UnitOperations
                     m_Heater.DeltaQ = Pcond
 
                     'Pas de rejet pour conserver le max de chaleur
-                    rejet.SetMassFlow(0)
-                    'recirculation.SetMassFlow(rejet.GetMassFlow)
+                    recirculation.SetMassFlow(edmFlashLiq.GetMassFlow)
+
                 Else
                     ' Qdistillat < QEdmin
                     ' On fait rentrer plus d'eau pour pouvoir condenser à T2
@@ -350,11 +339,13 @@ Namespace UnitOperations
                     ' La qté à intégrer peut être plus grande que la Qté de circulation
                     If W <= (edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) Then
                         recirculation.SetMassFlow((edmFlashLiq.GetMassFlow + distillatOut.GetMassFlow) - W)
-                        rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
 
                     End If
                     ' La Qté à rejeter peut être supérieure au flux disponible ! 
                 End If
+
+                rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
+
             ElseIf distillatOut.GetMassFlow > 0 Then
                 ' On produit du distillat déjà condensé (re-démarrage)
                 W = distillatOut.GetMassFlow
@@ -362,7 +353,13 @@ Namespace UnitOperations
                 m_Heater.CalcMode = Heater.CalculationMode.HeatAddedRemoved
                 m_Heater.DeltaQ = 0
                 ' TODO : Il faudrait que le distillat chaud puisse transférer de la chaleur
-
+                rejet.SetMassFlow(edmFlashLiq.GetMassFlow - recirculation.GetMassFlow)
+                ' TODO : Il faudrait que le distillat chaud puisse transférer de la chaleur
+            ElseIf distillatOut.GetMassFlow Then
+                'Chauffage sans production distillat
+                edmIn.SetMassFlow(W)
+                recirculation.SetMassFlow(edmFlashLiq.GetMassFlow)
+                rejet.SetMassFlow(0)
             End If
 
             m_Heater.Calculate()

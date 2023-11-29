@@ -397,14 +397,14 @@ Namespace UnitOperations
                 AccumulationStream.SetPressure(ims.GetPressure)
                 AccumulationStream.Calculate()
 
-                If GraphicObject.Tag = "vapor_pipe" Then
-                    Console.WriteLine(ims.ToResume)
-                    Console.WriteLine(oms.ToResume)
-                    Console.WriteLine(AccumulationStream.ToResume)
-                    Console.WriteLine(tempH)
-                    Console.WriteLine(dH_theory)
-                    Console.WriteLine("---------------------------")
-                End If
+                'If GraphicObject.Tag = "vapor_pipe" Then
+                '    Console.WriteLine(ims.ToResume)
+                '    Console.WriteLine(oms.ToResume)
+                '    Console.WriteLine(AccumulationStream.ToResume)
+                '    Console.WriteLine(tempH)
+                '    Console.WriteLine(dH_theory)
+                '    Console.WriteLine("---------------------------")
+                'End If
 
 
             End If
@@ -866,7 +866,7 @@ Namespace UnitOperations
                                         IObj6?.SetCurrent()
                                         If segmento.TipoSegmento = "Tubulaosimples" Or segmento.TipoSegmento = "" Or segmento.TipoSegmento = "Straight Tube Section" Or segmento.TipoSegmento = "Straight Tube" Or segmento.TipoSegmento = "Tubulação Simples" Then
                                             resv = fpp.CalculateDeltaP(.DI * 0.0254, .Comprimento / .Incrementos, .Elevacao / .Incrementos, Me.GetRugosity(.Material, segmento), Qvin * 24 * 3600, Qlin * 24 * 3600, eta_v * 1000, eta_l * 1000, rho_v, rho_l, tens)
-                                            Dim temp As Double = Pin - resv(2)
+                                            'Dim temp As Double = Pin - resv(2)
                                             'Console.WriteLine(Me.GraphicObject.Tag + String.Format(" {2} dpf {0:n2} dph {1:n2}", {resv(2), resv(3), resv(0)}))
                                             'If Me.GraphicObject.Tag = "desc_pipe" And ims.GetMassFlow > 0 Then
                                             '    Console.WriteLine(Me.GraphicObject.Tag + String.Format(" {2} dpf {0:n2} dph {1:n2} Pin {3:n2} T={4}", {resv(2), resv(3), resv(0), Pin, Tin}))
