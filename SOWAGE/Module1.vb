@@ -18,10 +18,11 @@ Module Module1
     Function Test()
         Dim interf As New DWSIM.Automation.Automation3
         Dim sim As Interfaces.IFlowsheet
-        sim = interf.LoadFlowsheet(String.Format("D:/git/sowage/{0}.dwxmz", "231018_test"))
+        sim = interf.LoadFlowsheet(String.Format("D:/git/sowage/{0}.dwxmz", "1205"))
         interf.CalculateFlowsheet4(sim)
-        Dim pipeOut = sim.GetObject("1_pipe_out")
-        Console.WriteLine(pipeOut)
+        'Dim pipeOut = sim.GetObject("1_pipe_out")
+        'Console.WriteLine(pipeOut)
+        Dim data = PythonData(sim)
     End Function
 
 

@@ -141,6 +141,17 @@ Namespace UnitOperations
             Return obj
         End Function
 
+        Public Overrides Function SaveData() As System.Collections.Generic.List(Of System.Xml.Linq.XElement)
+
+            Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = MyBase.SaveData()
+
+            elements.Add(New XElement("Volume", GetDynamicProperty("Volume")))
+
+
+            Return elements
+
+        End Function
+
         Public Overrides Function CloneJSON() As Object
             Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of Vessel)(Newtonsoft.Json.JsonConvert.SerializeObject(Me))
         End Function

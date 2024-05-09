@@ -15,7 +15,7 @@ Public Module SowageProcessData
         Dim data As List(Of XElement) = New List(Of XElement)
         For Each so As SharedClasses.UnitOperations.BaseClass In sim.SimulationObjects.Values
             Select Case so.GraphicObject.ObjectType
-                Case ObjectType.MaterialStream, ObjectType.Pipe, ObjectType.Heater, ObjectType.Cooler
+                Case ObjectType.MaterialStream, ObjectType.Pipe, ObjectType.Heater, ObjectType.Cooler, ObjectType.Pump, ObjectType.Vessel
                     data.Add(New XElement("SimulationObject", {so.SaveData().ToArray()}))
             End Select
         Next
@@ -93,7 +93,10 @@ Public Module SowageProcessData
                 Case "DWSIM.UnitOperations.UnitOperations.Heater"
                     With doc
                         .Add(element.GetElement("OutletTemperature"))
+                        .Add(element.GetElement("OutletVaporFraction"))
                         .Add(element.GetElement("DeltaQ"))
+                        .Add(element.GetElement("DeltaT"))
+                        .Add(element.GetElement("Volume"))
                     End With
                     toWriteData.Add(doc)
 
@@ -102,6 +105,8 @@ Public Module SowageProcessData
                         .Add(element.GetElement("OutletTemperature"))
                         .Add(element.GetElement("OutletVaporFraction"))
                         .Add(element.GetElement("DeltaQ"))
+                        .Add(element.GetElement("DeltaT"))
+                        .Add(element.GetElement("Volume"))
                     End With
                     toWriteData.Add(doc)
 
@@ -127,6 +132,17 @@ Public Module SowageProcessData
                         End Try
 
                     End With
+                    toWriteData.Add(doc)
+                Case "DWSIM.UnitOperations.UnitOperations.Pump"
+                    With doc
+                        .Add(element.GetElement("DeltaP"))
+                        .Add(element.GetElement("DeltaQ"))
+                        .Add(element.GetElement("Pout"))
+                    End With
+                    toWriteData.Add(doc)
+
+                Case "DWSIM.UnitOperations.UnitOperations.Vessel"
+                    doc.Add(element.GetElement("Volume"))
                     toWriteData.Add(doc)
 
                 Case Else

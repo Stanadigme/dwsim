@@ -251,6 +251,10 @@ Namespace UnitOperations
                 Next
             End With
 
+            elements.Add(New XElement("Pout", Pout()))
+            elements.Add(New XElement("DeltaP", DeltaP()))
+            elements.Add(New XElement("DeltaQ", DeltaQ()))
+
             Return elements
 
         End Function

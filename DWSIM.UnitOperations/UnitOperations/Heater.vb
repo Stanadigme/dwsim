@@ -153,6 +153,8 @@ Namespace UnitOperations
             Dim elements As System.Collections.Generic.List(Of System.Xml.Linq.XElement) = MyBase.SaveData()
 
             elements.Add(New XElement("DeltaQ", DeltaQ.GetValueOrDefault))
+            elements.Add(New XElement("DeltaT", DeltaT.GetValueOrDefault))
+            elements.Add(New XElement("Volume", GetDynamicProperty("Volume")))
 
 
             Return elements
