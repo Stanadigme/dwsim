@@ -385,6 +385,7 @@ Label_00CC:
 
             data = xdoc.Element("DWSIM_Simulation_Data").Element("ReactionSets").Elements.ToList
 
+            fs.ReactionSets.Clear()
             For Each xel As XElement In data
                 Try
                     Dim obj As New ReactionSet()
