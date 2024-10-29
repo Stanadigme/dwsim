@@ -1485,7 +1485,7 @@ Namespace UnitOperations
 
                     Dim Zb = Convert.ToDouble(Me.m_thermalprofile.Velocidade)
 
-                    Dim Rs = (Dext + esp_isol) / (2 * k_terreno(Me.m_thermalprofile.Meio)) * Math.Log((2 * Zb + (4 * Zb ^ 2 - (Dext + esp_isol) ^ 2) ^ 0.5) / (Dext + esp_isol))
+                    Dim Rs = (Dext + 2 * esp_isol) / (2 * k_terreno(Me.m_thermalprofile.Meio)) * Math.Log((2 * Zb + (4 * Zb ^ 2 - (Dext + 2 * esp_isol) ^ 2) ^ 0.5) / (Dext + 2 * esp_isol))
 
                     If Zb > 0 Then
                         U_ext = 1 / Rs
@@ -1517,16 +1517,16 @@ Namespace UnitOperations
                     k2 = props(3)
 
                     'External Re
-                    Dim Re_ext = NRe(rho2, vel, (Dext + esp_isol), mu2)
+                    Dim Re_ext = NRe(rho2, vel, (Dext + 2 * esp_isol), mu2)
 
                     'External Pr
                     Dim Pr_ext = NPr(cp2, mu2, k2)
 
                     'External h
-                    Dim h_ext = hext_holman(k2, (Dext + esp_isol), Re_ext, Pr_ext)
+                    Dim h_ext = hext_holman(k2, (Dext + 2 * esp_isol), Re_ext, Pr_ext)
 
                     'External HTC contribution
-                    U_ext = h_ext * (Dext + esp_isol) / Dint
+                    U_ext = h_ext * (Dext + 2 * esp_isol) / Dint
 
                 ElseIf Me.m_thermalprofile.Meio = 1 Then 'Water
 
@@ -1539,16 +1539,16 @@ Namespace UnitOperations
                     k2 = props(3)
 
                     'External Re
-                    Dim Re_ext = NRe(rho2, vel, (Dext + esp_isol), mu2)
+                    Dim Re_ext = NRe(rho2, vel, (Dext + 2 * esp_isol), mu2)
 
                     'External Pr
                     Dim Pr_ext = NPr(cp2, mu2, k2)
 
                     'External h
-                    Dim h_ext = hext_holman(k2, (Dext + esp_isol), Re_ext, Pr_ext)
+                    Dim h_ext = hext_holman(k2, (Dext + 2 * esp_isol), Re_ext, Pr_ext)
 
                     'External HTC contribution
-                    U_ext = h_ext * (Dext + esp_isol) / Dint
+                    U_ext = h_ext * (Dext + 2 * esp_isol) / Dint
 
                 End If
 
