@@ -301,7 +301,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
 
-            Hs = PP.DW_CalcSolidEnthalpy(T, Vz, CompoundProperties)
+            Hs = PP.DW_CalcEnthalpy(Vz, T, P, State.Solid)
             Hl = PP.DW_CalcEnthalpy(Vz, T, P, State.Liquid)
             Hv = PP.DW_CalcEnthalpy(Vz, T, P, State.Vapor)
 
@@ -450,7 +450,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim wid As Integer = CompoundProperties.IndexOf((From c As Interfaces.ICompoundConstantProperties In CompoundProperties Select c Where c.CAS_Number = "7732-18-5").SingleOrDefault)
 
-            Ss1 = PP.DW_CalcSolidEnthalpy(T, Vz, CompoundProperties) / T
+            Ss1 = PP.DW_CalcEntropy(Vz, T, P, State.Solid)
             Sl = PP.DW_CalcEntropy(Vz, T, P, State.Liquid)
             Sv = PP.DW_CalcEntropy(Vz, T, P, State.Vapor)
 
