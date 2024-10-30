@@ -420,7 +420,7 @@ Imports DWSIM.ExtensionMethods
 
     Public Sub RequestCalculation2(Wait As Boolean) Implements IFlowsheet.RequestCalculation2
 
-        If Wait Then
+        If Not Wait Then
             Task.Factory.StartNew(Sub()
                                       FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, GlobalSettings.Settings.SolverMode)
                                   End Sub)
@@ -439,6 +439,12 @@ Imports DWSIM.ExtensionMethods
         End If
 
     End Sub
+
+    Public Function RequestCalculationAndWait() As List(Of Exception) Implements IFlowsheet.RequestCalculationAndWait
+
+        Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, GlobalSettings.Settings.SolverMode)
+
+    End Function
 
     Public Sub ResetCalculationStatus() Implements IFlowsheet.ResetCalculationStatus
 

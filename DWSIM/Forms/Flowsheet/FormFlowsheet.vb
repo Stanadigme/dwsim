@@ -4158,6 +4158,12 @@ Public Class FormFlowsheet
 
     End Sub
 
+    Public Function RequestCalculationAndWait() As List(Of Exception) Implements IFlowsheet.RequestCalculationAndWait
+
+        Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, GlobalSettings.Settings.SolverMode)
+
+    End Function
+
     Public Sub ResetCalculationStatus() Implements IFlowsheet.ResetCalculationStatus
 
         For Each obj In SimulationObjects.Values

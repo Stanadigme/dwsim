@@ -372,6 +372,8 @@
 
     Sub RequestCalculation3(obj As ISimulationObject, Wait As Boolean)
 
+    Function RequestCalculationAndWait() As List(Of Exception)
+
     Property MessagesLog As List(Of String)
 
     Property AvailableExternalUnitOperations As Dictionary(Of String, IExternalUnitOperation)
