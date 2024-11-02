@@ -54,6 +54,7 @@ Partial Class FormFlowsheet
         Me.BotaoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolsTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.StreamDataImporterTSMI = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmiSolidsManager2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.CompoundCreatorWizardTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.CriadorDeComponentesSolidosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CaracterizacaoDePetroleosFracoesC7ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -76,6 +77,7 @@ Partial Class FormFlowsheet
         Me.SumarioToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ResultsTSMI = New System.Windows.Forms.ToolStripMenuItem()
         Me.GerarRelatorioToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmiDetailedReport = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExcelReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProcessFlowsheetDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PluginsTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -99,6 +101,7 @@ Partial Class FormFlowsheet
         Me.TimerScripts30 = New System.Windows.Forms.Timer(Me.components)
         Me.TimerScripts60 = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.tsmiSolidsManager = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsbAtivar = New System.Windows.Forms.ToolStripButton()
@@ -138,6 +141,7 @@ Partial Class FormFlowsheet
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.btnDismissPanelCOWarning = New System.Windows.Forms.Button()
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -357,7 +361,7 @@ Partial Class FormFlowsheet
         '
         'ToolsTSMI
         '
-        Me.ToolsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StreamDataImporterTSMI, Me.CompoundCreatorWizardTSMI, Me.CriadorDeComponentesSolidosToolStripMenuItem, Me.CaracterizacaoDePetroleosFracoesC7ToolStripMenuItem, Me.CaracterizacaoDePetroleosCurvasDeDestilacaoToolStripMenuItem, Me.CriarPseudocomponentesEmBateladaToolStripMenuItem, Me.GerenciadorDeAmostrasDePetroleoToolStripMenuItem, Me.PropriedadesDasSubstanciasToolStripMenuItem, Me.InspectorTSMI, Me.ToolStripSeparator15})
+        Me.ToolsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StreamDataImporterTSMI, Me.tsmiSolidsManager2, Me.CompoundCreatorWizardTSMI, Me.CriadorDeComponentesSolidosToolStripMenuItem, Me.CaracterizacaoDePetroleosFracoesC7ToolStripMenuItem, Me.CaracterizacaoDePetroleosCurvasDeDestilacaoToolStripMenuItem, Me.CriarPseudocomponentesEmBateladaToolStripMenuItem, Me.GerenciadorDeAmostrasDePetroleoToolStripMenuItem, Me.PropriedadesDasSubstanciasToolStripMenuItem, Me.InspectorTSMI, Me.ToolStripSeparator15})
         Me.ToolsTSMI.MergeAction = System.Windows.Forms.MergeAction.MatchOnly
         Me.ToolsTSMI.MergeIndex = 3
         Me.ToolsTSMI.Name = "ToolsTSMI"
@@ -370,6 +374,14 @@ Partial Class FormFlowsheet
         Me.StreamDataImporterTSMI.MergeIndex = 0
         Me.StreamDataImporterTSMI.Name = "StreamDataImporterTSMI"
         resources.ApplyResources(Me.StreamDataImporterTSMI, "StreamDataImporterTSMI")
+        '
+        'tsmiSolidsManager2
+        '
+        Me.tsmiSolidsManager2.Image = Global.DWSIM.My.Resources.Resources.flour_80px
+        Me.tsmiSolidsManager2.MergeAction = System.Windows.Forms.MergeAction.Insert
+        Me.tsmiSolidsManager2.MergeIndex = 3
+        Me.tsmiSolidsManager2.Name = "tsmiSolidsManager2"
+        resources.ApplyResources(Me.tsmiSolidsManager2, "tsmiSolidsManager2")
         '
         'CompoundCreatorWizardTSMI
         '
@@ -514,7 +526,7 @@ Partial Class FormFlowsheet
         '
         'ResultsTSMI
         '
-        Me.ResultsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GerarRelatorioToolStripMenuItem, Me.ExcelReportsToolStripMenuItem, Me.ProcessFlowsheetDiagramToolStripMenuItem})
+        Me.ResultsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GerarRelatorioToolStripMenuItem, Me.tsmiDetailedReport, Me.ExcelReportsToolStripMenuItem, Me.ProcessFlowsheetDiagramToolStripMenuItem})
         Me.ResultsTSMI.MergeAction = System.Windows.Forms.MergeAction.Insert
         Me.ResultsTSMI.MergeIndex = 7
         Me.ResultsTSMI.Name = "ResultsTSMI"
@@ -525,6 +537,12 @@ Partial Class FormFlowsheet
         Me.GerarRelatorioToolStripMenuItem.Image = Global.DWSIM.My.Resources.Resources.report
         Me.GerarRelatorioToolStripMenuItem.Name = "GerarRelatorioToolStripMenuItem"
         resources.ApplyResources(Me.GerarRelatorioToolStripMenuItem, "GerarRelatorioToolStripMenuItem")
+        '
+        'tsmiDetailedReport
+        '
+        Me.tsmiDetailedReport.Image = Global.DWSIM.My.Resources.Resources.Graph_Report_96px
+        Me.tsmiDetailedReport.Name = "tsmiDetailedReport"
+        resources.ApplyResources(Me.tsmiDetailedReport, "tsmiDetailedReport")
         '
         'ExcelReportsToolStripMenuItem
         '
@@ -649,9 +667,15 @@ Partial Class FormFlowsheet
         'ToolStrip1
         '
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripSeparator1, Me.tsbAtivar, Me.tsbCalcF, Me.tsbCalc, Me.tsbAbortCalc, Me.tsbSimultAdjustSolver, Me.ToolStripSeparator2, Me.tsbUndo, Me.tsbRedo, Me.ToolStripSeparator3, Me.ToolStripLabel2, Me.tsbDynamics, Me.tsbDynManager, Me.tsbDynIntegrator, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tscbStoredSolutions, Me.tsbStoreSolution, Me.tsbLoadSolution, Me.tsbDeleteSolution})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmiSolidsManager, Me.ToolStripSeparator5, Me.ToolStripButton1, Me.ToolStripSeparator1, Me.tsbAtivar, Me.tsbCalcF, Me.tsbCalc, Me.tsbAbortCalc, Me.tsbSimultAdjustSolver, Me.ToolStripSeparator2, Me.tsbUndo, Me.tsbRedo, Me.ToolStripSeparator3, Me.ToolStripLabel2, Me.tsbDynamics, Me.tsbDynManager, Me.tsbDynIntegrator, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tscbStoredSolutions, Me.tsbStoreSolution, Me.tsbLoadSolution, Me.tsbDeleteSolution})
         resources.ApplyResources(Me.ToolStrip1, "ToolStrip1")
         Me.ToolStrip1.Name = "ToolStrip1"
+        '
+        'tsmiSolidsManager
+        '
+        Me.tsmiSolidsManager.Image = Global.DWSIM.My.Resources.Resources.flour_80px
+        resources.ApplyResources(Me.tsmiSolidsManager, "tsmiSolidsManager")
+        Me.tsmiSolidsManager.Name = "tsmiSolidsManager"
         '
         'ToolStripButton1
         '
@@ -876,7 +900,7 @@ Partial Class FormFlowsheet
         Me.pbSolver.AutoIncrementFrequency = 50.0R
         resources.ApplyResources(Me.pbSolver, "pbSolver")
         Me.pbSolver.Name = "pbSolver"
-        Me.pbSolver.TransistionSegment = 11
+        Me.pbSolver.TransistionSegment = 2
         Me.pbSolver.TransistionSegmentColour = System.Drawing.Color.LightSkyBlue
         '
         'lblTotalMessages
@@ -942,6 +966,11 @@ Partial Class FormFlowsheet
         resources.ApplyResources(Me.btnDismissPanelCOWarning, "btnDismissPanelCOWarning")
         Me.btnDismissPanelCOWarning.Name = "btnDismissPanelCOWarning"
         Me.btnDismissPanelCOWarning.UseVisualStyleBackColor = True
+        '
+        'ToolStripSeparator5
+        '
+        Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+        resources.ApplyResources(Me.ToolStripSeparator5, "ToolStripSeparator5")
         '
         'FormFlowsheet
         '
@@ -1089,4 +1118,8 @@ Partial Class FormFlowsheet
     Friend WithEvents ProcessFlowsheetDiagramToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents lblTotalMessages As LinkLabel
     Public WithEvents CompoundCreatorWizardTSMI As ToolStripMenuItem
+    Friend WithEvents tsmiSolidsManager As ToolStripButton
+    Friend WithEvents tsmiDetailedReport As ToolStripMenuItem
+    Friend WithEvents tsmiSolidsManager2 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
 End Class

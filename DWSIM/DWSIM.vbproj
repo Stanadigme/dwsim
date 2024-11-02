@@ -3120,6 +3120,7 @@
     <None Include="Resources\file_80px.png" />
     <None Include="Resources\Excel 2013.png" />
     <None Include="Resources\expand_arrow_48px.png" />
+    <None Include="Resources\flour_80px.png" />
     <Content Include="Resources\fr.png" />
     <None Include="Resources\green_down.png" />
     <None Include="Resources\orifice.png" />
@@ -3263,6 +3264,7 @@
     <None Include="Resources\line_chart_80px.png" />
     <None Include="Resources\input_80px.png" />
     <None Include="Resources\icons8-documents.png" />
+    <None Include="Resources\Graph Report_96px.png" />
     <Content Include="Resources\ru.png" />
     <None Include="Resources\zoom.png" />
     <None Include="Resources\Services.png" />

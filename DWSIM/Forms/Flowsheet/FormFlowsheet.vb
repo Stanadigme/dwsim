@@ -5758,6 +5758,18 @@ Public Class FormFlowsheet
 
                         Select Case ts.FeatureName
 
+                            Case "Solids Manager"
+
+                                Dim hec As IExtenderCollection = My.Application.MainWindowForm.Extenders("7B0F156B-35E5-4398-A668-98ECD59F11A1")
+                                Dim he As IExtender = hec.Collection(0)
+                                he.Run()
+
+                            Case "Detailed Steady-State Simulation Report"
+
+                                Dim hec As IExtenderCollection = My.Application.MainWindowForm.Extenders("1b93996f-8edd-4960-a8e0-b8a348040aed")
+                                Dim he As IExtender = hec.Collection(0)
+                                he.Run()
+
                             Case "Excel Reports"
 
                                 Dim hec As IExtenderCollection = My.Application.MainWindowForm.Extenders("fd83c303-5dec-4038-8602-6f0a6c411091")
@@ -5801,6 +5813,22 @@ Public Class FormFlowsheet
     Public Sub UpdateObjectListPanel()
 
         FormSurface.FormObjects.UpdateData()
+
+    End Sub
+
+    Private Sub ToolStripButton2_Click_1(sender As Object, e As EventArgs) Handles tsmiSolidsManager.Click, tsmiSolidsManager2.Click
+
+        ProFeatures.Functions.CreateTransitionObject(Me, "Solids Manager", "Tool", "", "", Nothing)
+
+        ProFeatures.Functions.DisplayTransitionForm(FormMain.AnalyticsProvider, Me, "Solids Manager")
+
+    End Sub
+
+    Private Sub tsmiDetailedReport_Click(sender As Object, e As EventArgs) Handles tsmiDetailedReport.Click
+
+        ProFeatures.Functions.CreateTransitionObject(Me, "Detailed Steady-State Simulation Report", "Tool", "", "", Nothing)
+
+        ProFeatures.Functions.DisplayTransitionForm(FormMain.AnalyticsProvider, Me, "Detailed Steady-State Simulation Report")
 
     End Sub
 

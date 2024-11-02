@@ -309,6 +309,12 @@
   <data name="StreamDataImporterTSMI.Text" xml:space="preserve">
     <value>Stream Data Importer</value>
   </data>
+  <data name="tsmiSolidsManager2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>284, 22</value>
+  </data>
+  <data name="tsmiSolidsManager2.Text" xml:space="preserve">
+    <value>Solids Manager</value>
+  </data>
   <data name="CompoundCreatorWizardTSMI.Size" type="System.Drawing.Size, System.Drawing">
     <value>284, 22</value>
   </data>
@@ -490,19 +496,25 @@
     <value>&amp;Otimização</value>
   </data>
   <data name="GerarRelatorioToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>218, 22</value>
+    <value>284, 22</value>
   </data>
   <data name="GerarRelatorioToolStripMenuItem.Text" xml:space="preserve">
     <value>Relatórios</value>
   </data>
+  <data name="tsmiDetailedReport.Size" type="System.Drawing.Size, System.Drawing">
+    <value>284, 22</value>
+  </data>
+  <data name="tsmiDetailedReport.Text" xml:space="preserve">
+    <value>Detailed Steady-State Simulation Report</value>
+  </data>
   <data name="ExcelReportsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>218, 22</value>
+    <value>284, 22</value>
   </data>
   <data name="ExcelReportsToolStripMenuItem.Text" xml:space="preserve">
     <value>Excel Reports</value>
   </data>
   <data name="ProcessFlowsheetDiagramToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>218, 22</value>
+    <value>284, 22</value>
   </data>
   <data name="ProcessFlowsheetDiagramToolStripMenuItem.Text" xml:space="preserve">
     <value>Process Flowsheet Diagram</value>
@@ -639,6 +651,21 @@
   <metadata name="ToolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>413, 56</value>
   </metadata>
+  <data name="tsmiSolidsManager.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
+  </data>
+  <data name="tsmiSolidsManager.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 22</value>
+  </data>
+  <data name="tsmiSolidsManager.Text" xml:space="preserve">
+    <value>Solids Manager</value>
+  </data>
+  <data name="tsmiSolidsManager.ToolTipText" xml:space="preserve">
+    <value>Solids Manager</value>
+  </data>
+  <data name="ToolStripSeparator5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>6, 25</value>
+  </data>
   <data name="ToolStripButton1.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
@@ -1614,6 +1641,12 @@
   <data name="&gt;&gt;StreamDataImporterTSMI.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiSolidsManager2.Name" xml:space="preserve">
+    <value>tsmiSolidsManager2</value>
+  </data>
+  <data name="&gt;&gt;tsmiSolidsManager2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;CompoundCreatorWizardTSMI.Name" xml:space="preserve">
     <value>CompoundCreatorWizardTSMI</value>
   </data>
@@ -1744,6 +1777,12 @@
     <value>GerarRelatorioToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;GerarRelatorioToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmiDetailedReport.Name" xml:space="preserve">
+    <value>tsmiDetailedReport</value>
+  </data>
+  <data name="&gt;&gt;tsmiDetailedReport.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;ExcelReportsToolStripMenuItem.Name" xml:space="preserve">
@@ -1878,6 +1917,12 @@
   <data name="&gt;&gt;TimerScripts60.Type" xml:space="preserve">
     <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;tsmiSolidsManager.Name" xml:space="preserve">
+    <value>tsmiSolidsManager</value>
+  </data>
+  <data name="&gt;&gt;tsmiSolidsManager.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;ToolStripButton1.Name" xml:space="preserve">
     <value>ToolStripButton1</value>
   </data>
@@ -2003,6 +2048,12 @@
   </data>
   <data name="&gt;&gt;tsbDeleteSolution.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ToolStripSeparator5.Name" xml:space="preserve">
+    <value>ToolStripSeparator5</value>
+  </data>
+  <data name="&gt;&gt;ToolStripSeparator5.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>FormFlowsheet</value>
