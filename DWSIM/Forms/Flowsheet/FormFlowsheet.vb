@@ -240,6 +240,9 @@ Public Class FormFlowsheet
             StreamDataImporterTSMI.Visible = False
             ExcelReportsToolStripMenuItem.Visible = False
             ProcessFlowsheetDiagramToolStripMenuItem.Visible = False
+            tsmiSolidsManager.Visible = False
+            tsmiSolidsManager2.Visible = False
+            tsmiDetailedReport.Visible = False
         End If
 
         FormCharts.Flowsheet = Me
