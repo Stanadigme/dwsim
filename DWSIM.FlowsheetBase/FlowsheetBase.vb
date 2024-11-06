@@ -2601,9 +2601,7 @@ Imports DWSIM.ExtensionMethods
 
         End If
 
-        If Not Settings.AutomationMode Then
-            If LoadSpreadsheetData IsNot Nothing Then LoadSpreadsheetData.Invoke(xdoc)
-        End If
+        If LoadSpreadsheetData IsNot Nothing Then LoadSpreadsheetData.Invoke(xdoc)
 
         ProcessScripts(Enums.Scripts.EventType.SimulationOpened, Enums.Scripts.ObjectType.Simulation, "")
 
@@ -2806,9 +2804,7 @@ Imports DWSIM.ExtensionMethods
             xel.Add(New XElement("GHGComposition", DirectCast(ghgcomp, ICustomXMLSerialization).SaveData().ToArray()))
         Next
 
-        If Not GlobalSettings.Settings.AutomationMode Then
-            If SaveSpreadsheetData IsNot Nothing Then SaveSpreadsheetData.Invoke(xdoc)
-        End If
+        If SaveSpreadsheetData IsNot Nothing Then SaveSpreadsheetData.Invoke(xdoc)
 
         Return xdoc
 

@@ -227,12 +227,10 @@ namespace DWSIM.UI.Desktop.Editors
 
         public void WriteAll()
         {
-
             foreach (var ws in Sheet.Worksheets)
             {
                 ws.Recalculate();
             }
-
         }
 
         public void EvaluateAll()
