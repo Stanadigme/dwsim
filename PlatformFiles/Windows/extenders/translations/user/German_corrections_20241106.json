@@ -1,0 +1,29 @@
+[
+  {
+    "OriginalText": "Open File",
+    "Translated": "Datei öffnen",
+    "Reviewed": true,
+    "ReviewedBy_Name": "schlinges",
+    "ReviewedBy_Contact": "SebastianSchlinge@gmx.de",
+    "ReviewedBy_Date": "2024-11-06T11:39:55.0425883+01:00",
+    "Language": "de"
+  },
+  {
+    "OriginalText": "&Save",
+    "Translated": "&Sichern",
+    "Reviewed": true,
+    "ReviewedBy_Name": "schlinges",
+    "ReviewedBy_Contact": "SebastianSchlinge@gmx.de",
+    "ReviewedBy_Date": "2024-11-06T11:39:55.0435881+01:00",
+    "Language": "de"
+  },
+  {
+    "OriginalText": "Quick Create New Solid",
+    "Translated": "Schnelles Erstellen eines neuenFeststoffs",
+    "Reviewed": true,
+    "ReviewedBy_Name": "schlinges",
+    "ReviewedBy_Contact": "SebastianSchlinge@gmx.de",
+    "ReviewedBy_Date": "2024-11-06T11:39:55.0435881+01:00",
+    "Language": "de"
+  }
+]
