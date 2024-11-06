@@ -21,6 +21,11 @@ public class LoopTest
             var sim = interf.LoadFlowsheet("C:\\Users\\danie\\Downloads\\capeopen.dwxmz");
             sim.SetMessageListener((s, mt) => Console.WriteLine(s));
             interf.CalculateFlowsheet2(sim);
+            //unvell.ReoGrid.IWorkbook  ssheet = (unvell.ReoGrid.IWorkbook)sim.GetSpreadsheetObject();
+            //var val1 = ssheet.Worksheets[0].Cells["C4"].Data;
+            //var val2 = ssheet.Worksheets[0].Cells["C5"].Data;
+            //var val3 = ssheet.Worksheets[0].Cells["E4"].Data;
+            //ssheet.Worksheets[0].Recalculate();
             sim.ReleaseResources();
             sim = null;
             Console.WriteLine(String.Format("Finished in {0} ms.", sw.ElapsedMilliseconds));

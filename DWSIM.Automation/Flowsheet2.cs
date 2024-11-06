@@ -50,6 +50,7 @@ namespace DWSIM.Automation
                         {
                             var tmpfile = SharedClasses.Utility.GetTempFileName();
                             var sheet = Spreadsheet.CreateWorksheet(item.Key);
+                            Spreadsheet.Worksheets.Add(sheet);
                             var xmldoc = Newtonsoft.Json.JsonConvert.DeserializeXmlNode(item.Value);
                             xmldoc.Save(tmpfile);
                             sheet.LoadRGF(tmpfile);
