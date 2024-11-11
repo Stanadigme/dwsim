@@ -1,13 +1,9 @@
-Version 8.8.2
+Version 8.8.3
 
-- Optimized memory consumption and CPU usage
-- Added mass balance residual and total energy balance to flowsheet results
-- Added phase volumetric fractions
-- Set default System of Units  (Classic UI) 
-- Fixed issues with Sensitivity Analysis (Classic UI)
-- Fixed ironpython script debugging
-- Fixed/disabled display of dynamic properties in steady state
-- Tentative fix for Excel.exe not closing in Spreadsheet UO after calculation
-- Fixed memory leaks
-- Fixed issue with Heat Exchanger UO
-- Other fixes and enhancements
+- Added spreadsheet object to Automation3 API
+- Added MJ/h to heat flow units (#675)
+- Fixed enthalpy and entropy calculation for Seawater Property Package (#682)
+- Fixed Pipe Segment external diameter calculation
+- Fixed issue with loading reaction sets for internal flowsheets in Flowsheet UO
+- Fixed issue with CAPE-OPEN Property Package equilibrium calculations
+- Missing compound parameter warnings are now optional

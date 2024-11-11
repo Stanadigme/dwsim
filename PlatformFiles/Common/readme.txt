@@ -1,6 +1,6 @@
 ﻿==================================================
 DWSIM - Open Source Process Simulator
-Version 8.8.2
+Version 8.8.3
 Copyright (c) 2017-2024 Daniel Wagner and contributors
 Copyright (c) 2008-2016 Daniel Wagner, Gregor Reichert, Gustavo Leon
 ==================================================
@@ -62,7 +62,17 @@ VERSION HISTORY / CHANGELOG
 
 The full changelog including souce code changes can be viewed at https://github.com/DanWBR/dwsim/commits/windows
 
-Version 8.8.2
+Version 8.8.3
+
+- Added spreadsheet object to Automation3 API
+- Added MJ/h to heat flow units (#675)
+- Fixed enthalpy and entropy calculation for Seawater Property Package (#682)
+- Fixed Pipe Segment external diameter calculation
+- Fixed issue with loading reaction sets for internal flowsheets in Flowsheet UO
+- Fixed issue with CAPE-OPEN Property Package equilibrium calculations
+- Missing compound parameter warnings are now optional
+
+Version 8.8.3
 
 - Optimized memory consumption and CPU usage
 - Added mass balance residual and total energy balance to flowsheet results
