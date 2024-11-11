@@ -230,7 +230,7 @@ Namespace SystemsOfUnits
                 Case Enums.UnitOfMeasure.distance
                     units.AddRange(New String() {"m", "ft", "cm"})
                 Case Enums.UnitOfMeasure.heatflow
-                    units.AddRange(New String() {"kW", "kcal/h", "BTU/h", "BTU/s", "cal/s", "HP", "kJ/h", "kJ/d", "MW", "W",
+                    units.AddRange(New String() {"kW", "kcal/h", "BTU/h", "BTU/s", "cal/s", "HP", "kJ/h", "MJ/h", "kJ/d", "MW", "W",
                                    "BTU/d", "MMBTU/d", "MMBTU/h", "kcal/s", "kcal/h", "kcal/d"})
                 Case Enums.UnitOfMeasure.heat
                     units.AddRange(New String() {"kJ", "J", "kcal", "BTU", "MMBTU", "cal"})
@@ -340,7 +340,7 @@ Namespace SystemsOfUnits
                     Return Enums.UnitOfMeasure.deltaT
                 Case "m", "ft", "cm"
                     Return Enums.UnitOfMeasure.distance
-                Case "kW", "kcal/h", "BTU/h", "BTU/s", "cal/s", "HP", "kJ/h", "kJ/d", "MW", "W",
+                Case "kW", "kcal/h", "BTU/h", "BTU/s", "cal/s", "HP", "kJ/h", "MJ/h", "kJ/d", "MW", "W",
                      "BTU/d", "MMBTU/d", "MMBTU/h", "kcal/s", "kcal/h", "kcal/d"
                     Return Enums.UnitOfMeasure.heatflow
                 Case "ms", "s", "min.", "h"
@@ -1557,6 +1557,8 @@ Namespace SystemsOfUnits
                     Return value / 859.845
                 Case "kj/h"
                     Return value / 3600
+                Case "mj/h"
+                    Return value / 3600 * 1000
                 Case "kj/d"
                     Return value / 3600 / 24
                 Case "mw"
@@ -2143,6 +2145,8 @@ Namespace SystemsOfUnits
                     Return value * 859.845
                 Case "kj/h"
                     Return value * 3600
+                Case "mj/h"
+                    Return value * 3600 / 1000
                 Case "kj/d"
                     Return value * 3600 * 24
                 Case "mw"
