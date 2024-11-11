@@ -26,7 +26,7 @@ Public Class ObjectiveFunction
 
     End Function
 
-    Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+    Public Overrides Function Gradient(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
 
         If fxg IsNot Nothing Then
             Return fxg.Invoke(x.ToArray()).ToList()
@@ -36,7 +36,7 @@ Public Class ObjectiveFunction
 
     End Function
 
-    Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+    Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
 
         Return FunctionHessian(x.ToArray())
 

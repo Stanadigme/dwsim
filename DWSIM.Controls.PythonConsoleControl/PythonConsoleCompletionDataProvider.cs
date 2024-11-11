@@ -61,16 +61,6 @@ namespace PythonConsoleControl
                     {
                         PopulateFromCLRType(items, type, name);
                     }
-                    else
-                    {
-                        string dirCommand = "dir(" + name + ")";
-                        object value = commandLine.ScriptScope.Engine.CreateScriptSourceFromString(dirCommand, SourceCodeKind.Expression).Execute(commandLine.ScriptScope);
-                        AutocompletionInProgress = false;
-                        foreach (object member in (value as IronPython.Runtime.List))
-                        {
-                            items.Add(new PythonCompletionData((string)member, name, commandLine, false));
-                        }
-                    }
                 }
                 catch (ThreadAbortException tae)
                 {

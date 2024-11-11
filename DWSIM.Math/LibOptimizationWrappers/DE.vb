@@ -44,7 +44,7 @@ Namespace MathEx.OptimizationL
         End Property
 
         Sub New()
-            LibOptimization.Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+
         End Sub
 
         ''' <summary>
