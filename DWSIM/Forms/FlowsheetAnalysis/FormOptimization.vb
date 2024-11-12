@@ -249,6 +249,25 @@ Public Class FormOptimization
 
             End If
 
+        ElseIf Not Loaded And selectedindex0 = lbCases.SelectedIndex Then
+
+            If lbCases.SelectedIndex >= 0 Then
+                Panel1.Enabled = True
+            Else
+                Panel1.Enabled = False
+            End If
+
+            If Not Me.lbCases.SelectedItem Is Nothing Then
+                For Each optcase As OptimizationCase In form.Collections.OPT_OptimizationCollection
+                    If optcase.name = Me.lbCases.SelectedItem.ToString Then
+                        Me.selectedoptcase = optcase
+                        Me.PopulateForm(optcase)
+                    End If
+                Next
+            End If
+
+            selected = True
+
         End If
 
     End Sub
