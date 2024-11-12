@@ -24,6 +24,7 @@ Imports DWSIM.FlowsheetSolver
 Imports System.Linq
 Imports DWSIM.SharedClasses.Flowsheet.Optimization
 Imports DWSIM.SharedClasses.DWSIM.Flowsheet
+Imports System.Threading.Tasks
 
 Public Class FormSensAnalysis
 
@@ -139,7 +140,10 @@ Public Class FormSensAnalysis
             .Columns(1).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft
         End With
 
-        If Me.lbCases.Items.Count > 0 Then Me.lbCases.SelectedIndex = Me.lbCases.Items.Count - 1
+        If Me.lbCases.Items.Count > 0 Then
+            selectedindex = 0
+            lbCases.SelectedIndex = 0
+        End If
 
         form.WriteToLog(DWSIM.App.GetLocalTipString("FSAN001"), Color.Black, MessageType.Tip)
 
@@ -414,8 +418,8 @@ Public Class FormSensAnalysis
 
     Private Sub lbCases_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbCases.SelectedIndexChanged
 
-        If Loaded And selectedindex <> lbCases.SelectedIndex And
-            lbCases.SelectedIndex >= 0 Then
+        If (Loaded And selectedindex <> lbCases.SelectedIndex And
+            lbCases.SelectedIndex >= 0) Then
 
             If MessageBox.Show(form.GetTranslatedString1("Desejasalvarasaltera"),
                form.GetTranslatedString1("Pergunta"),
@@ -449,6 +453,27 @@ Public Class FormSensAnalysis
                 selected = True
 
             End If
+
+        ElseIf Not Loaded And selectedindex = lbCases.SelectedIndex Then
+
+            If Not Me.lbCases.SelectedItem Is Nothing Then
+                For Each sacase As SensitivityAnalysisCase In form.Collections.OPT_SensAnalysisCollection
+                    If sacase.name = Me.lbCases.SelectedItem.ToString Then
+                        Me.selectedsacase = sacase
+                        Me.PopulateForm(sacase)
+                        Exit For
+                    End If
+                Next
+                GroupBox8.Enabled = True
+                GroupBox9.Enabled = True
+                btnRun.Enabled = True
+            Else
+                GroupBox8.Enabled = False
+                GroupBox9.Enabled = False
+                btnRun.Enabled = False
+            End If
+
+            selected = True
 
         End If
 
@@ -650,10 +675,10 @@ Public Class FormSensAnalysis
     Private Sub btnRun_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRun.Click
 
         Dim idx As Integer = 0
-        Dim iv1ll, iv1ul, iv1np, iv2ll, iv2ul, iv2np, dvval, iv1val, iv2val, iv1val0, iv2val0 As Double
+        Dim iv1ll, iv1ul, iv1np, iv2ll, iv2ul, iv2np, iv1val0, iv2val0 As Double
         Dim iv1id, iv2id, iv1prop, iv2prop, dvid, dvprop As String
         Dim i, j, counter As Integer
-        Dim res As New ArrayList
+        Dim res As New List(Of Double())
 
         Me.lbCases.SelectedIndex = Me.selectedindex
 
@@ -775,6 +800,7 @@ Public Class FormSensAnalysis
                            form.SupressMessages = True
                            For i = 0 To iv1np
                                For j = 0 To iv2np
+                                   Dim iv1val, iv2val, dvval As Double
                                    iv1val = iv1ll + i * (iv1ul - iv1ll) / iv1np
                                    If Me.chkIndVar2.Checked Then iv2val = iv2ll + j * (iv2ul - iv2ll) / iv2np Else iv2val = 0
                                    'set object properties
@@ -797,7 +823,7 @@ Public Class FormSensAnalysis
                                        End If
                                    End If
                                    'run simulation
-                                   form.RequestCalculation2(True)
+                                   form.RequestCalculationAndWait()
                                    'get the value of the dependent variable
                                    If rbExp.Checked Then
                                        Me.selectedsacase.econtext = New ExpressionContext
@@ -821,7 +847,7 @@ Public Class FormSensAnalysis
                                        res.Add(New Double() {iv1val, iv2val, dvval})
                                    Else
                                        'store results
-                                       Dim currresults As New ArrayList
+                                       Dim currresults As New List(Of Double)
                                        currresults.Add(iv1val)
                                        currresults.Add(iv2val)
                                        For Each var As SAVariable In selectedsacase.depvariables.Values
@@ -834,18 +860,19 @@ Public Class FormSensAnalysis
                                            End If
                                            currresults.Add(var.currentvalue)
                                        Next
-                                       res.Add(currresults.ToArray(Type.GetType("System.Double")))
+                                       res.Add(currresults.ToArray())
                                    End If
+                                   Dim formattedvalues As New List(Of Object) From {
+                                       Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv1.unit, iv1val), nf),
+                                       Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv2.unit, iv2val), nf)
+                                   }
+                                   For Each var As SAVariable In selectedsacase.depvariables.Values
+                                       formattedvalues.Add(Format(SystemsOfUnits.Converter.ConvertFromSI(var.unit, var.currentvalue), nf))
+                                   Next
                                    UIThread(Sub()
                                                 If rbExp.Checked Then
                                                     Me.dgvResults.Rows.Add(New Object() {Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv1.unit, iv1val), nf), Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv2.unit, iv2val), nf), Format(dvval, nf)})
                                                 Else
-                                                    Dim formattedvalues As New ArrayList
-                                                    formattedvalues.Add(Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv1.unit, iv1val), nf))
-                                                    formattedvalues.Add(Format(SystemsOfUnits.Converter.ConvertFromSI(sacase.iv2.unit, iv2val), nf))
-                                                    For Each var As SAVariable In selectedsacase.depvariables.Values
-                                                        formattedvalues.Add(Format(SystemsOfUnits.Converter.ConvertFromSI(var.unit, var.currentvalue), nf))
-                                                    Next
                                                     Me.dgvResults.Rows.Add(formattedvalues.ToArray())
                                                 End If
                                                 Me.dgvResults.FirstDisplayedScrollingRowIndex = Me.dgvResults.Rows.Count - 1
