@@ -336,6 +336,7 @@ Public Class FormOptimization
                         If objname = DWSIM.App.GetLocalString("SpreadsheetCell") Then
                             Me.dgVariables.Rows(e.RowIndex).Cells(7).Value = form.FormSpreadsheet.GetCellValue(Me.dgVariables.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString).Data
                             Me.dgVariables.Rows(e.RowIndex).Cells(8).Value = form.FormSpreadsheet.GetCellValue(Me.dgVariables.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString).Data
+                            Me.dgVariables.Rows(e.RowIndex).Cells(9).Value = ""
                         ElseIf objname = DWSIM.App.GetLocalString("Flowsheet Result") Then
                             Dim id = Me.dgVariables.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString
                             Dim val = form.GetResultValue(id)
@@ -348,6 +349,7 @@ Public Class FormOptimization
                             Dim val = rx.GetPropertyValue(Me.dgVariables.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString.Split("|")(1))
                             Me.dgVariables.Rows(e.RowIndex).Cells(7).Value = val
                             Me.dgVariables.Rows(e.RowIndex).Cells(8).Value = val
+                            Me.dgVariables.Rows(e.RowIndex).Cells(9).Value = ""
                         Else
                             Dim tbc As DataGridViewTextBoxCell = Me.dgVariables.Rows(e.RowIndex).Cells(7)
                             Dim tbc0 As DataGridViewTextBoxCell = Me.dgVariables.Rows(e.RowIndex).Cells(8)
@@ -1616,10 +1618,11 @@ Public Class FormOptimization
                         .objectID = Me.ReturnObject(dgrow.Cells(3).Value).Name
                         .propID = Me.ReturnPropertyID(.objectID, dgrow.Cells(4).Value)
                     End If
-                    .lowerlimit = SystemsOfUnits.Converter.ConvertToSI(dgrow.Cells(9).Value, dgrow.Cells(5).Value)
-                    .upperlimit = SystemsOfUnits.Converter.ConvertToSI(dgrow.Cells(9).Value, dgrow.Cells(6).Value)
-                    .initialvalue = SystemsOfUnits.Converter.ConvertToSI(dgrow.Cells(9).Value, dgrow.Cells(7).Value)
-                    .currentvalue = SystemsOfUnits.Converter.ConvertToSI(dgrow.Cells(9).Value, dgrow.Cells(8).Value)
+                    Dim units = dgrow.Cells(9).Value
+                    .lowerlimit = SystemsOfUnits.Converter.ConvertToSI(units, dgrow.Cells(5).Value)
+                    .upperlimit = SystemsOfUnits.Converter.ConvertToSI(units, dgrow.Cells(6).Value)
+                    .initialvalue = SystemsOfUnits.Converter.ConvertToSI(units, dgrow.Cells(7).Value)
+                    .currentvalue = SystemsOfUnits.Converter.ConvertToSI(units, dgrow.Cells(8).Value)
                     Select Case dgrow.Cells(2).Value.ToString
                         Case "DEP"
                             .type = OPTVariableType.Dependent
