@@ -68,6 +68,7 @@ Version 8.8.3
 - Added MJ/h to heat flow units (#675)
 - Updated IronPython version to v3.4.1
 - Fixed Cantera Interop sample
+- Fixed Biodiesel Combustion (Cantera) sample
 - Fixed issue with Sensitivity Analysis utility (Classic UI) (#684)
 - Fixed issue with Optimization utility (Classic UI) (#688)
 - Fixed enthalpy and entropy calculation for Seawater Property Package (#682)
