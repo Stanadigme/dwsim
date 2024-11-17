@@ -50,9 +50,9 @@ Public Class FormFileExplorer
 
     Public Sub ListFiles()
 
+        Dim provider = Flowsheet.FileDatabaseProvider
         If provider IsNot Nothing Then
             Try
-                Dim provider = Flowsheet.FileDatabaseProvider
                 Dim files = provider.GetFiles()
                 ListView1.Items.Clear()
                 For Each item In files
