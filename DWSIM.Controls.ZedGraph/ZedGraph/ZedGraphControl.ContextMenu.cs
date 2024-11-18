@@ -455,12 +455,13 @@ namespace ZedGraph
                     {
                         if (myStream != null)
                         {
-                            switch (handler.GetExtension())
+                            var extension = handler.GetExtension().ToLower();
+                            switch (extension)
                             {
-                                case ".PNG":
+                                case ".png":
                                     ImageRender(scale).Save(myStream, ImageFormat.Png);
                                     break;
-                                case ".JPG":
+                                case ".jpg":
                                     ImageRender(scale).Save(myStream, ImageFormat.Jpeg);
                                     break;
                             }

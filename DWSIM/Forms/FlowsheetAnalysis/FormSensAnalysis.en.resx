@@ -131,13 +131,13 @@
     <value>226, 21</value>
   </data>
   <data name="tbStats.Size" type="System.Drawing.Size, System.Drawing">
-    <value>852, 63</value>
+    <value>1171, 63</value>
   </data>
   <data name="GroupBox7.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 248</value>
   </data>
   <data name="GroupBox7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>858, 82</value>
+    <value>1177, 82</value>
   </data>
   <data name="GroupBox7.Text" xml:space="preserve">
     <value>Information</value>
@@ -149,10 +149,10 @@
     <value>IV 2</value>
   </data>
   <data name="dgvResults.Size" type="System.Drawing.Size, System.Drawing">
-    <value>855, 226</value>
+    <value>1174, 226</value>
   </data>
   <data name="GroupBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>867, 340</value>
+    <value>1186, 340</value>
   </data>
   <data name="GroupBox1.Text" xml:space="preserve">
     <value>Results</value>
@@ -176,7 +176,7 @@
     <value>89, 49</value>
   </data>
   <data name="tbCaseDesc.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 76</value>
+    <value>709, 76</value>
   </data>
   <data name="Label4.Size" type="System.Drawing.Size, System.Drawing">
     <value>60, 13</value>
@@ -188,10 +188,10 @@
     <value>89, 20</value>
   </data>
   <data name="tbCaseName.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 20</value>
+    <value>709, 20</value>
   </data>
   <data name="GroupBox3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>340, 134</value>
+    <value>808, 134</value>
   </data>
   <data name="GroupBox3.Text" xml:space="preserve">
     <value>Name and Description (Selected Case)</value>
@@ -412,7 +412,7 @@
     <value>Top, Right</value>
   </data>
   <data name="rbExp.Location" type="System.Drawing.Point, System.Drawing">
-    <value>356, 6</value>
+    <value>824, 6</value>
   </data>
   <data name="rbExp.Size" type="System.Drawing.Size, System.Drawing">
     <value>76, 17</value>
@@ -445,7 +445,7 @@
     <value>Unit</value>
   </data>
   <data name="dgVariables.Size" type="System.Drawing.Size, System.Drawing">
-    <value>514, 166</value>
+    <value>364, 166</value>
   </data>
   <data name="tsbAddVar.ToolTipText" xml:space="preserve">
     <value>Add</value>
@@ -454,13 +454,13 @@
     <value>Remove</value>
   </data>
   <data name="ToolStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>514, 25</value>
+    <value>364, 25</value>
   </data>
   <data name="GroupBox9.Location" type="System.Drawing.Point, System.Drawing">
-    <value>353, 29</value>
+    <value>821, 29</value>
   </data>
   <data name="GroupBox9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>520, 210</value>
+    <value>370, 210</value>
   </data>
   <data name="GroupBox9.Text" xml:space="preserve">
     <value>Expression Parameters</value>
@@ -469,19 +469,19 @@
     <value>Bottom, Right</value>
   </data>
   <data name="btnClear.Location" type="System.Drawing.Point, System.Drawing">
-    <value>434, 54</value>
+    <value>284, 54</value>
   </data>
   <data name="btnClear.Text" xml:space="preserve">
     <value>Clear</value>
   </data>
   <data name="btnVerify.Location" type="System.Drawing.Point, System.Drawing">
-    <value>434, 22</value>
+    <value>284, 22</value>
   </data>
   <data name="btnVerify.Text" xml:space="preserve">
     <value>Verify</value>
   </data>
   <data name="tbCurrentValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>358, 20</value>
+    <value>208, 20</value>
   </data>
   <data name="Label15.Size" type="System.Drawing.Size, System.Drawing">
     <value>59, 13</value>
@@ -490,7 +490,7 @@
     <value>Curr. Value</value>
   </data>
   <data name="tbExpression.Size" type="System.Drawing.Size, System.Drawing">
-    <value>358, 77</value>
+    <value>208, 77</value>
   </data>
   <data name="Label17.Size" type="System.Drawing.Size, System.Drawing">
     <value>58, 13</value>
@@ -499,10 +499,10 @@
     <value>Expression</value>
   </data>
   <data name="GroupBox8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>353, 245</value>
+    <value>821, 245</value>
   </data>
   <data name="GroupBox8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>520, 135</value>
+    <value>370, 135</value>
   </data>
   <data name="GroupBox8.Text" xml:space="preserve">
     <value>Expression</value>
@@ -520,7 +520,7 @@
     <value>Unit</value>
   </data>
   <data name="dgDepVariables.Size" type="System.Drawing.Size, System.Drawing">
-    <value>336, 307</value>
+    <value>804, 307</value>
   </data>
   <data name="ToolStripButton1.ToolTipText" xml:space="preserve">
     <value>Add</value>
@@ -529,16 +529,16 @@
     <value>Remove</value>
   </data>
   <data name="ToolStrip2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>336, 25</value>
+    <value>804, 25</value>
   </data>
   <data name="GroupBox10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>342, 351</value>
+    <value>810, 351</value>
   </data>
   <data name="GroupBox10.Text" xml:space="preserve">
     <value>Add/Remove Variables</value>
   </data>
   <data name="btnRegressData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>204, 23</value>
+    <value>523, 23</value>
   </data>
   <data name="btnRegressData.Text" xml:space="preserve">
     <value>Send Data to Regression Plugin</value>
@@ -547,13 +547,13 @@
     <value>Break Calculation</value>
   </data>
   <data name="TabPage2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>729, 388</value>
+    <value>1197, 388</value>
   </data>
   <data name="TabPage2.Text" xml:space="preserve">
     <value>Independent Variables</value>
   </data>
   <data name="TabPage3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>879, 388</value>
+    <value>1197, 388</value>
   </data>
   <data name="TabPage3.Text" xml:space="preserve">
     <value>Dependent Variables</value>
@@ -562,7 +562,7 @@
     <value>Send Data to New Worksheet</value>
   </data>
   <data name="TabPage4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>879, 388</value>
+    <value>1197, 388</value>
   </data>
   <data name="TabPage4.Text" xml:space="preserve">
     <value>Results</value>
@@ -577,19 +577,19 @@
     <value>48, 22, 48, 22</value>
   </data>
   <data name="graph.Size" type="System.Drawing.Size, System.Drawing">
-    <value>610, 374</value>
+    <value>928, 374</value>
   </data>
   <data name="TabPage5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>879, 388</value>
+    <value>1197, 388</value>
   </data>
   <data name="TabPage5.Text" xml:space="preserve">
     <value>Chart</value>
   </data>
   <data name="TabControl1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>737, 414</value>
+    <value>1205, 414</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>751, 560</value>
+    <value>1219, 560</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Sensitivity Study</value>
