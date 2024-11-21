@@ -2166,6 +2166,34 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
             'result = Flash_PV_Saturated_Newton(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
 
             result = Flash_PV_1(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
+            'check if solution is valid.
+            Dim deltaT = result(11)
+            If Math.Abs(deltaT) > 0.01 And (V = 0 Or V = 1) Then
+                'solution is not valid. try a poly approximation
+                Dim Tlist, Plist As New List(Of Double)
+                Dim Pl As Double = 101325
+                Dim deltaPl = (P / 2 - 101325) / 10
+                Dim Tl As Double = 0.0
+                For i = 0 To 10
+                    result = Flash_PV_1(Vz, Pl, V, Tl, PP, ReuseKI, PrevKi)
+                    If result.Count = 1 Then Exit For
+                    Tl = result(4)
+                    Kvals = result(6)
+                    Tlist.Add(Tl)
+                    Plist.Add(Pl)
+                    Pl += 101325
+                Next
+                If result.Count > 1 Then
+                    'extrapolate Tl
+                    Tl = Interpolate.RationalWithPoles(Plist, Tlist).Interpolate(P)
+                    result = Flash_PV_1(Vz, P, V, Tl, PP, True, Kvals)
+                    deltaT = result(11)
+                    If Math.Abs(deltaT) > 0.01 Then
+                        Throw New Exception(String.Format("{0}: Unable to calculate PV Flash with P = {1} and VF = {2}, molar fractions = {3}",
+                                    PP.ComponentName, P, V, Vz.ToArrayString(PP.RET_VNAMES(), "G3")))
+                    End If
+                End If
+            End If
             'check if converged to the trivial solution.
             If result.Count > 1 Then
                 Kvals = result(6)
@@ -2195,7 +2223,7 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 Next
                 If result.Count > 1 Then
                     'extrapolate Tl
-                    Tl = MathNet.Numerics.Interpolate.RationalWithPoles(Plist, Tlist).Interpolate(P)
+                    Tl = Interpolate.RationalWithPoles(Plist, Tlist).Interpolate(P)
                     result = Flash_PV_1(Vz, P, V, Tl, PP, True, Kvals)
                 End If
             End If
@@ -2527,7 +2555,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                     xvals.Add(T)
                     fvals.Add(fval)
 
-                    If Math.Abs(fval) < etol And ecount > 1 Then Exit Do
+                    If Math.Abs(fval) < etol And ecount > 5 Then
+                        Exit Do
+                    End If
 
                     ecount += 1
 
@@ -2556,8 +2586,6 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
 
                     IObj2?.Paragraphs.Add(String.Format("Temperature error: {0} K", deltaT))
 
-                    If Abs(deltaT) < etol And ecount > 5 Then Exit Do
-
                     For i = 0 To n
                         dVxy(i) = Math.Abs(Vx(i) - Vy(i))
                     Next
@@ -2570,6 +2598,7 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                         Else
                             Vx = Vy.Clone()
                         End If
+                        deltaT = 0
                         Exit Do
                     Else
 
@@ -2602,6 +2631,8 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                             Else
                                 Vx = Vy.DivideY(Ki).NormalizeY()
                             End If
+
+                            deltaT = 0
 
                             Exit Do
 
@@ -2793,7 +2824,7 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
 
             End If
 
-            Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
+            Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector, deltaT}
 
         End Function
 
