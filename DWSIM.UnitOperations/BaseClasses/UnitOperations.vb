@@ -238,6 +238,12 @@ Namespace UnitOperations
 
 #Region "   DWSIM Specific"
 
+        Public Property Dimensions As List(Of IDimension) = New List(Of IDimension) Implements IUnitOperation.Dimensions
+
+        Public Property SelectedEquipmentType As String = "" Implements IUnitOperation.SelectedEquipmentType
+
+        Public Overridable ReadOnly Property EquipmentTypes As List(Of String) = New List(Of String)() Implements IUnitOperation.EquipmentTypes
+
         Public Overrides Function GetEnergyConsumption() As Double
 
             If GraphicObject Is Nothing Then Return 0.0
@@ -408,7 +414,9 @@ Namespace UnitOperations
         Public Overrides Property ObjectClass As SimulationObjectClass = SimulationObjectClass.Logical
 
         Public Sub New()
+
             MyBase.CreateNew()
+
         End Sub
 
     End Class

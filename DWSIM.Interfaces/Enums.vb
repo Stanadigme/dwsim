@@ -612,6 +612,26 @@ Namespace Enums
 
     End Enum
 
+    Public Enum DimensionName
+
+        NotDefined
+        Length
+        Diameter
+        Height
+        Area
+        Volume
+        Flow
+        Efficiency
+        Pressure
+        PressureDifference
+        NumberOfTubes
+        NumberofPackings
+        NumberOfSections
+        NumberOfTrays
+        NumberOfCells
+
+    End Enum
+
 End Namespace
 
 Namespace Enums.GraphicObjects

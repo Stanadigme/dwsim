@@ -127,6 +127,7 @@
     <Compile Include="BaseClass\ConnectionPortInfo.vb" />
     <Compile Include="BaseClass\FlowsheetBag.vb" />
     <Compile Include="BaseClass\SimulationObjectBaseClasses.vb" />
+    <Compile Include="Dimensions\Dimension.vb" />
     <Compile Include="Editor\DynamicsPropertyEditor.Designer.vb">
       <DependentUpon>DynamicsPropertyEditor.vb</DependentUpon>
     </Compile>
