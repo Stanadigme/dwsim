@@ -203,6 +203,12 @@ Namespace UnitOperations
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_Pump
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Centrifugal", "Diaphragm", "Gear"}
+            End Get
+        End Property
+
         Public Enum CalculationMode
             Delta_P = 0
             OutletPressure = 1
@@ -439,6 +445,29 @@ Namespace UnitOperations
                 m_ignorephase = value
             End Set
         End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Flow, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Pressure, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.PressureDifference, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Efficiency, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Head, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Power, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = GetInletMaterialStream(0).GetVolumetricFlow()
+            Dimensions(1).Value = Pout
+            Dimensions(2).Value = PressureIncrease
+            Dimensions(3).Value = Efficiency
+            Dimensions(4).Value = Head
+            Dimensions(5).Value = HeatDuty
+
+        End Sub
 
         Public Sub New()
 

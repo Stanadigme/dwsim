@@ -8,6 +8,7 @@ Imports SkiaSharp
 Imports Eto.Forms
 Imports DWSIM.UI.Shared.Common
 Imports System.Globalization
+Imports DWSIM.SharedClasses
 
 Namespace UnitOperations
 
@@ -20,6 +21,27 @@ Namespace UnitOperations
         Private Image As SKImage
 
         <Xml.Serialization.XmlIgnore> Public f As EditingForm_WaterElectrolyzer
+
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "PEM", "Alkaline", "Solid Oxide"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.NumberOfCells, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Flow, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = NumberOfCells
+            Dimensions(1).Value = GetInletMaterialStream(0).GetVolumetricFlow()
+
+        End Sub
 
         Public Overrides Function GetDisplayName() As String
             Return "Water Electrolyzer"

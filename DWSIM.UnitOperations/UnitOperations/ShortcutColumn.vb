@@ -39,6 +39,12 @@ Namespace UnitOperations
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_ShortcutColumn
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Tray Column", "Packed Column"}
+            End Get
+        End Property
+
         Public Enum CondenserType
             TotalCond = 0
             PartialCond = 1

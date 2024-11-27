@@ -39,6 +39,33 @@ Namespace UnitOperations
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_ComprExpndr
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Centrifugal", "Reciprocating"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Flow, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Pressure, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.PressureDifference, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Efficiency, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Power, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = GetInletMaterialStream(0).GetVolumetricFlow()
+            Dimensions(1).Value = POut
+            Dimensions(2).Value = PressureIncrease
+            Dimensions(3).Value = AdiabaticEfficiency
+            Dimensions(4).Value = HeatDuty
+
+        End Sub
+
         Public Enum CalculationMode
             OutletPressure = 0
             Delta_P = 1

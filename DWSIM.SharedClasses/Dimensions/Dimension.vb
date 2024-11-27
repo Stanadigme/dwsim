@@ -12,6 +12,12 @@ Public Class Dimension
 
     Public Property IsUserDefined As Boolean = False Implements IDimension.IsUserDefined
 
+    Public Sub New()
+
+        ID = Guid.NewGuid().ToString()
+
+    End Sub
+
     Public Function SaveData() As List(Of XElement) Implements ICustomXMLSerialization.SaveData
         Return XMLSerializer.XMLSerializer.Serialize(Me)
     End Function

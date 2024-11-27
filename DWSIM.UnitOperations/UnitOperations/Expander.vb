@@ -38,6 +38,33 @@ Namespace UnitOperations
 
         Public Overrides ReadOnly Property HasPropertiesForDynamicMode As Boolean = False
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Steam", "Gas"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Flow, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Pressure, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.PressureDifference, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Efficiency, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Power, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = GetInletMaterialStream(0).GetVolumetricFlow()
+            Dimensions(1).Value = POut
+            Dimensions(2).Value = PressureDrop
+            Dimensions(3).Value = AdiabaticEfficiency
+            Dimensions(4).Value = HeatDuty
+
+        End Sub
+
 
         <NonSerialized> <XML.Serialization.XmlIgnore> Public f As EditingForm_ComprExpndr
 

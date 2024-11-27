@@ -8,6 +8,7 @@ Imports SkiaSharp
 Imports Eto.Forms
 Imports DWSIM.UI.Shared.Common
 Imports System.Globalization
+Imports DWSIM.SharedClasses
 
 Namespace UnitOperations
 
@@ -20,6 +21,27 @@ Namespace UnitOperations
         Private Image As SKImage
 
         <Xml.Serialization.XmlIgnore> Public f As EditingForm_SolarPanel
+
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Monocrystalline", "Polycrystalline", "Thin Film"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Area, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Efficiency, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = PanelArea
+            Dimensions(1).Value = PanelEfficiency
+
+        End Sub
 
         Public Overrides Property Prefix As String = "SP-"
 

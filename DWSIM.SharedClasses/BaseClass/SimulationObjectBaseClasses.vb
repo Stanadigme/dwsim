@@ -465,7 +465,7 @@ Namespace UnitOperations
 
         End Sub
 
-        Public Sub Solve() Implements ISimulationObject.Solve
+        Public Overridable Sub Solve() Implements ISimulationObject.Solve
 
             If FlowSheet.FlowsheetOptions.ForceObjectSolving Then
                 Calculated = False

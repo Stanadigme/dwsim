@@ -8,6 +8,7 @@ Imports SkiaSharp
 Imports Eto.Forms
 Imports DWSIM.UI.Shared.Common
 Imports System.Globalization
+Imports DWSIM.SharedClasses
 
 Namespace UnitOperations
 
@@ -24,6 +25,27 @@ Namespace UnitOperations
         Private calc As DWSIM.Thermodynamics.CalculatorInterface.Calculator
 
         Private rpp As DWSIM.Thermodynamics.PropertyPackages.RaoultPropertyPackage
+
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Onshore", "Offshore"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Power, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = GeneratedPower
+            Dimensions(1).Value = RotorDiameter
+
+        End Sub
 
         Public Overrides Property Prefix As String = "WT-"
 

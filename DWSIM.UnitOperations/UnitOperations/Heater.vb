@@ -38,6 +38,12 @@ Namespace UnitOperations
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_HeaterCooler
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Electrical Heater"}
+            End Get
+        End Property
+
         Public Enum CalculationMode
             HeatAdded = 0
             OutletTemperature = 1

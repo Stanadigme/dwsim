@@ -54,6 +54,29 @@ Namespace Reactors
             Diameter = 1
         End Enum
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Tubular", "Fixed Bed", "Fluidized Bed"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Volume, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Length, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = Volume
+            Dimensions(1).Value = Length
+            Dimensions(2).Value = Diameter
+
+        End Sub
+
         Public Property ReactorSizingType As SizingType = SizingType.Length
 
         Private _IObj As InspectorItem

@@ -621,7 +621,10 @@ Namespace Enums
         Area
         Volume
         Flow
+        Head
         Efficiency
+        Power
+        HeatDuty
         Pressure
         PressureDifference
         NumberOfTubes

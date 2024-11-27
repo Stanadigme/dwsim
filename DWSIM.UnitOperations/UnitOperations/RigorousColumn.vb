@@ -1834,6 +1834,39 @@ Namespace UnitOperations
 
         Public Property InitialEstimatesProvider As String = "Internal (Default)"
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Tray Column", "Packed Column"}
+            End Get
+        End Property
+
+        Public Overrides Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Height, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.NumberOfTrays, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = EstimatedDiameter
+            Dimensions(1).Value = EstimatedHeight
+            If TypeOf Me Is AbsorptionColumn Then
+                Dimensions(2).Value = Stages.Count
+            Else
+                If DirectCast(Me, DistillationColumn).RefluxedAbsorber Then
+                    Dimensions(2).Value = Stages.Count - 1
+                ElseIf DirectCast(Me, DistillationColumn).RefluxedAbsorber Then
+                    Dimensions(2).Value = Stages.Count - 1
+                Else
+                    Dimensions(2).Value = Stages.Count - 2
+                End If
+            End If
+
+        End Sub
+
         Public Overrides Property ObjectClass As SimulationObjectClass = SimulationObjectClass.Columns
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_Column

@@ -48,6 +48,12 @@ Namespace UnitOperations
 
         Protected m_eta As Nullable(Of Double) = 100
 
+        Public Overrides ReadOnly Property EquipmentTypes As List(Of String)
+            Get
+                Return New List(Of String) From {"", "Air Cooler"}
+            End Get
+        End Property
+
         Public Enum CalculationMode
             HeatRemoved = 0
             OutletTemperature = 1

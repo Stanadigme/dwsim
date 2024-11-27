@@ -55,7 +55,24 @@ Namespace UnitOperations
         Public Sub New()
 
             MyBase.CreateNew()
+            CreateDimensionsList()
 
+        End Sub
+
+        Public Overridable Sub CreateDimensionsList()
+
+            Dimensions = New List(Of IDimension)
+
+        End Sub
+
+        Public Overridable Sub UpdateDimensionsList()
+
+
+        End Sub
+
+        Public Overrides Sub Solve()
+            MyBase.Solve()
+            UpdateDimensionsList()
         End Sub
 
         Public Overridable Function SetCalculationMode(modeID As Integer)
