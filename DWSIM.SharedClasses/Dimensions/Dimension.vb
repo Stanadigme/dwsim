@@ -12,8 +12,6 @@ Public Class Dimension
 
     Public Property IsUserDefined As Boolean = False Implements IDimension.IsUserDefined
 
-    Public Property UserOverriden As Boolean = False Implements IDimension.UserOverriden
-
     Public Property UserDefinedValue As Double Implements IDimension.UserDefinedValue
 
     Public Sub New()

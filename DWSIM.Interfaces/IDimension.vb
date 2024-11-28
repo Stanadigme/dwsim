@@ -8,8 +8,6 @@
 
     Property IsUserDefined As Boolean
 
-    Property UserOverriden As Boolean
-
     Property UserDefinedValue As Double
 
     Function GetDisplayName() As String
