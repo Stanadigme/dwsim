@@ -47,7 +47,13 @@ Namespace UnitOperations
         Public Overrides Sub CreateDimensionsList()
 
             Dimensions = New List(Of IDimension)
-            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = True})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            Dimensions(0).Value = GetInletMaterialStream(0).GetVolumetricFlow() * 15850.323140625 / Kv * 10.67 * 0.0254 'meters
 
         End Sub
 
@@ -119,7 +125,10 @@ Namespace UnitOperations
 
         Public Property FlowCoefficient As FlowCoefficientType = FlowCoefficientType.Kv
 
+        Public Property EstimatedDiameter As Double
+
         Private ActuatorTimeToNext As New DateTime
+
 
         Private DelayedOpenings As New Queue(Of Double)
 

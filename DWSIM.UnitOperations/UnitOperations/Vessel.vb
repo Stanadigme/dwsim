@@ -42,15 +42,29 @@ Namespace UnitOperations
         Public Overrides Sub CreateDimensionsList()
 
             Dimensions = New List(Of IDimension)
-            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = True})
-            Dimensions.Add(New Dimension With {.Name = DimensionName.Length, .IsUserDefined = True})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Diameter, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.Length, .IsUserDefined = False})
+
+        End Sub
+
+        Public Overrides Sub UpdateDimensionsList()
+
+            If SelectedEquipmentType = "Horizontal" Then
+                Dimensions(0).Value = DH
+                Dimensions(1).Value = AH
+            Else
+                Dimensions(0).Value = DV
+                Dimensions(1).Value = AV
+            End If
 
         End Sub
 
         Dim rhol, rhov, ql, qv, qe, rhoe, wl, wv As Double
         Dim C, VGI, VMAX, K As Double
-        Dim BeH, BSGH, BSLH, AH, DH As Double
-        Dim BeV, BSGV, BSLV, AV, DV As Double
+        Dim BeH, BSGH, BSLH As Double
+        Public AH, DH As Double
+        Dim BeV, BSGV, BSLV As Double
+        Public AV, DV As Double
 
         <NonSerialized> <Xml.Serialization.XmlIgnore> Public f As EditingForm_Vessel
 
