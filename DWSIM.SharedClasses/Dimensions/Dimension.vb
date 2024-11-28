@@ -35,12 +35,14 @@ Public Class Dimension
                 Return "Area"
             Case DimensionName.Diameter
                 Return "Diameter"
+            Case DimensionName.Flow
+                Return "Flow"
             Case DimensionName.Efficiency
                 Return "Efficiency"
             Case DimensionName.Head
                 Return "Head"
             Case DimensionName.HeatDuty
-                Return "HeatDuty"
+                Return "Heat Duty"
             Case DimensionName.Height
                 Return "Height"
             Case DimensionName.Length
