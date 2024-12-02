@@ -621,6 +621,7 @@ Namespace Enums
         Area
         Volume
         Flow
+        MassFlow
         Head
         Efficiency
         Power

@@ -32,14 +32,14 @@ Namespace UnitOperations
 
             Dimensions = New List(Of IDimension)
             Dimensions.Add(New Dimension With {.Name = DimensionName.NumberOfCells, .IsUserDefined = False})
-            Dimensions.Add(New Dimension With {.Name = DimensionName.Flow, .IsUserDefined = False})
+            Dimensions.Add(New Dimension With {.Name = DimensionName.MassFlow, .IsUserDefined = False})
 
         End Sub
 
         Public Overrides Sub UpdateDimensionsList()
 
             Dimensions(0).Value = NumberOfCells
-            Dimensions(1).Value = GetInletMaterialStream(0).GetVolumetricFlow()
+            Dimensions(1).Value = GetInletMaterialStream(0).GetMassFlow()
 
         End Sub
 
