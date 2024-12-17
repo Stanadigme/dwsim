@@ -61,7 +61,7 @@ Namespace SpecialOps
 
         Public Property SmoothingFactor As Double = 1.0
 
-        Public Property LegacyMode As Boolean = False
+        Public Property LegacyMode As Boolean = True
 
         Public ReadOnly Property Errors As Dictionary(Of String, Double) Implements Interfaces.IRecycle.Errors
             Get
