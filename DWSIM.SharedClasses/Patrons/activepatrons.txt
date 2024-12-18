@@ -1,5 +1,6 @@
 ﻿🥇 Yoshihide Watabe
 🥇 Lauterbach Verfahrenstechnik GmbH
+🥇 Nils Tellier, PE
 🥈 Alexander Semenyak
 🥈 Pedro Sabóia
 🥈 Sukin Oh
@@ -68,7 +69,6 @@ Guenther Holzer
 Harry Levinson
 Hep Ingham
 Hurudza
-Jay Hunter
 John Eamon
 John Kossik
 Kenneth Troldal
@@ -84,7 +84,6 @@ Nathan Schuh
 Peter Nordquist
 Petroconsulting LLC
 Rainer Scheuring
-Rashad Ahmadov
 Renato Arrieche
 Robert Gerard
 Robert Gulotty
