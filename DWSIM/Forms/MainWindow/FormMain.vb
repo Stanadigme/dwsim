@@ -5155,6 +5155,16 @@ Label_00CC:
 
     End Sub
 
+    Private Sub ToolStripButton6_CheckedChanged(sender As Object, e As EventArgs) Handles tsbAutoSave.CheckedChanged
+        If tsbAutoSave.Checked Then
+            tsbAutoSave.Image = My.Resources.checkmark_48px
+            tsbAutoSave.Text = "AutoSave Enabled"
+        Else
+            tsbAutoSave.Image = My.Resources.cancel_30px
+            tsbAutoSave.Text = "AutoSave Disabled"
+        End If
+    End Sub
+
     Private Sub tsbInspector_CheckedChanged(sender As Object, e As EventArgs) Handles tsbInspector.CheckedChanged
         GlobalSettings.Settings.InspectorEnabled = tsbInspector.Checked
         FrmOptions.chkEnableInspector.Checked = tsbInspector.Checked

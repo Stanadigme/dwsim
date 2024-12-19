@@ -3172,6 +3172,7 @@
     <Content Include="lib\lib2to3\PatternGrammar.txt" />
     <Content Include="lib\pydoc_data\_pydoc.css" />
     <Content Include="lib\venv\scripts\posix\activate.csh" />
+    <None Include="Resources\cancel_30px.png" />
     <Content Include="Resources\ch.png" />
     <None Include="Resources\clock_red.png" />
     <None Include="Resources\comp_separator.png" />
@@ -3196,6 +3197,7 @@
     <None Include="Resources\collaboration_female_male_48px.png" />
     <None Include="Resources\checkmark_48px.png" />
     <None Include="Resources\collapse_arrow_48px.png" />
+    <None Include="Resources\Checkmark_40px.png" />
     <Content Include="Resources\control_equalizer_blue.png" />
     <None Include="Resources\cut.png" />
     <None Include="Resources\ddbsearch.jpg" />

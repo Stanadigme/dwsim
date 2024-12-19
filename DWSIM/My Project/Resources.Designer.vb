@@ -933,6 +933,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property cancel_30px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("cancel_30px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property card_export() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("card_export", resourceCulture)
@@ -976,6 +986,16 @@ Namespace My.Resources
         Friend ReadOnly Property chart_LLE() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("chart_LLE", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property Checkmark_40px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Checkmark_40px", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
