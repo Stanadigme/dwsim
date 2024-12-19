@@ -2167,7 +2167,10 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
 
             result = Flash_PV_1(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
             'check if solution is valid.
-            Dim deltaT = result(11)
+            Dim deltaT As Double = 100
+            If result.Count > 1 Then
+                deltaT = result(11)
+            End If
             If Math.Abs(deltaT) > 0.01 And (V = 0 Or V = 1) Then
                 'solution is not valid. try a poly approximation
                 Dim Tlist, Plist As New List(Of Double)
@@ -2187,10 +2190,14 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                     'extrapolate Tl
                     Tl = Interpolate.RationalWithPoles(Plist, Tlist).Interpolate(P)
                     result = Flash_PV_1(Vz, P, V, Tl, PP, True, Kvals)
-                    deltaT = result(11)
+                    If result.Count > 1 Then
+                        deltaT = result(11)
+                    Else
+                        deltaT = 100
+                    End If
                     If Math.Abs(deltaT) > 0.01 Then
-                        Throw New Exception(String.Format("{0}: Unable to calculate PV Flash with P = {1} and VF = {2}, molar fractions = {3}",
-                                    PP.ComponentName, P, V, Vz.ToArrayString(PP.RET_VNAMES(), "G3")))
+                        'try previous calculation mode
+                        result = Flash_PV_1(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
                     End If
                 End If
             End If
