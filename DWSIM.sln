@@ -221,6 +221,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DWSIM.Thermodynamics.Thermo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DWSIM.Controls.OutlookGrid", "DWSIM.Controls.OutlookGrid\DWSIM.Controls.OutlookGrid.csproj", "{E0D167F9-AF5E-40EB-B646-34A6328745DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DWSIM.UI.Desktop.GTK3", "DWSIM.UI.Desktop.GTK3\DWSIM.UI.Desktop.GTK3.csproj", "{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2288,6 +2290,38 @@ Global
 		{E0D167F9-AF5E-40EB-B646-34A6328745DE}.Release|x64.Build.0 = Release|Any CPU
 		{E0D167F9-AF5E-40EB-B646-34A6328745DE}.Release|x86.ActiveCfg = Release|Any CPU
 		{E0D167F9-AF5E-40EB-B646-34A6328745DE}.Release|x86.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|wine32.ActiveCfg = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|wine32.Build.0 = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|x64.Build.0 = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Debug|x86.Build.0 = Debug|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|Any CPU.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|wine32.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|wine32.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|x64.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|x64.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|x86.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release Linux|x86.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|Any CPU.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|Any CPU.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|wine32.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|wine32.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|x64.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|x64.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|x86.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release WinMac|x86.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|wine32.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|wine32.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|x64.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|x64.Build.0 = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|x86.ActiveCfg = Release|Any CPU
+		{E8CAC254-E5C5-48B7-9A75-E2D41A3A95A1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

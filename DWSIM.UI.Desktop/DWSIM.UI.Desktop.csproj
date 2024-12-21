@@ -319,6 +319,10 @@
       <Project>{369bc7af-836b-4de1-93e3-b051bc148b23}</Project>
       <Name>DWSIM.Thermodynamics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DWSIM.UI.Desktop.GTK3\DWSIM.UI.Desktop.GTK3.csproj">
+      <Project>{e8cac254-e5c5-48b7-9a75-e2d41a3a95a1}</Project>
+      <Name>DWSIM.UI.Desktop.GTK3</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DWSIM.UI.Desktop.GTK\DWSIM.UI.Desktop.GTK.csproj">
       <Project>{67c35d45-f95a-4092-82e0-d9cf3b491d41}</Project>
       <Name>DWSIM.UI.Desktop.GTK</Name>
