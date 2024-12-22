@@ -18,7 +18,7 @@ Public Class Settings
         WinForms_Direct2D = 1
         WPF = 2
         Gtk2 = 3
-        Gtk3 = 3
+        Gtk3 = 4
     End Enum
 
     Public Enum LinuxPlatformRenderer

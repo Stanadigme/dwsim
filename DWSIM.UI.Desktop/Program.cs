@@ -106,6 +106,7 @@ namespace DWSIM.UI.Desktop
                             platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.WPF2.PlotHandler());
                             platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.WPF.ScintillaControlHandler());
                             break;
+                        case Settings.WindowsPlatformRenderer.Gtk2:
                         case Settings.WindowsPlatformRenderer.Gtk3:
                             DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
@@ -129,6 +130,7 @@ namespace DWSIM.UI.Desktop
                     if (GlobalSettings.Settings.AutomationMode) renderer = Settings.LinuxPlatformRenderer.WinForms;
                     switch (renderer)
                     {
+                        case Settings.LinuxPlatformRenderer.Gtk2:
                         case Settings.LinuxPlatformRenderer.Gtk3:
                             DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
@@ -177,6 +179,7 @@ namespace DWSIM.UI.Desktop
                                 platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Mac.PlotHandler());
                                 platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.Mac.ScintillaControlHandler());
                                 break;
+                            case Settings.MacOSPlatformRenderer.Gtk2:
                             case Settings.MacOSPlatformRenderer.Gtk3:
                                 DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                                 platform = new Eto.GtkSharp.Platform();
