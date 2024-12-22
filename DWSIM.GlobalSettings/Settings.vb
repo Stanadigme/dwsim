@@ -18,17 +18,20 @@ Public Class Settings
         WinForms_Direct2D = 1
         WPF = 2
         Gtk2 = 3
+        Gtk3 = 3
     End Enum
 
     Public Enum LinuxPlatformRenderer
         Gtk2 = 0
         WinForms = 1
+        Gtk3 = 2
     End Enum
 
     Public Enum MacOSPlatformRenderer
         MonoMac = 0
         Gtk2 = 1
         WinForms = 2
+        Gtk3 = 3
     End Enum
 
     Public Enum SkiaCanvasRenderer
