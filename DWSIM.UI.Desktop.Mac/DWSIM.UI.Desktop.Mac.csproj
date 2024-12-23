@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.props" Condition="Exists('..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -38,17 +39,13 @@
     <MacBuildBundle>false</MacBuildBundle>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Eto, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DWSIM\References\Eto.Forms\Release\net45\Eto.dll</HintPath>
+    <Reference Include="Eto, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Eto.Forms.2.8.3\lib\netstandard2.0\Eto.dll</HintPath>
     </Reference>
     <Reference Include="Eto.OxyPlot, Version=1.0.5911.41864, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Eto.OxyPlot.1.2.0-beta\lib\net45\Eto.OxyPlot.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Eto.XamMac2">
-      <HintPath>..\DWSIM\References\Eto.Forms\Release\net45\Eto.XamMac2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
@@ -82,7 +79,11 @@
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -199,6 +200,11 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets'))" />
+    <Error Condition="!Exists('..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.props'))" />
+    <Error Condition="!Exists('..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.targets'))" />
   </Target>
   <Import Project="..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets')" />
+  <Import Project="..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets" Condition="Exists('..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets')" />
+  <Import Project="..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.targets" Condition="Exists('..\packages\Eto.Platform.macOS.2.8.3\build\Eto.Platform.macOS.targets')" />
 </Project>
