@@ -52,10 +52,10 @@ namespace DWSIM.UI
 
             height = (int)(height * sf);
 
-            Application.Instance.UnhandledException += (sender, e) =>
-            {
-                new DWSIM.UI.Desktop.Editors.UnhandledExceptionView((Exception)e.ExceptionObject).ShowModalAsync();
-            };
+            //Application.Instance.UnhandledException += (sender, e) =>
+            //{
+            //    new DWSIM.UI.Desktop.Editors.UnhandledExceptionView((Exception)e.ExceptionObject).ShowModalAsync();
+            //};
 
             Title = "DWSIMLauncher".Localize();
 

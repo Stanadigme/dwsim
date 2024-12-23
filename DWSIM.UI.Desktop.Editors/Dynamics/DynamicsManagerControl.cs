@@ -61,7 +61,7 @@ namespace DWSIM.UI.Desktop.Editors.Dynamics
 
             var tl1w = new TableLayout { Padding = new Padding(5), Spacing = new Size(10, 10) };
 
-            var DocumentContainer = new DocumentControl() { AllowReordering = false, DisplayArrows = false };
+            var DocumentContainer = new DocumentControl() { AllowReordering = false };
 
             DocumentContainer.Pages.Add(new DocumentPage { Text = "Event Sets", Closable = false });
             DocumentContainer.Pages.Add(new DocumentPage { Text = "Cause-and-Effect Matrices", Closable = false });

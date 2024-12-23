@@ -203,7 +203,7 @@ namespace DWSIM.UI.Shared
                 //Resizable = true
             };
 
-            var tabctrl = new DocumentControl { DisplayArrows = false, AllowReordering = true };
+            var tabctrl = new DocumentControl { AllowReordering = true };
             foreach (var tab in tabs)
             {
                 tabctrl.Pages.Add(tab);
@@ -649,7 +649,8 @@ namespace DWSIM.UI.Shared
 
             var txt = new Label { Text = text, VerticalAlignment = VerticalAlignment.Center };
             txt.Font = new Font(SystemFont.Default, GetEditorFontSize());
-            var editor = new ColorPicker { Value = currval };
+            var editor = new ColorPicker { Value = currval, BackgroundColor = Colors.White };
+            editor.Style = "colorpicker-wpf-fix";
             if (GlobalSettings.Settings.EditorTextBoxFixedSize) editor.Width = (int)(sf * GlobalSettings.Settings.EditorTextBoxFixedSizeWidth);
 
             if (command != null) editor.ValueChanged += (sender, e) => command.Invoke((ColorPicker)sender, e);
