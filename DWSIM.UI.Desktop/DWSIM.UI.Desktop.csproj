@@ -160,9 +160,6 @@
     <Reference Include="PresentationFramework">
       <Private>True</Private>
     </Reference>
-    <Reference Include="Scintilla.Eto.GTK">
-      <HintPath>..\DWSIM\References\Eto.Scintilla\Scintilla.Eto.GTK.dll</HintPath>
-    </Reference>
     <Reference Include="Scintilla.Eto.GTK3">
       <HintPath>..\DWSIM\References\Eto.Scintilla\Scintilla.Eto.GTK3.dll</HintPath>
     </Reference>

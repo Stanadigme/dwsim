@@ -182,9 +182,9 @@ namespace DWSIM.UI.Desktop.GTK3
             using (new SKAutoCanvasRestore(surface.Canvas, true))
             {
                 OnPaintSurface(new SKPaintSurfaceEventArgs(surface, imgInfo));
+                if (fsurface != null) fsurface.UpdateSurface(surface);
             }
 
-            if (fsurface != null) fsurface.UpdateSurface(surface);
             surface.Canvas.Flush();
 
             pix.MarkDirty();

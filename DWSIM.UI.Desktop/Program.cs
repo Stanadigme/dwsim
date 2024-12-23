@@ -80,9 +80,7 @@ namespace DWSIM.UI.Desktop
             }
 
             Eto.Platform platform = null;
-
-            GlobalSettings.Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
-
+            
             try
             {
                 if (Settings.RunningPlatform() == Settings.Platform.Windows)
