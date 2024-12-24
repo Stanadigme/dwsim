@@ -88,6 +88,8 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
                 }
             }
 
+            var dpi = 1.0 / Display.PrimaryMonitor.ScaleFactor;
+            cr.Scale(dpi, dpi);
             cr.SetSourceSurface(pix, 0, 0);
             cr.Paint();
             return true;
@@ -139,16 +141,17 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
 
         private SKImageInfo CreateDrawingObjects()
         {
+            var dpi = Display.PrimaryMonitor.ScaleFactor;
             Gdk.Rectangle allocation = base.Allocation;
-            int width = allocation.Width;
-            int height = allocation.Height;
+            int width = allocation.Width * dpi;
+            int height = allocation.Height * dpi;
             SKImageInfo sKImageInfo = new SKImageInfo(width, height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
             if (pix == null || pix.Width != sKImageInfo.Width || pix.Height != sKImageInfo.Height)
             {
                 FreeDrawingObjects();
                 if (sKImageInfo.Width != 0 && sKImageInfo.Height != 0)
                 {
-                    pix = new ImageSurface(Format.Argb32, sKImageInfo.Width, sKImageInfo.Height);
+                    pix = new ImageSurface( Format.Argb32, sKImageInfo.Width, sKImageInfo.Height);
                     surface = SKSurface.Create(sKImageInfo, pix.DataPtr, sKImageInfo.RowBytes);
                 }
             }

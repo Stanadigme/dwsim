@@ -21,6 +21,7 @@ using DWSIM.UI.Desktop.Editors.Charts;
 using DWSIM.UI.Desktop.Editors.Dynamics;
 using SkiaSharp;
 using DWSIM.ExtensionMethods;
+using DWSIM.UI.Controls;
 
 namespace DWSIM.UI.Forms
 {
@@ -172,14 +173,7 @@ namespace DWSIM.UI.Forms
 
             Title = "New Flowsheet";
 
-            if (s.FlowsheetRenderer == s.SkiaCanvasRenderer.CPU)
-            {
-                FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
-            }
-            else
-            {
-                FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl_OpenGL() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
-            }
+            FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
 
             FlowsheetObject.FlowsheetControl = FlowsheetControl;
 
@@ -562,17 +556,20 @@ namespace DWSIM.UI.Forms
 
             // button click events
 
-            btnmUndo.Click += (sender, e) => {
+            btnmUndo.Click += (sender, e) =>
+            {
                 if (!FlowsheetObject.FlowsheetOptions.EnabledUndoRedo)
                 {
                     FlowsheetObject.ShowMessage("Undo/Redo feature is disabled (Edit > Flowsheet Settings > General > Enable Undo/Redo)", Interfaces.IFlowsheet.MessageType.Tip);
                 }
-                else {
+                else
+                {
                     FlowsheetObject.ProcessUndo();
                 }
             };
 
-            btnmRedo.Click += (sender, e) => {
+            btnmRedo.Click += (sender, e) =>
+            {
                 if (!FlowsheetObject.FlowsheetOptions.EnabledUndoRedo)
                 {
                     FlowsheetObject.ShowMessage("Undo/Redo feature is disabled (Edit > Flowsheet Settings > General > Enable Undo/Redo)", Interfaces.IFlowsheet.MessageType.Tip);
@@ -1444,15 +1441,22 @@ namespace DWSIM.UI.Forms
                     imghum, tbhum, lblhum, imgsun, tbirr, lblirr },
                 VerticalContentAlignment = VerticalAlignment.Center,
                 Spacing = 4,
-                Visible = false
+                Visible = false,
+                Height = 0
             };
 
             btnToggleWeatherPanel.Click += (s, e) =>
             {
                 weatherpanel.Visible = !weatherpanel.Visible;
+                if (weatherpanel.Visible)
+                    weatherpanel.Height = 40;
+                else
+                    weatherpanel.Height = 0;
             };
-
-            flowsheetcontrolcontainer.Rows.Add(new TableRow(new Scrollable { Border = BorderType.None, Content = weatherpanel }));
+            
+            flowsheetcontrolcontainer.Rows.Last().ScaleHeight = true;
+            
+            flowsheetcontrolcontainer.Rows.Add(new TableRow(weatherpanel));
 
             Split2.Panel1 = flowsheetcontrolcontainer;
 
@@ -1539,14 +1543,15 @@ namespace DWSIM.UI.Forms
                 documentcontainer.SelectedIndex = 1;
             };
 
-            Split1.Panel2 = Split3;
-
             btnShowHideObjectPalette.Click += (sender, e) =>
             {
                 Split2.Panel2.Visible = !Split2.Panel2.Visible;
             };
 
-            DocumentPageSpreadsheet = new DocumentPage { Content = SpreadsheetControl, Text = "Spreadsheet", Closable = false };
+            if (Application.Instance.Platform.IsGtk)
+                DocumentPageSpreadsheet = new DocumentPage { Content = new Scrollable { Content = SpreadsheetControl }, Text = "Spreadsheet", Closable = false };
+            else
+                DocumentPageSpreadsheet = new DocumentPage { Content = SpreadsheetControl, Text = "Spreadsheet", Closable = false };
 
             DocumentContainer = new DocumentControl() { AllowReordering = false };
             DocumentContainer.Pages.Add(new DocumentPage { Content = Split2, Text = "Flowsheet", Closable = false });
@@ -1630,6 +1635,8 @@ namespace DWSIM.UI.Forms
                 Spacing = 4,
                 Visible = true
             };
+
+            Split1.Panel2 = Split3;
 
             var Split0 = new Eto.Forms.Splitter { Orientation = Orientation.Vertical, FixedPanel = SplitterFixedPanel.Panel2 };
             Split0.Panel1 = Split1;
@@ -1823,10 +1830,22 @@ namespace DWSIM.UI.Forms
             btnmMultiSelect.Checked = FlowsheetObject.Options.FlowsheetMultiSelectMode;
 
             var surface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface();
-            surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
-            surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
-            surface.Zoom *= 0.7f;
-            surface.Center((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+
+            if (Application.Instance.Platform.IsGtk)
+            {
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+                surface.Zoom *= 0.8f;
+                surface.Center((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+            }
+            else
+            {
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+                surface.Zoom *= 0.8f;
+                surface.Center((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+            }
+
 
             ddstates.Items.Clear();
             ddstates.Items.Add("");

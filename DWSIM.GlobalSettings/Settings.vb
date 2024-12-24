@@ -192,6 +192,8 @@ Public Class Settings
 
     Public Shared LockModelParameters As Boolean = False
 
+    Public Shared IsGTKRenderer As Boolean = False
+
     <DllImport("kernel32.dll", SetLastError:=True)> Public Shared Function AddDllDirectory(lpPathName As String) As Boolean
 
     End Function

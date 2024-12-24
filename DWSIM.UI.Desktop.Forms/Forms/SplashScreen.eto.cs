@@ -36,7 +36,7 @@ namespace DWSIM.UI.Forms
             {
                 w = (int)(sf * 1088);
                 h = (int)(sf * 509);
-                dx = 20;
+                dx = (int)(18 * sf);
                 dy = 0;
             }
             else
@@ -58,6 +58,8 @@ namespace DWSIM.UI.Forms
             lbl1a.Text += "-" + File.GetLastWriteTimeUtc(Assembly.GetExecutingAssembly().Location).ToString();
 #endif
 
+            lbl1a.Font = SystemFonts.Bold();
+
             if (Environment.Is64BitProcess)
             {
                 lbl1a.Text +=  " (Cross-Platform UI, 64-bit)";
@@ -78,13 +80,12 @@ namespace DWSIM.UI.Forms
 
             lbl5.TextColor = new Color(0.051f, 0.447f, 0.651f);
 
-            var bgcolor = new Color(0.867f, 0.917f, 0.945f, 1.0f);
-
             var lblpatrons = new Label { Style = "splashlabels1", Text = "Special thanks to the following Patrons/Sponsors: " + Patrons.GetList() };
 
             lblpatrons.TextColor = new Color(0.051f, 0.447f, 0.651f);
             lblpatrons.Width = (int)(sf * 650);
             lblpatrons.Height = (int)(sf * 227);
+
             if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Mac)
             {
                 lblpatrons.Font = SystemFonts.Label(9.0f);
@@ -102,11 +103,6 @@ namespace DWSIM.UI.Forms
             {
                 img = new ImageView { Image = Bitmap.FromResource(imgprefix + "DWSIM_splash_v8_gtk.png").WithSize(w, h) };
                 layout.Add(img, 0, 0);
-                lbl1a.BackgroundColor = bgcolor;
-                lbl1a.BackgroundColor = bgcolor;
-                lbl5.BackgroundColor = bgcolor;
-                lbl3.BackgroundColor = bgcolor;
-                lblpatrons.BackgroundColor = bgcolor;
             }
             else
             {

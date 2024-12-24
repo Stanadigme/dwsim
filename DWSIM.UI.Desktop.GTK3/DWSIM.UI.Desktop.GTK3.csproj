@@ -119,9 +119,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Libraries\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\DWSIM.Drawing.SkiaSharp\DWSIM.DrawingTools.SkiaSharp.vbproj">
       <Project>{77040ecc-07b9-4b21-8b1f-7e45764e35f0}</Project>

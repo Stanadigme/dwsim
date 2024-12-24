@@ -17,6 +17,7 @@ namespace DWSIM.UI.Desktop.GTK3
         {
             nativecontrol = new FlowsheetSurface_GTK();
             this.Control = nativecontrol;
+
         }
 
         public override void OnLoadComplete(EventArgs e)
@@ -24,21 +25,24 @@ namespace DWSIM.UI.Desktop.GTK3
             base.OnLoadComplete(e);
             nativecontrol.fbase = this.Widget.FlowsheetObject;
             nativecontrol.fsurface = this.Widget.FlowsheetSurface;
-            //nativecontrol.DragDataGet += (sender, e2) => {
-            //    Console.WriteLine(e2.SelectionData.Type.Name);
-            //};
-            //nativecontrol.DragEnd += (sender, e2) => {
-            //    foreach (var item in e2.Args)
-            //    {
-            //        Console.WriteLine(item.ToString());
-            //    }
-            //};
-            //nativecontrol.DragFailed += (sender, e2) => {
-            //    foreach (var item in e2.Args)
-            //    {
-            //        Console.WriteLine(item.ToString());
-            //    }
-            //};
+            nativecontrol.DragDataGet += (sender, e2) =>
+            {
+                Console.WriteLine(e2.SelectionData.Target.Name);
+            };
+            nativecontrol.DragEnd += (sender, e2) =>
+            {
+                foreach (var item in e2.Args)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            };
+            nativecontrol.DragFailed += (sender, e2) =>
+            {
+                foreach (var item in e2.Args)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            };
         }
 
         public override Eto.Drawing.Color BackgroundColor
@@ -88,18 +92,24 @@ namespace DWSIM.UI.Desktop.GTK3
         private float _lastTouchX;
         private float _lastTouchY;
 
+        private float dpi;
+
         public FlowsheetSurface_GTK()
         {
 
+            dpi = Screen.Display.PrimaryMonitor.ScaleFactor;
+            GlobalSettings.Settings.DpiScale = dpi;
+
             this.AddEvents((int)Gdk.EventMask.PointerMotionMask);
+            this.AddEvents((int)Gdk.EventMask.ScrollMask);
             this.ButtonPressEvent += FlowsheetSurface_GTK_ButtonPressEvent;
             this.ButtonReleaseEvent += FlowsheetSurface_GTK_ButtonReleaseEvent;
             this.MotionNotifyEvent += FlowsheetSurface_GTK_MotionNotifyEvent;
             this.ScrollEvent += FlowsheetSurface_GTK_ScrollEvent;
 
             var targets = new List<Gtk.TargetEntry>();
-            targets.Add(new Gtk.TargetEntry("ObjectName", 0, 1));
-            Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link | Gdk.DragAction.Move);
+            targets.Add(new Gtk.TargetEntry("ObjectName", Gtk.TargetFlags.OtherWidget, 1));
+            Gtk.Drag.DestSet(this, Gtk.DestDefaults.Motion | Gtk.DestDefaults.Highlight, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link);
 
         }
 
@@ -117,11 +127,11 @@ namespace DWSIM.UI.Desktop.GTK3
 
             if (args.Event.Direction == Gdk.ScrollDirection.Down)
             {
-                fsurface.Zoom += -5 / 100f;
+                fsurface.Zoom += -5 * dpi / 100f;
             }
             else
             {
-                fsurface.Zoom += 5 / 100f;
+                fsurface.Zoom += 5 * dpi / 100f;
             }
             if (fsurface.Zoom < 0.05) fsurface.Zoom = 0.05f;
 
@@ -141,7 +151,7 @@ namespace DWSIM.UI.Desktop.GTK3
             float y = (int)args.Event.Y;
             _lastTouchX = x;
             _lastTouchY = y;
-            fsurface.InputMove((int)_lastTouchX, (int)_lastTouchY);
+            fsurface.InputMove((int)((int)_lastTouchX * dpi), (int)((int)_lastTouchY * dpi));
             this.QueueDraw();
         }
 
@@ -156,19 +166,20 @@ namespace DWSIM.UI.Desktop.GTK3
             fbase?.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout);
             if (args.Event.Type == Gdk.EventType.TwoButtonPress)
             {
-                //if (args.Event.State == Gdk.ModifierType.ShiftMask)
-                //{
-                //    fsurface.Zoom = 1.0f;
-                //}
-                //else {
-                //    fsurface.ZoomAll((int)this.Allocation.Width, (int)this.Allocation.Height);
-                //}
+                if (args.Event.State == Gdk.ModifierType.ShiftMask)
+                {
+                    fsurface.Zoom = 1.0f;
+                }
+                else
+                {
+                    fsurface.ZoomAll((int)(Allocation.Width * dpi), (int)(Allocation.Height * dpi));
+                }
             }
             else
             {
                 _lastTouchX = (int)args.Event.X;
                 _lastTouchY = (int)args.Event.Y;
-                fsurface.InputPress((int)_lastTouchX, (int)_lastTouchY);
+                fsurface.InputPress((int)((int)_lastTouchX * dpi), (int)((int)_lastTouchY * dpi));
             }
             this.QueueDraw();
 

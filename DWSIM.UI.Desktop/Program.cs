@@ -85,6 +85,7 @@ namespace DWSIM.UI.Desktop
             {
                 if (Settings.RunningPlatform() == Settings.Platform.Windows)
                 {
+                    GlobalSettings.Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
                     switch (GlobalSettings.Settings.WindowsRenderer)
                     {
                         case Settings.WindowsPlatformRenderer.WinForms:
@@ -104,11 +105,12 @@ namespace DWSIM.UI.Desktop
                             break;
                         case Settings.WindowsPlatformRenderer.Gtk2:
                         case Settings.WindowsPlatformRenderer.Gtk3:
+                            GlobalSettings.Settings.IsGTKRenderer = true;
                             DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
                             platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
                             platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk3.PlotHandler());
-                            platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
+                            //platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
                             break;
                     }
                     if (!GlobalSettings.Settings.AutomationMode)
@@ -128,6 +130,7 @@ namespace DWSIM.UI.Desktop
                     {
                         case Settings.LinuxPlatformRenderer.Gtk2:
                         case Settings.LinuxPlatformRenderer.Gtk3:
+                            GlobalSettings.Settings.IsGTKRenderer = true;
                             DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
                             platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
@@ -175,6 +178,7 @@ namespace DWSIM.UI.Desktop
                                 break;
                             case Settings.MacOSPlatformRenderer.Gtk2:
                             case Settings.MacOSPlatformRenderer.Gtk3:
+                                GlobalSettings.Settings.IsGTKRenderer = true;
                                 DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                                 platform = new Eto.GtkSharp.Platform();
                                 platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
