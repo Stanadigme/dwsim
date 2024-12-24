@@ -61,10 +61,20 @@ namespace DWSIM.UI.Shared
         /// <param name="form"></param>
         public static void Center(this Form form)
         {
-            var center = Screen.PrimaryScreen.WorkingArea.Center;
-            center.X -= form.Width / 2;
-            center.Y -= form.Height / 2;
-            form.Location = new Point(center);
+            if (!Application.Instance.Platform.IsGtk)
+            {
+                var center = Screen.PrimaryScreen.WorkingArea.Center;
+                center.X -= form.Width / 2;
+                center.Y -= form.Height / 2;
+                form.Location = new Point(center);
+            }
+            else
+            {
+                var center = Screen.DisplayBounds.Center;
+                center.X -= form.Width / 2;
+                center.Y -= form.Height / 2;
+                form.Location = new Point(center);
+            }
         }
 
         /// <summary>

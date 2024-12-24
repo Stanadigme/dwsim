@@ -122,12 +122,6 @@ namespace DWSIM.UI.Forms
 
             Content = layout;
 
-            var center = Screen.PrimaryScreen.WorkingArea.Center;
-            center.X -= w / 2;
-            center.Y -= h / 2;
-
-            Location = new Point(center);
-
             Topmost = true;
 
             img.BackgroundColor = Colors.Transparent;

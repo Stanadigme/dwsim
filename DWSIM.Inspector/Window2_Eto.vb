@@ -117,13 +117,9 @@ Public Class Window2_Eto
             Dim w = 400
             Dim h = 80
 
-            Dim center = Screen.PrimaryScreen.WorkingArea.Center
-            center.X -= w / 2
-            center.Y -= h / 2
-
-            .Location = New Point(center)
-
             .ClientSize = New Size(w, h)
+
+            DWSIM.UI.Shared.Common.Center(f)
 
         End With
 

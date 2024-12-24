@@ -580,6 +580,7 @@ namespace DWSIM.UI
         //}
         var splash = new SplashScreen { MainFrm = this };
                 splash.Show();
+                splash.Center();
             });
             this.Center();
 
