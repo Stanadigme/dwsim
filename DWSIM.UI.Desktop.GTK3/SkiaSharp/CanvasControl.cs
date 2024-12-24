@@ -9,7 +9,7 @@ using SkiaSharp.Views.Desktop;
 
 namespace DWSIM.UI.Desktop.GTK3
 {
-    public class FlowsheetSurfaceControlHandler : Eto.GtkSharp.Forms.GtkControl<Gtk.EventBox, FlowsheetSurfaceControl, FlowsheetSurfaceControl.ICallback>, FlowsheetSurfaceControl.IFlowsheetSurface
+    public class FlowsheetSurfaceControlHandler : Eto.GtkSharp.Forms.GtkControl<Gtk.Widget, FlowsheetSurfaceControl, FlowsheetSurfaceControl.ICallback>, FlowsheetSurfaceControl.IFlowsheetSurface
     {
         private FlowsheetSurface_GTK nativecontrol;
 
@@ -79,7 +79,7 @@ namespace DWSIM.UI.Desktop.GTK3
 
     }
 
-    public class FlowsheetSurface_GTK : Gtk.EventBox
+    public class FlowsheetSurface_GTK : SkiaSharp.SKDrawingArea
     {
 
         public GraphicsSurface fsurface;
@@ -90,6 +90,7 @@ namespace DWSIM.UI.Desktop.GTK3
 
         public FlowsheetSurface_GTK()
         {
+
             this.AddEvents((int)Gdk.EventMask.PointerMotionMask);
             this.ButtonPressEvent += FlowsheetSurface_GTK_ButtonPressEvent;
             this.ButtonReleaseEvent += FlowsheetSurface_GTK_ButtonReleaseEvent;
@@ -100,6 +101,12 @@ namespace DWSIM.UI.Desktop.GTK3
             targets.Add(new Gtk.TargetEntry("ObjectName", 0, 1));
             Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link | Gdk.DragAction.Move);
 
+        }
+
+        protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
+        {
+            base.OnPaintSurface(e);
+            fsurface?.UpdateCanvas(e.Surface.Canvas);
         }
 
         void FlowsheetSurface_GTK_ScrollEvent(object o, Gtk.ScrollEventArgs args)
@@ -165,94 +172,6 @@ namespace DWSIM.UI.Desktop.GTK3
             }
             this.QueueDraw();
 
-        }
-
-        private ImageSurface pix;
-        private SKSurface surface;
-
-        protected override bool OnDrawn(Context cr)
-        {
-            // get the pixbuf
-            var imgInfo = CreateDrawingObjects();
-
-            if (imgInfo.Width == 0 || imgInfo.Height == 0)
-                return true;
-
-            // start drawing
-            using (new SKAutoCanvasRestore(surface.Canvas, true))
-            {
-                OnPaintSurface(new SKPaintSurfaceEventArgs(surface, imgInfo));
-                if (fsurface != null) fsurface.UpdateSurface(surface);
-            }
-
-            surface.Canvas.Flush();
-
-            pix.MarkDirty();
-
-            // swap R and B
-            if (imgInfo.ColorType == SKColorType.Rgba8888)
-            {
-                using (var pixmap = surface.PeekPixels())
-                {
-                    SKSwizzle.SwapRedBlue(pixmap.GetPixels(), imgInfo.Width * imgInfo.Height);
-                }
-            }
-
-            // write the pixbuf to the graphics
-            cr.SetSourceSurface(pix, 0, 0);
-            cr.Paint();
-
-            return true;
-        }
-
-        private SKImageInfo CreateDrawingObjects()
-        {
-            var alloc = Allocation;
-            var w = alloc.Width;
-            var h = alloc.Height;
-            var imgInfo = new SKImageInfo(w, h, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
-
-            if (pix == null || pix.Width != imgInfo.Width || pix.Height != imgInfo.Height)
-            {
-                FreeDrawingObjects();
-
-                if (imgInfo.Width != 0 && imgInfo.Height != 0)
-                {
-                    pix = new ImageSurface(Format.Argb32, imgInfo.Width, imgInfo.Height);
-
-                    // (re)create the SkiaSharp drawing objects
-                    surface = SKSurface.Create(imgInfo, pix.DataPtr, imgInfo.RowBytes);
-                }
-            }
-
-            return imgInfo;
-        }
-
-        private void FreeDrawingObjects()
-        {
-            pix?.Dispose();
-            pix = null;
-
-            // SkiaSharp objects should only exist if the Pixbuf is set as well
-            surface?.Dispose();
-            surface = null;
-        }
-        
-        [Category("Appearance")]
-        public event EventHandler<SKPaintSurfaceEventArgs> PaintSurface;
-
-        protected virtual void OnPaintSurface(SKPaintSurfaceEventArgs e)
-        {
-            // invoke the event
-            PaintSurface?.Invoke(this, e);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                FreeDrawingObjects();
-            }
         }
 
     }
