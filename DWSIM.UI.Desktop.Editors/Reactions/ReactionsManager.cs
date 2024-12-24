@@ -71,6 +71,7 @@ namespace DWSIM.UI.Desktop.Editors
                 };
                 alert.Topmost = true;
                 alert.Show();
+                alert.Center();
             });
 
             var btnAddEq = container.CreateAndAddLabelAndButtonRow("Add New Equilibrium Reaction", "New Equilibrium Reaction", null, (sender, e) =>
@@ -97,6 +98,7 @@ namespace DWSIM.UI.Desktop.Editors
                 };
                 alert.Topmost = true;
                 alert.Show();
+                alert.Center();
             });
 
             var btnAddKin = container.CreateAndAddLabelAndButtonRow("Add New Kinetic Reaction", "New Kinetic Reaction", null, (sender, e) =>
@@ -123,6 +125,7 @@ namespace DWSIM.UI.Desktop.Editors
                 };
                 alert.Topmost = true;
                 alert.Show();
+                alert.Center();
             });
 
             var btnAddHC = container.CreateAndAddLabelAndButtonRow("Add New Heterogeneous Catalytic Reaction", "New HetCat Reaction", null, (sender, e) =>
@@ -149,6 +152,7 @@ namespace DWSIM.UI.Desktop.Editors
                 };
                 alert.Topmost = true;
                 alert.Show();
+                alert.Center();
             });
 
             container.CreateAndAddEmptySpace();
@@ -223,6 +227,7 @@ namespace DWSIM.UI.Desktop.Editors
                                 };
                                 alert.Topmost = true;
                                 alert.Show();
+                                alert.Center();
                                 break;
                             case Interfaces.Enums.ReactionType.Equilibrium:
                                 var myview2 = s.GetDefaultContainer();
@@ -244,6 +249,7 @@ namespace DWSIM.UI.Desktop.Editors
                                 };
                                 alert2.Topmost = true;
                                 alert2.Show();
+                                alert2.Center();
                                 break;
                             case Interfaces.Enums.ReactionType.Kinetic:
                                 var myview3 = s.GetDefaultContainer();
@@ -265,6 +271,7 @@ namespace DWSIM.UI.Desktop.Editors
                                 };
                                 alert3.Topmost = true;
                                 alert3.Show();
+                                alert3.Center();
                                 break;
                             case Interfaces.Enums.ReactionType.Heterogeneous_Catalytic:
                                 var myview4 = s.GetDefaultContainer();
@@ -286,6 +293,7 @@ namespace DWSIM.UI.Desktop.Editors
                                 };
                                 alert4.Topmost = true;
                                 alert4.Show();
+                                alert4.Center();
                                 break;
                         }
                     },
@@ -332,6 +340,7 @@ namespace DWSIM.UI.Desktop.Editors
                         });
                         alert.Topmost = true;
                         alert.Show();
+                        alert.Center();
                         flowsheet.UpdateEditorPanels.Invoke();
                     },
                     (sender, e) =>
