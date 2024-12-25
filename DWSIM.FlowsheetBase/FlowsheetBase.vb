@@ -3112,7 +3112,7 @@ Imports DWSIM.ExtensionMethods
 
         AddExternalUOs()
         AddSystemsOfUnits()
-        AddDefaultProperties()
+        'AddDefaultProperties()
 
         If Not SupressDataLoading Then
 
@@ -3573,11 +3573,7 @@ Label_00CC:
 
         Dim otheruos = SharedClasses.Utility.LoadAdditionalUnitOperations()
 
-        Dim unitopassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.UnitOperations")).FirstOrDefault
-
-        If unitopassembly Is Nothing Then
-            unitopassembly = Assembly.Load("DWSIM.UnitOperations")
-        End If
+        Dim unitopassembly = Assembly.Load("DWSIM.UnitOperations")
 
         Dim euolist As List(Of Interfaces.IExternalUnitOperation) = SharedClasses.Utility.GetUnitOperations(unitopassembly)
 
@@ -3642,21 +3638,20 @@ Label_00CC:
 
     Sub AddDefaultProperties()
 
+        If (GlobalSettings.Settings.RunningPlatform() = Settings.Platform.Linux) Then
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+
+        End If
+
         If Me.FlowsheetOptions.VisibleProperties.Count = 0 Then
 
-            Dim calculatorassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.Thermodynamics,")).FirstOrDefault
-            Dim unitopassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.UnitOperations")).FirstOrDefault
-
-            If calculatorassembly Is Nothing Then
-                calculatorassembly = AppDomain.CurrentDomain.Load("DWSIM.Thermodynamics")
-            End If
-            If unitopassembly Is Nothing Then
-                unitopassembly = AppDomain.CurrentDomain.Load("DWSIM.UnitOperations")
-            End If
+            Dim calculatorassembly = System.Reflection.Assembly.Load("DWSIM.Thermodynamics")
+            Dim unitopassembly = System.Reflection.Assembly.Load("DWSIM.UnitOperations")
 
             Dim aTypeList As New List(Of Type)
-            aTypeList.AddRange(calculatorassembly.GetTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing, True, False)))
-            aTypeList.AddRange(unitopassembly.GetTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing And
+            aTypeList.AddRange(calculatorassembly.GetExportedTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing, True, False)))
+            aTypeList.AddRange(unitopassembly.GetExportedTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing And
                                                                    Not x.IsAbstract And x.GetInterface("DWSIM.Interfaces.IExternalUnitOperation") Is Nothing, True, False)))
 
             For Each item In aTypeList.OrderBy(Function(x) x.Name)
@@ -4005,14 +4000,23 @@ Label_00CC:
 
         If Not File.Exists(assemblyPath1) Then
             If Not File.Exists(assemblyPath2) Then
+                Console.WriteLine("Could not find assembly " + assemblyPath1)
                 Return Nothing
             Else
-                Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath2)
-                Return assembly
+                Try
+                    Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath2)
+                    Return assembly
+                Catch ex As System.IO.FileLoadException
+                    Console.WriteLine("Could not find assembly " + ex.FileName)
+                End Try
             End If
         Else
-            Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath1)
-            Return assembly
+            Try
+                Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath1)
+                Return assembly
+            Catch ex As System.IO.FileLoadException
+                Console.WriteLine("Could not find assembly " + ex.FileName)
+            End Try
         End If
 
     End Function
@@ -4906,37 +4910,37 @@ Label_00CC:
 
                     data = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicProperties").Elements.ToList
 
-                    Try
+                    'Try
 
-                        ExtraProperties = New ExpandoObject
+                    '    ExtraProperties = New ExpandoObject
 
-                        If Not data Is Nothing Then
-                            For Each xel As XElement In data
-                                Try
-                                    Dim propname = xel.Element("Name").Value
-                                    Dim proptype = xel.Element("PropertyType").Value
-                                    Dim assembly1 As Assembly = Nothing
-                                    For Each assembly In My.Application.Info.LoadedAssemblies
-                                        If proptype.Contains(assembly.GetName().Name) Then
-                                            assembly1 = assembly
-                                            Exit For
-                                        End If
-                                    Next
-                                    If assembly1 IsNot Nothing Then
-                                        Dim ptype As Type = assembly1.GetType(proptype)
-                                        Dim propval = Newtonsoft.Json.JsonConvert.DeserializeObject(xel.Element("Data").Value, ptype)
-                                        DirectCast(ExtraProperties, IDictionary(Of String, Object))(propname) = propval
-                                    End If
-                                Catch ex As Exception
-                                End Try
-                            Next
-                        End If
+                    '    If Not data Is Nothing Then
+                    '        For Each xel As XElement In data
+                    '            Try
+                    '                Dim propname = xel.Element("Name").Value
+                    '                Dim proptype = xel.Element("PropertyType").Value
+                    '                Dim assembly1 As Assembly = Nothing
+                    '                For Each assembly In My.Application.Info.LoadedAssemblies
+                    '                    If proptype.Contains(assembly.GetName().Name) Then
+                    '                        assembly1 = assembly
+                    '                        Exit For
+                    '                    End If
+                    '                Next
+                    '                If assembly1 IsNot Nothing Then
+                    '                    Dim ptype As Type = assembly1.GetType(proptype)
+                    '                    Dim propval = Newtonsoft.Json.JsonConvert.DeserializeObject(xel.Element("Data").Value, ptype)
+                    '                    DirectCast(ExtraProperties, IDictionary(Of String, Object))(propname) = propval
+                    '                End If
+                    '            Catch ex As Exception
+                    '            End Try
+                    '        Next
+                    '    End If
 
-                    Catch ex As Exception
+                    'Catch ex As Exception
 
-                        excs.Add(New Exception("Error Loading Dynamic Properties", ex))
+                    '    excs.Add(New Exception("Error Loading Dynamic Properties", ex))
 
-                    End Try
+                    'End Try
 
                 End If
 

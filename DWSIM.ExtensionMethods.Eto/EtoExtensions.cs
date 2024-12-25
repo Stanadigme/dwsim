@@ -70,10 +70,20 @@ namespace DWSIM.UI.Shared
             }
             else
             {
-                var center = Screen.DisplayBounds.Center;
-                center.X -= form.Width / 2;
-                center.Y -= form.Height / 2;
-                form.Location = new Point(center);
+                if (GlobalSettings.Settings.RunningPlatform() != GlobalSettings.Settings.Platform.Linux)
+                {
+                    var center = Screen.PrimaryScreen.WorkingArea.Center;
+                    center.X -= form.Width / 2;
+                    center.Y -= form.Height / 2;
+                    form.Location = new Point(center);
+                }
+                else
+                {
+                    var center = Screen.DisplayBounds.Center;
+                    center.X -= form.Width / 2;
+                    center.Y -= form.Height / 2;
+                    form.Location = new Point(center);
+                }
             }
         }
 

@@ -234,9 +234,9 @@ namespace DWSIM.ExtensionMethods.Eto
         public static void SetFontAndPadding(this Form form)
         {
 
-            var sysfont = System.Drawing.SystemFonts.MessageBoxFont;
-            var regularfont = new Font(sysfont.FontFamily.Name, sysfont.SizeInPoints);
-            var boldfont = new Font(sysfont.FontFamily.Name, sysfont.SizeInPoints, FontStyle.Bold);
+            var sysfont = global::Eto.Drawing.SystemFonts.Default();
+            var regularfont = new Font(sysfont.Family.Name, sysfont.Size);
+            var boldfont = new Font(sysfont.Family.Name, sysfont.Size, FontStyle.Bold);
 
             var allcontrols = GetAllChildren(form);
             foreach (var control in allcontrols)

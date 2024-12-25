@@ -13,7 +13,6 @@ using DWSIM.UI.Desktop.Editors;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables;
 using System.Timers;
-using System.Diagnostics;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects.Charts;
 using System.Reflection;
 using s = DWSIM.GlobalSettings.Settings;
@@ -21,7 +20,6 @@ using DWSIM.UI.Desktop.Editors.Charts;
 using DWSIM.UI.Desktop.Editors.Dynamics;
 using SkiaSharp;
 using DWSIM.ExtensionMethods;
-using DWSIM.UI.Controls;
 
 namespace DWSIM.UI.Forms
 {
@@ -1007,8 +1005,6 @@ namespace DWSIM.UI.Forms
                         if (Application.Instance.Platform.IsGtk)
                         {
                             var dobj = new DataObject();
-                            //dobj.Image = pitem.imgIcon.Image;
-                            // dobj.SetString(obj.GetDisplayName(), "ObjectName");
                             dobj.SetString(obj.GetDisplayName(), "ObjectName");
                             using (var img = new Bitmap(pitem.imgIcon.Image, 40, 40, ImageInterpolation.High))
                                 pitem.DoDragDrop(dobj, DragEffects.Copy, img, new PointF(20, 20));

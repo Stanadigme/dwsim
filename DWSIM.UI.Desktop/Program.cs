@@ -85,7 +85,7 @@ namespace DWSIM.UI.Desktop
             {
                 if (Settings.RunningPlatform() == Settings.Platform.Windows)
                 {
-                    GlobalSettings.Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
+                    //GlobalSettings.Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
                     switch (GlobalSettings.Settings.WindowsRenderer)
                     {
                         case Settings.WindowsPlatformRenderer.WinForms:
