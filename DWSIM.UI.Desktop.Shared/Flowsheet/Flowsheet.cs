@@ -11,6 +11,9 @@ namespace DWSIM.UI.Desktop.Shared
 {
     public class Flowsheet : FlowsheetBase.FlowsheetBase
     {
+
+        public Action SetGTKDragDest;
+
         private Action<string, IFlowsheet.MessageType> listeningaction;
 
         public Action FinishedSolving;

@@ -43,44 +43,107 @@ namespace DWSIM.UI.Forms.Forms
             switch (GlobalSettings.Settings.RunningPlatform())
             {
                 case Settings.Platform.Windows:
-                    renderers.AddRange(Enum.GetNames(typeof(Settings.WindowsPlatformRenderer)));
-                    currentrenderer = (int)Settings.WindowsRenderer;
+                    renderers.AddRange(new[] { "Windows Forms", "Windows Presentation Foundation (WPF)", "GTK 3" });
+                    switch (Settings.WindowsRenderer)
+                    {
+                        case Settings.WindowsPlatformRenderer.WinForms:
+                            currentrenderer = 0;
+                            break;
+                        case Settings.WindowsPlatformRenderer.WPF:
+                            currentrenderer = 1;
+                            break;
+                        case Settings.WindowsPlatformRenderer.Gtk3:
+                            currentrenderer = 2;
+                            break;
+                        default:
+                            currentrenderer = 1;
+                            break;
+                    }
                     break;
                 case Settings.Platform.Linux:
-                    renderers.AddRange(Enum.GetNames(typeof(Settings.LinuxPlatformRenderer)));
-                    currentrenderer = (int)Settings.LinuxRenderer;
+                    renderers.AddRange(new[] { "Windows Forms", "GTK 3" });
+                    switch (Settings.LinuxRenderer)
+                    {
+                        case Settings.LinuxPlatformRenderer.WinForms:
+                            currentrenderer = 0;
+                            break;
+                        case Settings.LinuxPlatformRenderer.Gtk3:
+                            currentrenderer = 1;
+                            break;
+                        default:
+                            currentrenderer = 1;
+                            break;
+                    }
                     break;
                 case Settings.Platform.Mac:
-                    renderers.AddRange(Enum.GetNames(typeof(Settings.MacOSPlatformRenderer)));
-                    currentrenderer = (int)Settings.MacOSRenderer;
+                    renderers.AddRange(new[] { "Cocoa", "GTK 3" });
+                    switch (Settings.MacOSRenderer)
+                    {
+                        case Settings.MacOSPlatformRenderer.MonoMac:
+                            currentrenderer = 0;
+                            break;
+                        case Settings.MacOSPlatformRenderer.Gtk3:
+                            currentrenderer = 1;
+                            break;
+                        default:
+                            currentrenderer = 1;
+                            break;
+                    }
                     break;
             }
 
-            //tab1.CreateAndAddDropDownRow("Platform Renderer", renderers, currentrenderer, (sender, e) =>
-            //{
-            //    switch (GlobalSettings.Settings.RunningPlatform())
-            //    {
-            //        case Settings.Platform.Windows:
-            //            Settings.WindowsRenderer = (Settings.WindowsPlatformRenderer)sender.SelectedIndex;
-            //            break;
-            //        case Settings.Platform.Linux:
-            //            Settings.LinuxRenderer = (Settings.LinuxPlatformRenderer)sender.SelectedIndex;
-            //            break;
-            //        case Settings.Platform.Mac:
-            //            Settings.MacOSRenderer = (Settings.MacOSPlatformRenderer)sender.SelectedIndex;
-            //            break;
-            //    }
-            //});
+            tab1.CreateAndAddDropDownRow("Platform Renderer", renderers, currentrenderer, (sender, e) =>
+            {
+                switch (GlobalSettings.Settings.RunningPlatform())
+                {
+                    case Settings.Platform.Windows:
+                        switch (sender.SelectedIndex)
+                        {
+                            case 0:
+                                Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.WinForms;
+                                break;
+                            case 1:
+                                Settings.WindowsRenderer =  Settings.WindowsPlatformRenderer.WPF;
+                                break;
+                            case 2:
+                                Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
+                                break;
+                        }
+                        break;
+                    case Settings.Platform.Linux:
+                        switch (sender.SelectedIndex)
+                        {
+                            case 0:
+                                Settings.LinuxRenderer = Settings.LinuxPlatformRenderer.WinForms;
+                                break;
+                            case 1:
+                                Settings.LinuxRenderer = Settings.LinuxPlatformRenderer.Gtk3;
+                                break;
+                        }
+                        break;
+                    case Settings.Platform.Mac:
+                        switch (sender.SelectedIndex)
+                        {
+                            case 0:
+                                Settings.MacOSRenderer = Settings.MacOSPlatformRenderer.MonoMac;
+                                break;
+                            case 1:
+                                Settings.MacOSRenderer = Settings.MacOSPlatformRenderer.Gtk3;
+                                break;
+                        }
+                        break;
+                }
+            });
 
-            //tab1.CreateAndAddDescriptionRow("This sets the GUI Renderer for the current platform. Recommended renderers for each platform are:\nWindows: WPF (Windows Presentation Foundation)\nLinux: GTK 2\nmacOS: MonoMac");
-            //tab1.CreateAndAddDescriptionRow("Changes to this setting will have effect upon application restart.");
+            tab1.CreateAndAddDescriptionRow("This sets the GUI Renderer for the current platform. Recommended renderers for each platform are:\nWindows: WPF (Windows Presentation Foundation)\nLinux: GTK\nmacOS: Cocoa");
+            tab1.CreateAndAddDescriptionRow("Changes to this setting will have effect upon application restart.");
 
-            //if (Settings.RunningPlatform() == Settings.Platform.Mac)
-            //{
-            //    var check1 = tab1.CreateAndAddCheckBoxRow("Enable Dark Mode (macOS Mojave only)", Settings.DarkMode, (CheckBox sender, EventArgs obj) => { Settings.DarkMode = sender.Checked.Value; });
-            //    check1.Enabled = false;
-            //}
-            
+            if (Settings.RunningPlatform() == Settings.Platform.Mac)
+            {
+                var check1 = tab1.CreateAndAddCheckBoxRow("Enable Dark Mode", Settings.DarkMode, (CheckBox sender, EventArgs obj) => { Settings.DarkMode = sender.Checked.Value; });
+                check1.Enabled = false;
+            }
+
             tab1.CreateAndAddNumericEditorRow2("Scaling Factor", Settings.UIScalingFactor, 0.2, 3.0, 2, (sender, e) => Settings.UIScalingFactor = sender.Text.ToDoubleFromCurrent());
             tab1.CreateAndAddDescriptionRow("Sets the Scaling Factor for controls (windows, panels, buttons, lists, etc). Useful on Linux when used in conjunction with Font Scaling on High DPI displays.");
 
@@ -115,7 +178,8 @@ namespace DWSIM.UI.Forms.Forms
             var tab2a = DWSIM.UI.Shared.Common.GetDefaultContainer();
             tab2a.Tag = "Inspector";
 
-            chkInsp = tab2a.CreateAndAddCheckBoxRow("Enable Inspector Reports", Settings.InspectorEnabled, (CheckBox sender, EventArgs obj) => {
+            chkInsp = tab2a.CreateAndAddCheckBoxRow("Enable Inspector Reports", Settings.InspectorEnabled, (CheckBox sender, EventArgs obj) =>
+            {
                 Settings.InspectorEnabled = sender.Checked.GetValueOrDefault();
                 Settings.EnableParallelProcessing = !Settings.InspectorEnabled;
                 chkCPUP.Checked = !sender.Checked.GetValueOrDefault();
@@ -134,7 +198,8 @@ namespace DWSIM.UI.Forms.Forms
             });
             tab2.CreateAndAddDescriptionRow("Set the solver's maximum calculation (waiting) time.");
 
-            chkCPUP = tab2.CreateAndAddCheckBoxRow("EnableCPUParallelProcessing".Localize(prefix), Settings.EnableParallelProcessing, (CheckBox sender, EventArgs obj) => { 
+            chkCPUP = tab2.CreateAndAddCheckBoxRow("EnableCPUParallelProcessing".Localize(prefix), Settings.EnableParallelProcessing, (CheckBox sender, EventArgs obj) =>
+            {
                 Settings.EnableParallelProcessing = sender.Checked.GetValueOrDefault();
                 Settings.InspectorEnabled = !Settings.EnableParallelProcessing;
                 chkInsp.Checked = !sender.Checked.GetValueOrDefault();
@@ -356,12 +421,13 @@ namespace DWSIM.UI.Forms.Forms
                 (sender, e) => GlobalSettings.Settings.PythonPath = sender.Text,
                 (sender, e) =>
                 {
-                    var searchdialog = new OpenFileDialog() { Title = "Search"};
+                    var searchdialog = new OpenFileDialog() { Title = "Search" };
                     if (GlobalSettings.Settings.RunningPlatform() == Settings.Platform.Mac)
                     {
                         searchdialog.Filters.Add(new FileFilter("Python Dynamic Libraries", new[] { ".dylib" }));
                     }
-                    else {
+                    else
+                    {
                         searchdialog.Filters.Add(new FileFilter("Python Dynamic Libraries", new[] { ".so" }));
                     }
                     if (searchdialog.ShowDialog(tab5) == DialogResult.Ok)
@@ -371,9 +437,10 @@ namespace DWSIM.UI.Forms.Forms
                 });
             tab5.CreateAndAddDescriptionRow("Restart DWSIM for your changes to take effect.");
 
-            var form =  DWSIM.UI.Shared.Common.GetDefaultTabbedForm("Title".Localize(prefix), 700, 550, new[] { tab1, tab2, tab2a, tab3, tab4, tab5 });
+            var form = DWSIM.UI.Shared.Common.GetDefaultTabbedForm("Title".Localize(prefix), 700, 550, new[] { tab1, tab2, tab2a, tab3, tab4, tab5 });
 
-            form.Closed += (s, e) => {
+            form.Closed += (s, e) =>
+            {
                 try
                 {
                     DWSIM.GlobalSettings.Settings.SaveSettings("dwsim_newui.ini");

@@ -1004,11 +1004,24 @@ namespace DWSIM.UI.Forms
                     pitem.txtName.Text = obj.GetDisplayName();
                     pitem.MouseDown += (sender, e) =>
                     {
-                        var dobj = new DataObject();
-                        dobj.Image = pitem.imgIcon.Image;
-                        dobj.SetString(obj.GetDisplayName(), "ObjectName");
-                        pitem.DoDragDrop(dobj, DragEffects.All);
-                        e.Handled = true;
+                        if (Application.Instance.Platform.IsGtk)
+                        {
+                            var dobj = new DataObject();
+                            //dobj.Image = pitem.imgIcon.Image;
+                            // dobj.SetString(obj.GetDisplayName(), "ObjectName");
+                            dobj.SetString(obj.GetDisplayName(), "ObjectName");
+                            using (var img = new Bitmap(pitem.imgIcon.Image, 40, 40, ImageInterpolation.High))
+                                pitem.DoDragDrop(dobj, DragEffects.Copy, img, new PointF(20, 20));
+                            e.Handled = true;
+                        }
+                        else
+                        {
+                            var dobj = new DataObject();
+                            dobj.Image = pitem.imgIcon.Image;
+                            dobj.SetString(obj.GetDisplayName(), "ObjectName");
+                            pitem.DoDragDrop(dobj, DragEffects.Copy);
+                            e.Handled = true;
+                        }
                     };
                     switch (obj.ObjectClass)
                     {
@@ -1064,6 +1077,10 @@ namespace DWSIM.UI.Forms
             }
 
             if (Application.Instance.Platform.IsWpf) FlowsheetControl.AllowDrop = true;
+            if (Application.Instance.Platform.IsGtk)
+            {
+                FlowsheetControl.AllowDrop = true;
+            }
             FlowsheetControl.DragDrop += (sender, e) =>
             {
                 if (e.Data.GetString("ObjectName") != null)
@@ -1453,9 +1470,9 @@ namespace DWSIM.UI.Forms
                 else
                     weatherpanel.Height = 0;
             };
-            
+
             flowsheetcontrolcontainer.Rows.Last().ScaleHeight = true;
-            
+
             flowsheetcontrolcontainer.Rows.Add(new TableRow(weatherpanel));
 
             Split2.Panel1 = flowsheetcontrolcontainer;
@@ -1822,6 +1839,8 @@ namespace DWSIM.UI.Forms
             }
         }
 
+        private bool called1 = false; 
+
         void Flowsheet_Shown(object sender, EventArgs e)
         {
 
@@ -1837,6 +1856,10 @@ namespace DWSIM.UI.Forms
                 surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
                 surface.Zoom *= 0.8f;
                 surface.Center((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+
+                Task.Delay(2000).ContinueWith((t) => {
+                    if (!called1) Application.Instance.Invoke(() => { FlowsheetObject.SetGTKDragDest.Invoke(); called1 = true; });
+                });
             }
             else
             {

@@ -4,6 +4,10 @@ using System.ComponentModel;
 using Cairo;
 using DWSIM.Drawing.SkiaSharp;
 using DWSIM.UI.Controls;
+using Eto.Drawing;
+using Eto.Forms;
+using Eto.GtkSharp;
+using Eto.GtkSharp.Forms;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
@@ -107,16 +111,20 @@ namespace DWSIM.UI.Desktop.GTK3
             this.MotionNotifyEvent += FlowsheetSurface_GTK_MotionNotifyEvent;
             this.ScrollEvent += FlowsheetSurface_GTK_ScrollEvent;
 
-            var targets = new List<Gtk.TargetEntry>();
-            targets.Add(new Gtk.TargetEntry("ObjectName", Gtk.TargetFlags.OtherWidget, 1));
-            Gtk.Drag.DestSet(this, Gtk.DestDefaults.Motion | Gtk.DestDefaults.Highlight, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link);
-
         }
+
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             base.OnPaintSurface(e);
             fsurface?.UpdateCanvas(e.Surface.Canvas);
+            if (fbase != null && fbase.SetGTKDragDest == null) {
+                fbase.SetGTKDragDest = () => {
+                    var targets = new List<Gtk.TargetEntry>();
+                    targets.Add(new Gtk.TargetEntry("ObjectName", 0, 1));
+                    Gtk.Drag.DestSet(this, Gtk.DestDefaults.Highlight | Gtk.DestDefaults.Motion, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link | Gdk.DragAction.Move);
+                };
+            }
         }
 
         void FlowsheetSurface_GTK_ScrollEvent(object o, Gtk.ScrollEventArgs args)
