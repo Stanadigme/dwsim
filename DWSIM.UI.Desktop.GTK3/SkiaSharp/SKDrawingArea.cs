@@ -89,7 +89,11 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
                 }
             }
 
-            var dpi = 1.0 / Display.PrimaryMonitor.ScaleFactor;
+            int dpi;
+            if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
+                dpi = Display.PrimaryMonitor.ScaleFactor;
+            else
+                dpi = 1;
             cr.Scale(dpi, dpi);
             cr.SetSourceSurface(pix, 0, 0);
             cr.Paint();
@@ -144,13 +148,9 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
         {
             int dpi;
             if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
-            {
                 dpi = Display.PrimaryMonitor.ScaleFactor;
-            }
             else
-            {
                 dpi = 1;
-            }
             Gdk.Rectangle allocation = base.Allocation;
             int width = allocation.Width * dpi;
             int height = allocation.Height * dpi;

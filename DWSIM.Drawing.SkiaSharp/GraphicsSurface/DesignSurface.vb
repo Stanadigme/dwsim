@@ -1162,11 +1162,15 @@ Public Class GraphicsSurface
 
         Else
 
+#If LINUX Then
+                SelectRectangle = False
+#Else
             If MultiSelectMode Then
                 SelectRectangle = Not My.Computer.Keyboard.ShiftKeyDown
             Else
                 SelectRectangle = My.Computer.Keyboard.ShiftKeyDown
             End If
+#End If
 
             Dim mousePT As New SKPoint(x, y)
 
@@ -1183,6 +1187,13 @@ Public Class GraphicsSurface
                     justselected = False
                     draggingfs = Not SelectRectangle
                 Else
+#If LINUX Then
+                        If Not justselected Then Me.SelectedObjects.Clear()
+                        If Not Me.SelectedObjects.ContainsKey(Me.SelectedObject.Name) Then
+                            Me.SelectedObjects.Add(Me.SelectedObject.Name, Me.SelectedObject)
+                        End If
+                        justselected = False
+#Else
                     If My.Computer.Keyboard.CtrlKeyDown And MultiSelectMode Then
                         If Not Me.SelectedObjects.ContainsKey(Me.SelectedObject.Name) Then
                             Me.SelectedObjects.Add(Me.SelectedObject.Name, Me.SelectedObject)
@@ -1197,6 +1208,8 @@ Public Class GraphicsSurface
                         End If
                         justselected = False
                     End If
+#End If
+
                 End If
 
                 If Not SelectedObject Is Nothing Then

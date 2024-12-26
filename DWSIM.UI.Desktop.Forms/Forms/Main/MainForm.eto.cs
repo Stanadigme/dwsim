@@ -444,8 +444,6 @@ namespace DWSIM.UI
             };
 
             var fosseecontainer = c.GetDefaultContainer();
-            var l1 = c.CreateAndAddLabelRow3(fosseecontainer, "About the Project");
-            var l2 = c.CreateAndAddDescriptionRow(fosseecontainer, "FOSSEE, IIT Bombay, invites chemical engineering students, faculty and practitioners to the flowsheeting project using DWSIM. We want you to convert existing flowsheets into DWSIM and get honoraria and certificates.");
             var bu1 = c.CreateAndAddButtonRow(fosseecontainer, "Submit a Flowsheet", null, (b1, e1) => Process.Start("https://dwsim.fossee.in/flowsheeting-project"));
             var bu2 = c.CreateAndAddButtonRow(fosseecontainer, "About FOSSEE", null, (b2, e2) => Process.Start("https://fossee.in/"));
             var l3 = c.CreateAndAddLabelRow3(fosseecontainer, "Completed Flowsheets");
@@ -464,14 +462,17 @@ namespace DWSIM.UI
 
             if (Application.Instance.Platform.IsGtk)
             {
+                var scrollable = new Scrollable { Content = tabview };
                 tabview.Size = new Size((int)(480 * sf), (int)(636 - dy * 4 - bfh));
+                scrollable.Size = new Size((int)(480 * sf), (int)(636 - dy * 4 - bfh));
+                abslayout.Add(scrollable, dx * 2 + (int)(500 * sf), dy * 2 + bfh);
             }
             else
             {
                 tabview.Size = new Size((int)(480 * sf), (int)(ClientSize.Height - dy * 4 - bfh));
+                abslayout.Add(tabview, dx * 2 + (int)(500 * sf), dy * 2 + bfh);
             }
 
-            abslayout.Add(tabview, dx * 2 + (int)(500 * sf), dy * 2 + bfh);
 
             Content = abslayout;
 

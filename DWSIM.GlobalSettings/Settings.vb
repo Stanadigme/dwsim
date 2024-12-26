@@ -463,7 +463,7 @@ Public Class Settings
         If Settings.RunningPlatform = Platform.Mac Then
             configfiledir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Documents", "DWSIM Application Data") & Path.DirectorySeparatorChar
         Else
-            configfiledir = My.Computer.FileSystem.SpecialDirectories.MyDocuments & Path.DirectorySeparatorChar & "DWSIM Application Data" & Path.DirectorySeparatorChar
+            configfiledir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & Path.DirectorySeparatorChar & "DWSIM Application Data" & Path.DirectorySeparatorChar
         End If
         Return configfiledir
     End Function

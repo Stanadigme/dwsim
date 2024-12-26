@@ -3325,7 +3325,7 @@ Label_00CC:
 
     Public Shared Function LoadZippedXMLDoc(pathtofile As String) As XDocument
 
-        Dim pathtosave As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, Guid.NewGuid().ToString())
+        Dim pathtosave As String = Path.Combine(IO.Path.GetTempPath(), Guid.NewGuid().ToString())
 
         Directory.CreateDirectory(pathtosave)
 
