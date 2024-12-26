@@ -2285,7 +2285,7 @@ Imports DWSIM.ExtensionMethods
                             Dim propname = xel.Element("Name").Value
                             Dim proptype = xel.Element("PropertyType").Value
                             Dim assembly1 As Assembly = Nothing
-                            For Each assembly In My.Application.Info.LoadedAssemblies
+                            For Each assembly In AppDomain.CurrentDomain.GetAssemblies()
                                 If proptype.Contains(assembly.GetName().Name) Then
                                     assembly1 = assembly
                                     Exit For
@@ -2648,12 +2648,13 @@ Imports DWSIM.ExtensionMethods
         xel = xdoc.Element("DWSIM_Simulation_Data").Element("GeneralInfo")
 
         If Not DWSIM.GlobalSettings.Settings.AutomationMode Then
-            xel.Add(New XElement("BuildVersion", My.Application.Info.Version.ToString))
-            xel.Add(New XElement("BuildDate", CType("01/01/2000", DateTime).AddDays(My.Application.Info.Version.Build).AddSeconds(My.Application.Info.Version.Revision * 2)))
+            Dim appver = Assembly.GetEntryAssembly().GetName().Version
+            xel.Add(New XElement("BuildVersion", appver.ToString))
+            xel.Add(New XElement("BuildDate", CType("01/01/2000", DateTime).AddDays(appver.Build).AddSeconds(appver.Revision * 2)))
             If GlobalSettings.Settings.RunningPlatform() = GlobalSettings.Settings.Platform.Mac Then
                 xel.Add(New XElement("OSInfo", "macOS " + Environment.OSVersion.ToString()))
             Else
-                xel.Add(New XElement("OSInfo", My.Computer.Info.OSFullName & ", Version " & My.Computer.Info.OSVersion & ", " & My.Computer.Info.OSPlatform & " Platform"))
+                xel.Add(New XElement("OSInfo", Environment.OSVersion.Platform.ToString() & ", Version " & Environment.OSVersion.Version.ToString()))
             End If
         End If
         xel.Add(New XElement("SavedOn", Date.Now))
@@ -3263,7 +3264,7 @@ Imports DWSIM.ExtensionMethods
 
     Public Function LoadZippedXML(pathtofile As String) As XDocument
 
-        Dim pathtosave As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, Guid.NewGuid().ToString())
+        Dim pathtosave As String = Path.Combine(IO.Path.GetTempPath(), Guid.NewGuid().ToString())
 
         Directory.CreateDirectory(pathtosave)
 
@@ -4910,37 +4911,37 @@ Label_00CC:
 
                     data = xdoc.Element("DWSIM_Simulation_Data").Element("DynamicProperties").Elements.ToList
 
-                    'Try
+                    Try
 
-                    '    ExtraProperties = New ExpandoObject
+                        ExtraProperties = New ExpandoObject
 
-                    '    If Not data Is Nothing Then
-                    '        For Each xel As XElement In data
-                    '            Try
-                    '                Dim propname = xel.Element("Name").Value
-                    '                Dim proptype = xel.Element("PropertyType").Value
-                    '                Dim assembly1 As Assembly = Nothing
-                    '                For Each assembly In My.Application.Info.LoadedAssemblies
-                    '                    If proptype.Contains(assembly.GetName().Name) Then
-                    '                        assembly1 = assembly
-                    '                        Exit For
-                    '                    End If
-                    '                Next
-                    '                If assembly1 IsNot Nothing Then
-                    '                    Dim ptype As Type = assembly1.GetType(proptype)
-                    '                    Dim propval = Newtonsoft.Json.JsonConvert.DeserializeObject(xel.Element("Data").Value, ptype)
-                    '                    DirectCast(ExtraProperties, IDictionary(Of String, Object))(propname) = propval
-                    '                End If
-                    '            Catch ex As Exception
-                    '            End Try
-                    '        Next
-                    '    End If
+                        If Not data Is Nothing Then
+                            For Each xel As XElement In data
+                                Try
+                                    Dim propname = xel.Element("Name").Value
+                                    Dim proptype = xel.Element("PropertyType").Value
+                                    Dim assembly1 As Assembly = Nothing
+                                    For Each assembly In AppDomain.CurrentDomain.GetAssemblies()
+                                        If proptype.Contains(assembly.GetName().Name) Then
+                                            assembly1 = assembly
+                                            Exit For
+                                        End If
+                                    Next
+                                    If assembly1 IsNot Nothing Then
+                                        Dim ptype As Type = assembly1.GetType(proptype)
+                                        Dim propval = Newtonsoft.Json.JsonConvert.DeserializeObject(xel.Element("Data").Value, ptype)
+                                        DirectCast(ExtraProperties, IDictionary(Of String, Object))(propname) = propval
+                                    End If
+                                Catch ex As Exception
+                                End Try
+                            Next
+                        End If
 
-                    'Catch ex As Exception
+                    Catch ex As Exception
 
-                    '    excs.Add(New Exception("Error Loading Dynamic Properties", ex))
+                        excs.Add(New Exception("Error Loading Dynamic Properties", ex))
 
-                    'End Try
+                    End Try
 
                 End If
 

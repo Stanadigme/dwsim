@@ -573,13 +573,13 @@ namespace DWSIM.UI
         {
             Application.Instance.Invoke(() =>
             {
-        //switch (GlobalSettings.Settings.RunningPlatform())
-        //{
-        //    case GlobalSettings.Settings.Platform.Windows:
-        //        ClientSize = new Size((int)(s.UIScalingFactor * 700), (int)(s.UIScalingFactor * 400));
-        //        break;
-        //}
-        var splash = new SplashScreen { MainFrm = this };
+                //switch (GlobalSettings.Settings.RunningPlatform())
+                //{
+                //    case GlobalSettings.Settings.Platform.Windows:
+                //        ClientSize = new Size((int)(s.UIScalingFactor * 700), (int)(s.UIScalingFactor * 400));
+                //        break;
+                //}
+                var splash = new SplashScreen { MainFrm = this };
                 splash.Show();
                 splash.Center();
             });
@@ -628,6 +628,11 @@ namespace DWSIM.UI
                         form.FlowsheetObject.FlowsheetOptions.FilePath = path;
                     }).ContinueWith((t) =>
                     {
+                        if (t.Exception != null)
+                        {
+                            Console.WriteLine("Error loading file: " + t.Exception.ToString());
+                            MessageBox.Show("Error loading file: " + t.Exception.Message, "Error", MessageBoxType.Error);
+                        }
                         Application.Instance.Invoke(() =>
                         {
                             loadingdialog.Close();

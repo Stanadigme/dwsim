@@ -205,7 +205,6 @@ namespace DWSIM.UI.Forms.Forms
                 chkInsp.Checked = !sender.Checked.GetValueOrDefault();
             });
             tab2.CreateAndAddDescriptionRow("Enables utilization of all CPU cores during flowsheet calculations.");
-            tab2.CreateAndAddCheckBoxRow("EnableCPUSIMDAccel".Localize(prefix), Settings.UseSIMDExtensions, (CheckBox sender, EventArgs obj) => { Settings.UseSIMDExtensions = sender.Checked.GetValueOrDefault(); });
             tab2.CreateAndAddDescriptionRow("Enables utilization of special CPU instructions for accelerated math calculations.");
 
             tab2.CreateAndAddCheckBoxRow("BreakOnException".Localize(prefix), Settings.SolverBreakOnException, (CheckBox sender, EventArgs obj) => { Settings.SolverBreakOnException = sender.Checked.GetValueOrDefault(); });

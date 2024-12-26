@@ -59,6 +59,5 @@ namespace DWSIM.UI.Forms.Properties {
                 resourceCulture = value;
             }
         }
-        
     }
 }
