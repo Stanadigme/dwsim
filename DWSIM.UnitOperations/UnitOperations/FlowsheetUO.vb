@@ -1191,6 +1191,12 @@ Label_00CC:
             Return My.Resources.flowsheet_block
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.flowsheet_block.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("FLOWS_Desc")
         End Function

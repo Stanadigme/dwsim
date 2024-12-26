@@ -1358,6 +1358,12 @@ Namespace UnitOperations
             Return My.Resources.compressor
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.compressor.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("COMP_Desc")
         End Function

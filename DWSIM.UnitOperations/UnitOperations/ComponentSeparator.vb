@@ -604,6 +604,12 @@ Namespace UnitOperations
             Return My.Resources.component_separator
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.component_separator.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("CSEP_Desc")
         End Function

@@ -368,6 +368,12 @@ Namespace UnitOperations
             Return My.Resources.solids_separator
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.solids_separator.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("SSEP_Desc")
         End Function

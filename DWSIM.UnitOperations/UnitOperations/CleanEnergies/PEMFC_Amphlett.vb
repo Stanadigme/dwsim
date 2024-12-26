@@ -61,6 +61,12 @@ Namespace UnitOperations
 
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.fuel_cell.png")
+
+        End Function
+
         Public Overrides Function CloneXML() As Object
 
             Dim obj As ICustomXMLSerialization = New PEMFC_Amphlett()

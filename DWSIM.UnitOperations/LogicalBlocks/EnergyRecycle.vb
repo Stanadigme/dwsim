@@ -452,6 +452,12 @@ final:          Me.IterationsTaken = Me.IterationCount.ToString
             Return My.Resources.erecycle
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.erecycle.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("ERECY_Desc")
         End Function

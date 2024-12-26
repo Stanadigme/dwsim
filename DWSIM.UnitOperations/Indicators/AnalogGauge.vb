@@ -214,6 +214,12 @@ Namespace UnitOperations
             Return My.Resources.analog_gauge1
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.analog_gauge.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("AG_Desc")
         End Function

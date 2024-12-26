@@ -564,6 +564,12 @@ Namespace UnitOperations
             Return My.Resources.python_script
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.python_script.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("IPUO_Desc")
         End Function

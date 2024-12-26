@@ -299,6 +299,25 @@ Namespace UnitOperations
 
         Public MustOverride Function GetIconBitmap() As Object Implements ISimulationObject.GetIconBitmap
 
+        Public Overridable Function GetIconBitmapBytes() As Byte() Implements ISimulationObject.GetIconBitmapBytes
+
+            Return New Byte() {}
+
+        End Function
+
+        Protected Function GetBytesFromResource(resourcename As String) As Byte()
+
+            Using stream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourcename)
+                Dim streamLength As Integer = Convert.ToInt32(stream.Length)
+                Dim fileData As Byte() = New Byte(streamLength) {}
+                ' Read the file into a byte array
+                stream.Read(fileData, 0, streamLength)
+                stream.Close()
+                Return fileData
+            End Using
+
+        End Function
+
         <NonSerialized> Private _AttachedUtilities As New List(Of IAttachedUtility)
 
         Public Property AttachedUtilities As List(Of IAttachedUtility) Implements ISimulationObject.AttachedUtilities
@@ -1843,6 +1862,7 @@ Namespace UnitOperations
         Public Overridable Function GetPreferredGraphicObjectHeight() As Double Implements ISimulationObject.GetPreferredGraphicObjectHeight
             Return 40.0
         End Function
+
     End Class
 
 End Namespace

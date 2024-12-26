@@ -2776,6 +2776,12 @@ Namespace Reactors
             Return My.Resources.reactor_gibbs
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.reactor_gibbs.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("GIBBS_Desc")
         End Function

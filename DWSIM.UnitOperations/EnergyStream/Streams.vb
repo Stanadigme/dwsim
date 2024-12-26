@@ -321,6 +321,12 @@ Namespace Streams
             Return My.Resources.energy_stream
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.energy_stream.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("ESTR_Desc")
         End Function

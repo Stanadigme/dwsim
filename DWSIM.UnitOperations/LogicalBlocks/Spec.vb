@@ -578,6 +578,12 @@ Namespace SpecialOps
             Return My.Resources.spec
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.spec.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("SPEC_Desc")
         End Function

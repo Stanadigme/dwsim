@@ -1333,6 +1333,12 @@ Namespace UnitOperations
             Return My.Resources.col_dc_32
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.col_dc_32.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("CDEST_Desc")
         End Function
@@ -1761,6 +1767,12 @@ Namespace UnitOperations
 
         Public Overrides Function GetIconBitmap() As Object
             Return My.Resources.col_abs_32
+        End Function
+
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.col_abs_32.png")
+
         End Function
 
         Public Overrides Function GetDisplayDescription() As String

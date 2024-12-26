@@ -1420,6 +1420,12 @@ out:        Dim ms1, ms2 As MaterialStream
             Return My.Resources._cstr
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.cstr.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("CSTR_Desc")
         End Function

@@ -477,6 +477,12 @@ Namespace SpecialOps
             Return My.Resources.adjust
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.adjust.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("ADJ_Desc")
         End Function

@@ -996,8 +996,8 @@ namespace DWSIM.UI.Forms
                     var pitem = new FlowsheetObjectPanelItem();
                     if (!(Application.Instance.Platform.IsGtk && s.RunningPlatform() == s.Platform.Mac))
                     {
-                        var bmp = (System.Drawing.Bitmap)obj.GetIconBitmap();
-                        pitem.imgIcon.Image = new Bitmap(DWSIM.UI.Shared.Common.ImageToByte(bmp));
+                        var bmp = new Bitmap(obj.GetIconBitmapBytes());
+                        pitem.imgIcon.Image = bmp;
                     }
                     pitem.txtName.Text = obj.GetDisplayName();
                     pitem.MouseDown += (sender, e) =>

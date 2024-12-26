@@ -658,6 +658,12 @@ Namespace SpecialOps
             Return My.Resources.recycle
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.recycle.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("MRECY_Desc")
         End Function
