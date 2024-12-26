@@ -101,7 +101,13 @@ namespace DWSIM.UI.Desktop.GTK3
         public FlowsheetSurface_GTK()
         {
 
-            dpi = Screen.Display.PrimaryMonitor.ScaleFactor;
+            if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
+            {
+                dpi = Screen.Display.PrimaryMonitor.ScaleFactor;
+            }
+            else {
+                dpi = 1.0f;
+            }
             GlobalSettings.Settings.DpiScale = dpi;
 
             this.AddEvents((int)Gdk.EventMask.PointerMotionMask);

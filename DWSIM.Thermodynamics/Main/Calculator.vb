@@ -19,10 +19,6 @@ Public Class Calculator
 
         If _ResourceManager Is Nothing Then
 
-            Dim cultureinfo As String = If(Settings.ExcelMode, "en", GlobalSettings.Settings.CultureInfo)
-
-            My.Application.ChangeUICulture(cultureinfo)
-
             'loads the resource manager
             _ResourceManager = New System.Resources.ResourceManager("DWSIM.Thermodynamics.Strings", System.Reflection.Assembly.GetExecutingAssembly())
 
@@ -30,12 +26,7 @@ Public Class Calculator
 
         If text <> "" Then
 
-            Dim cultureinfo As String = If(Settings.ExcelMode, "en", GlobalSettings.Settings.CultureInfo)
-            If My.Application.UICulture.Name <> cultureinfo Then
-                My.Application.ChangeUICulture(cultureinfo)
-            End If
-
-            Dim retstr As String = _ResourceManager.GetString(text, My.Application.UICulture)
+            Dim retstr As String = _ResourceManager.GetString(text, Globalization.CultureInfo.InvariantCulture)
             If retstr Is Nothing Then Return text Else Return retstr
 
         Else

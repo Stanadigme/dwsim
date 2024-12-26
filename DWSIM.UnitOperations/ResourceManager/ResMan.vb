@@ -10,18 +10,14 @@
 
         If _ResourceManager Is Nothing Then
 
-            Dim cultureinfo As String = If(Settings.ExcelMode, "en", GlobalSettings.Settings.CultureInfo)
-
-            My.Application.ChangeUICulture(cultureinfo)
-
             'loads the resource manager
             _ResourceManager = New System.Resources.ResourceManager("DWSIM.UnitOperations.Strings", System.Reflection.Assembly.GetExecutingAssembly())
 
-        End If
+            End If
 
-        If text <> "" Then
+            If text <> "" Then
 
-            Dim retstr As String = _ResourceManager.GetString(text, My.Application.UICulture)
+            Dim retstr As String = _ResourceManager.GetString(text, Globalization.CultureInfo.InvariantCulture)
             If retstr Is Nothing Then Return text Else Return retstr
 
         Else

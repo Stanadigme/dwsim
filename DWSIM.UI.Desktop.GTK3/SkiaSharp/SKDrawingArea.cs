@@ -83,7 +83,8 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
             pix.MarkDirty();
             if (info.ColorType == SKColorType.Rgba8888)
             {
-                using (SKPixmap sKPixmap = surface.PeekPixels()) {
+                using (SKPixmap sKPixmap = surface.PeekPixels())
+                {
                     SKSwizzle.SwapRedBlue(sKPixmap.GetPixels(), info.Width * info.Height);
                 }
             }
@@ -141,7 +142,15 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
 
         private SKImageInfo CreateDrawingObjects()
         {
-            var dpi = Display.PrimaryMonitor.ScaleFactor;
+            int dpi;
+            if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
+            {
+                dpi = Display.PrimaryMonitor.ScaleFactor;
+            }
+            else
+            {
+                dpi = 1;
+            }
             Gdk.Rectangle allocation = base.Allocation;
             int width = allocation.Width * dpi;
             int height = allocation.Height * dpi;
@@ -151,7 +160,7 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
                 FreeDrawingObjects();
                 if (sKImageInfo.Width != 0 && sKImageInfo.Height != 0)
                 {
-                    pix = new ImageSurface( Format.Argb32, sKImageInfo.Width, sKImageInfo.Height);
+                    pix = new ImageSurface(Format.Argb32, sKImageInfo.Width, sKImageInfo.Height);
                     surface = SKSurface.Create(sKImageInfo, pix.DataPtr, sKImageInfo.RowBytes);
                 }
             }
