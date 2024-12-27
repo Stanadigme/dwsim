@@ -85,6 +85,12 @@ namespace DWSIM.UI.Desktop.WPF
                 wpfgrid.UpdateLayout();
             });
 
+            Eto.Style.Add<Eto.Forms.ColorPicker>("colorpicker-wpf-fix", control =>
+            {
+                var picker = (Xceed.Wpf.Toolkit.ColorPicker)control.ControlObject;
+                picker.DropDownBackground = Brushes.White;
+            });
+
         }
 
         /// <summary>

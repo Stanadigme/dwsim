@@ -25,7 +25,6 @@ namespace DWSIM.UI.Forms
 
         public ObjectEditorContainer(ISimulationObject sobj) : base()
         {
-            DisplayArrows = true;
             obj = sobj;
             Tag = obj.Name;
             this.Width = 300;

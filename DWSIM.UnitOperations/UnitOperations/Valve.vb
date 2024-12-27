@@ -1423,6 +1423,12 @@ Namespace UnitOperations
             Return My.Resources.valve
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.valve.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("VALVE_Desc")
         End Function

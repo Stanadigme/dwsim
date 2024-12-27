@@ -490,6 +490,12 @@ Namespace UnitOperations
             Return My.Resources.filter
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.filter.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("FILTER_Desc")
         End Function

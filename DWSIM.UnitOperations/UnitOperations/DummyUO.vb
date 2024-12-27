@@ -71,6 +71,12 @@ Namespace UnitOperations
             Return My.Resources.square_240px
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.square_240px.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ""
         End Function

@@ -17,19 +17,19 @@ namespace DWSIM.UI.Desktop.GTK3
 
             Eto.Style.Add<Eto.Forms.Label>("splashlabels1", label =>
             {
-                label.BackgroundColor = Color.FromArgb(232, 232, 232);
+                //label.BackgroundColor = Color.FromArgb(232, 232, 232);
                 label.TextAlignment = Eto.Forms.TextAlignment.Left;
             });
 
             Eto.Style.Add<Eto.Forms.Label>("splashlabels2", label =>
             {
-                label.BackgroundColor = new Color(0.051f, 0.447f, 0.651f);
+                //label.BackgroundColor = new Color(0.051f, 0.447f, 0.651f);
             });
 
             Eto.Style.Add<LabelHandler>("fixedwidth", label =>
             {
                 label.Control.MaxWidthChars = 100;
-                label.BackgroundColor = Color.FromArgb(232, 232, 232);
+                //label.BackgroundColor = Color.FromArgb(232, 232, 232);
             });
 
             Eto.Style.Add<Eto.Forms.Panel>("transparent-form", control =>

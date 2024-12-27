@@ -3078,6 +3078,12 @@ Namespace UnitOperations
             Return My.Resources.heat_exchanger
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.heat_exchanger.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("HEXCH_Desc")
         End Function

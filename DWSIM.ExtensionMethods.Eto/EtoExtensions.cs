@@ -61,10 +61,30 @@ namespace DWSIM.UI.Shared
         /// <param name="form"></param>
         public static void Center(this Form form)
         {
-            var center = Screen.PrimaryScreen.WorkingArea.Center;
-            center.X -= form.Width / 2;
-            center.Y -= form.Height / 2;
-            form.Location = new Point(center);
+            if (!Application.Instance.Platform.IsGtk)
+            {
+                var center = Screen.PrimaryScreen.WorkingArea.Center;
+                center.X -= form.Width / 2;
+                center.Y -= form.Height / 2;
+                form.Location = new Point(center);
+            }
+            else
+            {
+                if (GlobalSettings.Settings.RunningPlatform() != GlobalSettings.Settings.Platform.Linux)
+                {
+                    var center = Screen.PrimaryScreen.WorkingArea.Center;
+                    center.X -= form.Width / 2;
+                    center.Y -= form.Height / 2;
+                    form.Location = new Point(center);
+                }
+                else
+                {
+                    var center = Screen.DisplayBounds.Center;
+                    center.X -= form.Width / 2;
+                    center.Y -= form.Height / 2;
+                    form.Location = new Point((int)center.X, (int)center.Y);
+                }
+            }
         }
 
         /// <summary>
@@ -203,7 +223,7 @@ namespace DWSIM.UI.Shared
                 //Resizable = true
             };
 
-            var tabctrl = new DocumentControl { DisplayArrows = false, AllowReordering = true };
+            var tabctrl = new DocumentControl { AllowReordering = true };
             foreach (var tab in tabs)
             {
                 tabctrl.Pages.Add(tab);
@@ -649,7 +669,8 @@ namespace DWSIM.UI.Shared
 
             var txt = new Label { Text = text, VerticalAlignment = VerticalAlignment.Center };
             txt.Font = new Font(SystemFont.Default, GetEditorFontSize());
-            var editor = new ColorPicker { Value = currval };
+            var editor = new ColorPicker { Value = currval, BackgroundColor = Colors.White };
+            editor.Style = "colorpicker-wpf-fix";
             if (GlobalSettings.Settings.EditorTextBoxFixedSize) editor.Width = (int)(sf * GlobalSettings.Settings.EditorTextBoxFixedSizeWidth);
 
             if (command != null) editor.ValueChanged += (sender, e) => command.Invoke((ColorPicker)sender, e);

@@ -41,7 +41,7 @@ Public Class Settings
 
     Public Shared Property WindowsRenderer As WindowsPlatformRenderer = WindowsPlatformRenderer.WinForms
 
-    Public Shared Property LinuxRenderer As LinuxPlatformRenderer = LinuxPlatformRenderer.Gtk2
+    Public Shared Property LinuxRenderer As LinuxPlatformRenderer = LinuxPlatformRenderer.Gtk3
 
     Public Shared Property MacOSRenderer As MacOSPlatformRenderer = MacOSPlatformRenderer.MonoMac
 
@@ -191,6 +191,8 @@ Public Class Settings
     Public Shared TranslatorLanguage As String = ""
 
     Public Shared LockModelParameters As Boolean = False
+
+    Public Shared IsGTKRenderer As Boolean = False
 
     <DllImport("kernel32.dll", SetLastError:=True)> Public Shared Function AddDllDirectory(lpPathName As String) As Boolean
 
@@ -461,7 +463,7 @@ Public Class Settings
         If Settings.RunningPlatform = Platform.Mac Then
             configfiledir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Documents", "DWSIM Application Data") & Path.DirectorySeparatorChar
         Else
-            configfiledir = My.Computer.FileSystem.SpecialDirectories.MyDocuments & Path.DirectorySeparatorChar & "DWSIM Application Data" & Path.DirectorySeparatorChar
+            configfiledir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & Path.DirectorySeparatorChar & "DWSIM Application Data" & Path.DirectorySeparatorChar
         End If
         Return configfiledir
     End Function

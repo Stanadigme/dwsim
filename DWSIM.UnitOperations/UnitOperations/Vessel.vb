@@ -1086,6 +1086,12 @@ Namespace UnitOperations
             Return My.Resources.separator
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.separator.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("VESSEL_Desc")
         End Function

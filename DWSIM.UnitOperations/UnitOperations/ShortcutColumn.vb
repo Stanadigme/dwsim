@@ -774,6 +774,12 @@ restart:    B = F - D
             Return My.Resources.col_sc_32
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.col_sc_32.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("CSC_Desc")
         End Function

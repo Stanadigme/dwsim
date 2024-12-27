@@ -208,6 +208,8 @@ Imports DWSIM.Interfaces.Enums
 
     Function GetIconBitmap() As Object
 
+    Function GetIconBitmapBytes() As Byte()
+
     Function GetDisplayName() As String
 
     Function GetDisplayDescription() As String

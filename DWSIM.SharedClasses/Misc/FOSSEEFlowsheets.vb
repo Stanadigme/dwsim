@@ -30,18 +30,23 @@ Public Class FOSSEEFlowsheets
 
         Dim handler As New HttpClientHandler()
 
-        If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
-            Dim proxyObj As New WebProxy(proxyUri)
-            proxyObj.Credentials = CredentialCache.DefaultCredentials
-            handler.Proxy = proxyObj
-        End If
+        Try
+            If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
+                Dim proxyObj As New WebProxy(proxyUri)
+                proxyObj.Credentials = CredentialCache.DefaultCredentials
+                handler.Proxy = proxyObj
+            End If
+        Catch ex As Exception
+        End Try
 
         Dim http As New HttpClient(handler)
 
         Dim response = http.GetByteArrayAsync(website)
         response.Wait()
 
-        Dim source As [String] = Encoding.GetEncoding("utf-8").GetString(response.Result, 0, response.Result.Length - 1)
+        Dim enc = Encoding.GetEncoding("utf-8")
+
+        Dim source As [String] = enc.GetString(response.Result, 0, response.Result.Length - 1)
         source = WebUtility.HtmlDecode(source)
 
         Dim htmlpage As New HtmlDocument()
@@ -90,11 +95,14 @@ Public Class FOSSEEFlowsheets
 
         Dim handler2 As New HttpClientHandler()
 
-        If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
-            Dim proxyObj2 As New WebProxy(proxyUri)
-            proxyObj2.Credentials = CredentialCache.DefaultCredentials
-            handler2.Proxy = proxyObj2
-        End If
+        Try
+            If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
+                Dim proxyObj2 As New WebProxy(proxyUri)
+                proxyObj2.Credentials = CredentialCache.DefaultCredentials
+                handler2.Proxy = proxyObj2
+            End If
+        Catch ex As Exception
+        End Try
 
         Dim http2 As New HttpClient(handler2)
 
@@ -202,11 +210,14 @@ Public Class FOSSEEFlowsheets
         Dim siteUri As Uri = New Uri(address)
         Dim proxyUri As Uri = Net.WebRequest.GetSystemWebProxy.GetProxy(siteUri)
 
-        If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
-            Dim proxyObj As New WebProxy(proxyUri)
-            proxyObj.Credentials = CredentialCache.DefaultCredentials
-            wc.Proxy = proxyObj
-        End If
+        Try
+            If Not siteUri.AbsolutePath = proxyUri.AbsolutePath Then
+                Dim proxyObj As New WebProxy(proxyUri)
+                proxyObj.Credentials = CredentialCache.DefaultCredentials
+                wc.Proxy = proxyObj
+            End If
+        Catch ex As Exception
+        End Try
 
         Dim fpath = Utility.GetTempFileName()
 

@@ -306,6 +306,12 @@ Namespace SpecialOps
             Return My.Resources.typewriter
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.typewriter.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return "IronPython Script Custom Controller"
         End Function

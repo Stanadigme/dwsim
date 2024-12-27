@@ -144,6 +144,12 @@ Namespace UnitOperations
             Return My.Resources.input
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.input.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("IN_Desc")
         End Function

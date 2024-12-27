@@ -6622,6 +6622,12 @@ Namespace Streams
             Return My.Resources.material_stream
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.Thermodynamics.material_stream.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return Calculator.GetLocalString("MSTR_Desc")
         End Function

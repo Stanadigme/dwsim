@@ -1278,6 +1278,12 @@ Namespace UnitOperations
             Return My.Resources.expander
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.expander.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("EXP_Desc")
         End Function

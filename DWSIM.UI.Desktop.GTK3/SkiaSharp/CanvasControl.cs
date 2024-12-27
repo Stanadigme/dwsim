@@ -4,12 +4,16 @@ using System.ComponentModel;
 using Cairo;
 using DWSIM.Drawing.SkiaSharp;
 using DWSIM.UI.Controls;
+using Eto.Drawing;
+using Eto.Forms;
+using Eto.GtkSharp;
+using Eto.GtkSharp.Forms;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
 namespace DWSIM.UI.Desktop.GTK3
 {
-    public class FlowsheetSurfaceControlHandler : Eto.GtkSharp.Forms.GtkControl<Gtk.EventBox, FlowsheetSurfaceControl, FlowsheetSurfaceControl.ICallback>, FlowsheetSurfaceControl.IFlowsheetSurface
+    public class FlowsheetSurfaceControlHandler : Eto.GtkSharp.Forms.GtkControl<Gtk.Widget, FlowsheetSurfaceControl, FlowsheetSurfaceControl.ICallback>, FlowsheetSurfaceControl.IFlowsheetSurface
     {
         private FlowsheetSurface_GTK nativecontrol;
 
@@ -17,6 +21,7 @@ namespace DWSIM.UI.Desktop.GTK3
         {
             nativecontrol = new FlowsheetSurface_GTK();
             this.Control = nativecontrol;
+
         }
 
         public override void OnLoadComplete(EventArgs e)
@@ -24,21 +29,24 @@ namespace DWSIM.UI.Desktop.GTK3
             base.OnLoadComplete(e);
             nativecontrol.fbase = this.Widget.FlowsheetObject;
             nativecontrol.fsurface = this.Widget.FlowsheetSurface;
-            //nativecontrol.DragDataGet += (sender, e2) => {
-            //    Console.WriteLine(e2.SelectionData.Type.Name);
-            //};
-            //nativecontrol.DragEnd += (sender, e2) => {
-            //    foreach (var item in e2.Args)
-            //    {
-            //        Console.WriteLine(item.ToString());
-            //    }
-            //};
-            //nativecontrol.DragFailed += (sender, e2) => {
-            //    foreach (var item in e2.Args)
-            //    {
-            //        Console.WriteLine(item.ToString());
-            //    }
-            //};
+            nativecontrol.DragDataGet += (sender, e2) =>
+            {
+                Console.WriteLine(e2.SelectionData.Target.Name);
+            };
+            nativecontrol.DragEnd += (sender, e2) =>
+            {
+                foreach (var item in e2.Args)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            };
+            nativecontrol.DragFailed += (sender, e2) =>
+            {
+                foreach (var item in e2.Args)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            };
         }
 
         public override Eto.Drawing.Color BackgroundColor
@@ -79,7 +87,7 @@ namespace DWSIM.UI.Desktop.GTK3
 
     }
 
-    public class FlowsheetSurface_GTK : Gtk.EventBox
+    public class FlowsheetSurface_GTK : SkiaSharp.SKDrawingArea
     {
 
         public GraphicsSurface fsurface;
@@ -88,18 +96,41 @@ namespace DWSIM.UI.Desktop.GTK3
         private float _lastTouchX;
         private float _lastTouchY;
 
+        private float dpi;
+
         public FlowsheetSurface_GTK()
         {
+
+            if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
+            {
+                dpi = Screen.Display.PrimaryMonitor.ScaleFactor;
+            }
+            else {
+                dpi = 1.0f;
+            }
+            GlobalSettings.Settings.DpiScale = dpi;
+
             this.AddEvents((int)Gdk.EventMask.PointerMotionMask);
+            this.AddEvents((int)Gdk.EventMask.ScrollMask);
             this.ButtonPressEvent += FlowsheetSurface_GTK_ButtonPressEvent;
             this.ButtonReleaseEvent += FlowsheetSurface_GTK_ButtonReleaseEvent;
             this.MotionNotifyEvent += FlowsheetSurface_GTK_MotionNotifyEvent;
             this.ScrollEvent += FlowsheetSurface_GTK_ScrollEvent;
 
-            var targets = new List<Gtk.TargetEntry>();
-            targets.Add(new Gtk.TargetEntry("ObjectName", 0, 1));
-            Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link | Gdk.DragAction.Move);
+        }
 
+
+        protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
+        {
+            base.OnPaintSurface(e);
+            fsurface?.UpdateCanvas(e.Surface.Canvas);
+            if (fbase != null && fbase.SetGTKDragDest == null) {
+                fbase.SetGTKDragDest = () => {
+                    var targets = new List<Gtk.TargetEntry>();
+                    targets.Add(new Gtk.TargetEntry("ObjectName", 0, 1));
+                    Gtk.Drag.DestSet(this, Gtk.DestDefaults.Highlight | Gtk.DestDefaults.Motion, targets.ToArray(), Gdk.DragAction.Copy | Gdk.DragAction.Link | Gdk.DragAction.Move);
+                };
+            }
         }
 
         void FlowsheetSurface_GTK_ScrollEvent(object o, Gtk.ScrollEventArgs args)
@@ -110,11 +141,11 @@ namespace DWSIM.UI.Desktop.GTK3
 
             if (args.Event.Direction == Gdk.ScrollDirection.Down)
             {
-                fsurface.Zoom += -5 / 100f;
+                fsurface.Zoom += -5 * dpi / 100f;
             }
             else
             {
-                fsurface.Zoom += 5 / 100f;
+                fsurface.Zoom += 5 * dpi / 100f;
             }
             if (fsurface.Zoom < 0.05) fsurface.Zoom = 0.05f;
 
@@ -134,7 +165,7 @@ namespace DWSIM.UI.Desktop.GTK3
             float y = (int)args.Event.Y;
             _lastTouchX = x;
             _lastTouchY = y;
-            fsurface.InputMove((int)_lastTouchX, (int)_lastTouchY);
+            fsurface.InputMove((int)((int)_lastTouchX * dpi), (int)((int)_lastTouchY * dpi));
             this.QueueDraw();
         }
 
@@ -149,110 +180,23 @@ namespace DWSIM.UI.Desktop.GTK3
             fbase?.RegisterSnapshot(Interfaces.Enums.SnapshotType.ObjectLayout);
             if (args.Event.Type == Gdk.EventType.TwoButtonPress)
             {
-                //if (args.Event.State == Gdk.ModifierType.ShiftMask)
-                //{
-                //    fsurface.Zoom = 1.0f;
-                //}
-                //else {
-                //    fsurface.ZoomAll((int)this.Allocation.Width, (int)this.Allocation.Height);
-                //}
+                if (args.Event.State == Gdk.ModifierType.ShiftMask)
+                {
+                    fsurface.Zoom = 1.0f;
+                }
+                else
+                {
+                    fsurface.ZoomAll((int)(Allocation.Width * dpi), (int)(Allocation.Height * dpi));
+                }
             }
             else
             {
                 _lastTouchX = (int)args.Event.X;
                 _lastTouchY = (int)args.Event.Y;
-                fsurface.InputPress((int)_lastTouchX, (int)_lastTouchY);
+                fsurface.InputPress((int)((int)_lastTouchX * dpi), (int)((int)_lastTouchY * dpi));
             }
             this.QueueDraw();
 
-        }
-
-        private ImageSurface pix;
-        private SKSurface surface;
-
-        protected override bool OnDrawn(Context cr)
-        {
-            // get the pixbuf
-            var imgInfo = CreateDrawingObjects();
-
-            if (imgInfo.Width == 0 || imgInfo.Height == 0)
-                return true;
-
-            // start drawing
-            using (new SKAutoCanvasRestore(surface.Canvas, true))
-            {
-                OnPaintSurface(new SKPaintSurfaceEventArgs(surface, imgInfo));
-                if (fsurface != null) fsurface.UpdateSurface(surface);
-            }
-
-            surface.Canvas.Flush();
-
-            pix.MarkDirty();
-
-            // swap R and B
-            if (imgInfo.ColorType == SKColorType.Rgba8888)
-            {
-                using (var pixmap = surface.PeekPixels())
-                {
-                    SKSwizzle.SwapRedBlue(pixmap.GetPixels(), imgInfo.Width * imgInfo.Height);
-                }
-            }
-
-            // write the pixbuf to the graphics
-            cr.SetSourceSurface(pix, 0, 0);
-            cr.Paint();
-
-            return true;
-        }
-
-        private SKImageInfo CreateDrawingObjects()
-        {
-            var alloc = Allocation;
-            var w = alloc.Width;
-            var h = alloc.Height;
-            var imgInfo = new SKImageInfo(w, h, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
-
-            if (pix == null || pix.Width != imgInfo.Width || pix.Height != imgInfo.Height)
-            {
-                FreeDrawingObjects();
-
-                if (imgInfo.Width != 0 && imgInfo.Height != 0)
-                {
-                    pix = new ImageSurface(Format.Argb32, imgInfo.Width, imgInfo.Height);
-
-                    // (re)create the SkiaSharp drawing objects
-                    surface = SKSurface.Create(imgInfo, pix.DataPtr, imgInfo.RowBytes);
-                }
-            }
-
-            return imgInfo;
-        }
-
-        private void FreeDrawingObjects()
-        {
-            pix?.Dispose();
-            pix = null;
-
-            // SkiaSharp objects should only exist if the Pixbuf is set as well
-            surface?.Dispose();
-            surface = null;
-        }
-        
-        [Category("Appearance")]
-        public event EventHandler<SKPaintSurfaceEventArgs> PaintSurface;
-
-        protected virtual void OnPaintSurface(SKPaintSurfaceEventArgs e)
-        {
-            // invoke the event
-            PaintSurface?.Invoke(this, e);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                FreeDrawingObjects();
-            }
         }
 
     }

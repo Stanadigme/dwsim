@@ -1275,6 +1275,12 @@ Namespace UnitOperations
             Return My.Resources.uo_co_32
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.uo_co_32.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("COUO_Desc")
         End Function

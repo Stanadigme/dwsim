@@ -842,7 +842,7 @@ namespace DWSIM.UI.Desktop.Editors.LogicalBlocks
             var su = simobj.GetFlowsheet().FlowsheetOptions.SelectedUnitSystem;
             var nf = simobj.GetFlowsheet().FlowsheetOptions.NumberFormat;
 
-            var dc = new DocumentControl { DisplayArrows = true };
+            var dc = new DocumentControl();
             var dp1 = new DocumentPage { Closable = false, Text = "General" };
             var dp2 = new DocumentPage { Closable = false, Text = "Python Script" };
 

@@ -883,6 +883,7 @@
     <None Include="Resources\DWSIM_ico_64.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Icons\material_stream.png" />
     <None Include="Resources\export_48px.png" />
     <None Include="Resources\import_48px.png" />
     <None Include="Resources\DWSIM Icon Vector Transp.png" />

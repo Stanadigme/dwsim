@@ -54,7 +54,8 @@ namespace DWSIM.UI.Desktop.Editors
                 (sender, e) => { gobj.LineWidth = (int)sender.Text.ToDoubleFromCurrent(); });
             this.CreateAndAddCheckBoxRow("Override Color", gobj.OverrideColors, (sender, e) => gobj.OverrideColors = sender.Checked.GetValueOrDefault());
             this.CreateAndAddColorPickerRow("Color", Color.Parse(gobj.LineColor.ToString()),
-                (sender, e) => {
+                (sender, e) =>
+                {
                     gobj.LineColor = SkiaSharp.SKColor.Parse(sender.Value.ToHex());
                 });
         }

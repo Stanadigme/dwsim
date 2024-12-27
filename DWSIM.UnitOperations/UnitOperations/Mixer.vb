@@ -313,6 +313,12 @@ Namespace UnitOperations
             Return My.Resources.mixer
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.mixer.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("MIX_Desc")
         End Function

@@ -904,6 +904,12 @@ Namespace UnitOperations
             Return My.Resources.cooler
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.cooler.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("COOL_Desc")
         End Function

@@ -588,6 +588,12 @@ Namespace UnitOperations
             Return My.Resources.splitter
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.splitter.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("SPLIT_Desc")
         End Function

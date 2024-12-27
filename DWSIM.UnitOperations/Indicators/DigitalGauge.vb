@@ -214,6 +214,12 @@ Namespace UnitOperations
             Return My.Resources.digital_display1
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.digital_display.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("DG_Desc")
         End Function
