@@ -1,9 +1,12 @@
 {
   "runtimeOptions": {
-    "tfm": "netcore2.1",
+    "tfm": "netcore8.0",
     "framework": {
       "name": "Microsoft.NETCore.App",
-      "version": "2.1"
+      "version": "8.0.11"
+    },
+    "configProperties": {
+      "System.Drawing.EnableUnixSupport": true
     }
   }
 }
