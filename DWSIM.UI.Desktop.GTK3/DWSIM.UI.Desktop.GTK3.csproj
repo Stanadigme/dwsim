@@ -69,10 +69,6 @@
     <Reference Include="OxyPlot, Version=2.0.0.0, Culture=neutral, PublicKeyToken=638079a8f0bd61e9, processorArchitecture=MSIL">
       <HintPath>..\packages\OxyPlot.Core.2.0.0-unstable0956\lib\net45\OxyPlot.dll</HintPath>
     </Reference>
-    <Reference Include="OxyPlot.GtkSharp3, Version=0.0.1.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DWSIM\References\OxyPlot.GtkSharp3.dll</HintPath>
-    </Reference>
     <Reference Include="PangoSharp, Version=3.24.24.95, Culture=neutral, PublicKeyToken=f6892ebcc5dd81ba, processorArchitecture=MSIL">
       <HintPath>..\packages\PangoSharp.3.24.24.95\lib\netstandard2.0\PangoSharp.dll</HintPath>
     </Reference>
@@ -110,6 +106,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OxyPlot\ConverterExtensions.cs" />
+    <Compile Include="OxyPlot\GraphicsRenderContext.cs" />
+    <Compile Include="OxyPlot\PlotModelExtensions.cs" />
+    <Compile Include="OxyPlot\PlotView.cs" />
+    <Compile Include="OxyPlot\PngExporter.cs" />
     <Compile Include="SkiaSharp\CanvasControl.cs" />
     <Compile Include="SkiaSharp\SKDrawingArea.cs" />
     <Compile Include="Styling.cs" />

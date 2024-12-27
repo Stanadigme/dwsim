@@ -23,7 +23,7 @@ using DWSIM.UI.Desktop.Shared.Controls;
 
 namespace DWSIM.UI.Desktop.Editors.Utilities
 {
-    public class PhaseEnvelopeView : TableLayout
+    public class PhaseEnvelopeView : DynamicLayout
     {
 
         public IFlowsheet flowsheet;
@@ -45,8 +45,6 @@ namespace DWSIM.UI.Desktop.Editors.Utilities
 
             p1 = UI.Shared.Common.GetDefaultContainer();
             p2 = new TableLayout() { Spacing = new Size(5, 5), Padding = new Padding(15) };
-
-            Rows.Add(new TableRow(p1, p2));
 
             p1.Width = 420;
 
@@ -168,7 +166,8 @@ namespace DWSIM.UI.Desktop.Editors.Utilities
 
                     var token = new System.Threading.CancellationTokenSource();
 
-                    var pg = ProgressDialog.ShowWithAbort(this, "Please Wait", "Calculating Envelope Lines...", false, "Abort/Cancel", (s, e1) => {
+                    var pg = ProgressDialog.ShowWithAbort(this, "Please Wait", "Calculating Envelope Lines...", false, "Abort/Cancel", (s, e1) =>
+                    {
 
                         token.Cancel();
 
@@ -216,6 +215,8 @@ namespace DWSIM.UI.Desktop.Editors.Utilities
                 }
 
             };
+
+            this.Add(new Splitter { Panel1 = p1, Panel2 = p2, Orientation = Orientation.Horizontal });
 
         }
 
