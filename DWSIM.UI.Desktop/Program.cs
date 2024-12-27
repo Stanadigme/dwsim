@@ -50,42 +50,12 @@ namespace DWSIM.UI.Desktop
                 loadsetex = ex;
             }
 
-            if (GlobalSettings.Settings.EnableGPUProcessing)
-            {
-                // initialize gpu if enabled
-                try
-                {
-                    //set CUDA params
-                    CudafyModes.Compiler = eGPUCompiler.All;
-                    CudafyModes.Target = (eGPUType)Settings.CudafyTarget;
-                    Cudafy.Translator.CudafyTranslator.GenerateDebug = false;
-                    DWSIM.Thermodynamics.Calculator.InitComputeDevice();
-                    Console.WriteLine("GPU initialized successfully: " + Settings.SelectedGPU + "(" + CudafyModes.Target.ToString() + ")");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("GPU initialization failed: " + ex.ToString());
-                    var ex1 = ex;
-                    while (ex1.InnerException != null)
-                    {
-                        Console.WriteLine("GPU initialization failed (IEX): " + ex1.InnerException.ToString());
-                        if (ex1.InnerException is ReflectionTypeLoadException)
-                        {
-                            foreach (var tlex in ((ReflectionTypeLoadException)(ex1.InnerException)).LoaderExceptions)
-                            { Console.WriteLine("GPU initialization failed (TLEX): " + tlex.Message); }
-                        }
-                        ex1 = ex1.InnerException;
-                    }
-                }
-            }
-
             Eto.Platform platform = null;
             
             try
             {
                 if (Settings.RunningPlatform() == Settings.Platform.Windows)
                 {
-                    //GlobalSettings.Settings.WindowsRenderer = Settings.WindowsPlatformRenderer.Gtk3;
                     switch (GlobalSettings.Settings.WindowsRenderer)
                     {
                         case Settings.WindowsPlatformRenderer.WinForms:
