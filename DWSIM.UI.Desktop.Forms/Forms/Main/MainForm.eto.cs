@@ -52,6 +52,8 @@ namespace DWSIM.UI
 
             height = (int)(height * sf);
 
+            ClientSize = new Size((int)(width * sf), (int)(height * sf));
+
             //Application.Instance.UnhandledException += (sender, e) =>
             //{
             //    new DWSIM.UI.Desktop.Editors.UnhandledExceptionView((Exception)e.ExceptionObject).ShowModalAsync();
@@ -542,7 +544,8 @@ namespace DWSIM.UI
 
             LoadPlugins();
 
-            Size = new Size((int)(width * sf), (int)(height * sf));
+            if (Application.Instance.Platform.IsGtk)
+                Size = new Size((int)(width * sf), (int)(height * sf));
 
             DWSIM.UI.Shared.Common.Center(this);
 

@@ -1467,8 +1467,6 @@ namespace DWSIM.UI.Forms
                     weatherpanel.Height = 0;
             };
 
-            flowsheetcontrolcontainer.Rows.Last().ScaleHeight = true;
-
             flowsheetcontrolcontainer.Rows.Add(new TableRow(weatherpanel));
 
             Split2.Panel1 = flowsheetcontrolcontainer;
