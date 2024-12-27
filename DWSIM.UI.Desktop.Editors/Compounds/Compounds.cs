@@ -242,7 +242,6 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             };
 
-            //container.Rows.Add(new TableRow(new Scrollable { Content = listcontainer, Border = BorderType.None }));
             container.Rows.Add(new TableRow(listcontainer));
 
         }

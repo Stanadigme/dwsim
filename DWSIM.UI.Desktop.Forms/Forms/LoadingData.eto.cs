@@ -45,7 +45,7 @@ namespace DWSIM.UI.Forms.Forms
             int w = (int)(sf * 400);
             int h = (int)(sf * 160);
 
-            ClientSize = new Size(w, h);
+            Size = new Size(w, h);
 
             DWSIM.UI.Shared.Common.Center(this);
 

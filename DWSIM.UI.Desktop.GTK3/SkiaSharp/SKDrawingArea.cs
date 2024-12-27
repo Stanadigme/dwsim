@@ -89,11 +89,11 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
                 }
             }
 
-            int dpi;
+            float dpi;
             if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
                 dpi = Display.PrimaryMonitor.ScaleFactor;
             else
-                dpi = 1;
+                dpi = 1.0f;
             cr.Scale(dpi, dpi);
             cr.SetSourceSurface(pix, 0, 0);
             cr.Paint();
@@ -146,14 +146,14 @@ namespace DWSIM.UI.Desktop.GTK3.SkiaSharp
 
         private SKImageInfo CreateDrawingObjects()
         {
-            int dpi;
+            float dpi;
             if (GlobalSettings.Settings.RunningPlatform() == GlobalSettings.Settings.Platform.Windows)
                 dpi = Display.PrimaryMonitor.ScaleFactor;
             else
-                dpi = 1;
+                dpi = 1.0f;
             Gdk.Rectangle allocation = base.Allocation;
-            int width = allocation.Width * dpi;
-            int height = allocation.Height * dpi;
+            int width = (int)(allocation.Width * dpi);
+            int height = (int)(allocation.Height * dpi);
             SKImageInfo sKImageInfo = new SKImageInfo(width, height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
             if (pix == null || pix.Width != sKImageInfo.Width || pix.Height != sKImageInfo.Height)
             {

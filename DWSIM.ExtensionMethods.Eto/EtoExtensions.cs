@@ -82,7 +82,7 @@ namespace DWSIM.UI.Shared
                     var center = Screen.DisplayBounds.Center;
                     center.X -= form.Width / 2;
                     center.Y -= form.Height / 2;
-                    form.Location = new Point(center);
+                    form.Location = new Point((int)center.X, (int)center.Y);
                 }
             }
         }

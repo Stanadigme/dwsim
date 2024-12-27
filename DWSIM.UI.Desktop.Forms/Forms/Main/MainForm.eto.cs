@@ -59,8 +59,6 @@ namespace DWSIM.UI
 
             Title = "DWSIMLauncher".Localize();
 
-            ClientSize = new Size((int)(width * sf), (int)(height * sf));
-
             Icon = Eto.Drawing.Icon.FromResource(imgprefix + "DWSIM_ico.ico");
 
             if (Application.Instance.Platform.IsGtk)
@@ -543,6 +541,10 @@ namespace DWSIM.UI
             //Plugins
 
             LoadPlugins();
+
+            Size = new Size((int)(width * sf), (int)(height * sf));
+
+            DWSIM.UI.Shared.Common.Center(this);
 
         }
 
