@@ -4001,14 +4001,14 @@ Label_00CC:
 
         If Not File.Exists(assemblyPath1) Then
             If Not File.Exists(assemblyPath2) Then
-                Console.WriteLine("Could not find assembly " + assemblyPath1)
+                'Console.WriteLine("Could not find assembly " + assemblyPath1)
                 Return Nothing
             Else
                 Try
                     Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath2)
                     Return assembly
                 Catch ex As System.IO.FileLoadException
-                    Console.WriteLine("Could not find assembly " + ex.FileName)
+                    'Console.WriteLine("Could not find assembly " + ex.FileName)
                 End Try
             End If
         Else
@@ -4016,7 +4016,7 @@ Label_00CC:
                 Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath1)
                 Return assembly
             Catch ex As System.IO.FileLoadException
-                Console.WriteLine("Could not find assembly " + ex.FileName)
+                'Console.WriteLine("Could not find assembly " + ex.FileName)
             End Try
         End If
 

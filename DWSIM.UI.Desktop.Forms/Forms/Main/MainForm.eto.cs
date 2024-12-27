@@ -41,6 +41,8 @@ namespace DWSIM.UI
 
         private int height = 640;
 
+        private int c1, c2, c3, c4;
+
         void InitializeComponent()
         {
 
@@ -369,7 +371,9 @@ namespace DWSIM.UI
 
             FoldersList.SelectedIndexChanged += (sender, e) =>
             {
-                if (FoldersList.SelectedIndex >= 0)
+                if (!Application.Instance.Platform.IsGtk)
+                    c3+=1;
+                if (FoldersList.SelectedIndex >= 0 && c3 > 0)
                 {
                     var dialog = new OpenFileDialog();
                     dialog.Title = "Open File".Localize();
@@ -382,6 +386,7 @@ namespace DWSIM.UI
                         LoadSimulation(dialog.FileName);
                     }
                 }
+                c3+=1;
             };
 
             MostRecentList.SelectedItemChanged += (sender, e) =>
@@ -396,15 +401,24 @@ namespace DWSIM.UI
 
             SampleList.SelectedIndexChanged += (sender, e) =>
             {
-                if (SampleList.SelectedIndex >= 0)
+                if (Application.Instance.Platform.IsGtk)
                 {
-                    LoadSimulation(SampleList.SelectedKey);
-                };
+                    if (SampleList.SelectedIndex >= 0 && c1 > 0)
+                        LoadSimulation(SampleList.SelectedKey);
+                    c1+=1;
+                }
+                else
+                {
+                    if (SampleList.SelectedIndex >= 0)
+                        LoadSimulation(SampleList.SelectedKey);
+                }
             };
 
             FOSSEEList.SelectedIndexChanged += (sender, e) =>
             {
-                if (FOSSEEList.SelectedIndex >= 0 && FOSSEEList.SelectedKey != "")
+                if (!Application.Instance.Platform.IsGtk)
+                    c2+=1;
+                if (FOSSEEList.SelectedIndex >= 0 && FOSSEEList.SelectedKey != "" && c2 > 0)
                 {
                     var item = fslist[FOSSEEList.SelectedKey];
                     var sb = new StringBuilder();
@@ -441,6 +455,7 @@ namespace DWSIM.UI
                         FOSSEEList.SelectedIndex = -1;
                     }
                 };
+                c2+=1;
             };
 
             var fosseecontainer = c.GetDefaultContainer();
