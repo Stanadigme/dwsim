@@ -103,7 +103,7 @@ namespace DWSIM.UI.Desktop.Editors
 
             page1.Init(Width, Height);
 
-            var tl = new TableLayout() { Width = Width, Height = Height };
+            var tl = new DynamicLayout() { Width = Width, Height = Height };
 
             new Compounds(flowsheet, tl);
 

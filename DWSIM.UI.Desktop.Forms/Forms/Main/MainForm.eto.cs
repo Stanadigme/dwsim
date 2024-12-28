@@ -232,7 +232,7 @@ namespace DWSIM.UI
 
             abslayout.Add(pabout, dx, dy * 6 + bfh + 4 * (int)(100 * sf));
 
-            MostRecentList = new TreeGridView();
+            MostRecentList = new TreeGridView { AllowMultipleSelection = false, Width = (int)(460 * sf) };
             SampleList = new ListBox();
             FoldersList = new ListBox();
             FOSSEEList = new ListBox();

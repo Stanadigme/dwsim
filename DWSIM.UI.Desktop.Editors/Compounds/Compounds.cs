@@ -19,13 +19,13 @@ namespace DWSIM.UI.Desktop.Editors
     {
 
         public Flowsheet flowsheet;
-        public TableLayout container;
+        public DynamicLayout container;
 
         private ObservableCollection<CompoundItem> obslist = new ObservableCollection<CompoundItem>();
 
         public GridView listcontainer;
 
-        public Compounds(IFlowsheet fs, TableLayout layout)
+        public Compounds(IFlowsheet fs, DynamicLayout layout)
         {
             flowsheet = (Flowsheet)fs;
             container = layout;
@@ -44,14 +44,14 @@ namespace DWSIM.UI.Desktop.Editors
 
             container.Spacing = new Size(10, 10);
 
-            container.Rows.Add(new TableRow(new Label { Text = "Simulation Compounds", Font = new Font(SystemFont.Bold, DWSIM.UI.Shared.Common.GetEditorFontSize()) }));
+            container.Rows.Add(new DynamicRow(new Label { Text = "Simulation Compounds", Font = new Font(SystemFont.Bold, DWSIM.UI.Shared.Common.GetEditorFontSize()) }));
 
-            container.Rows.Add(new TableRow(new Label { Text = "Check compounds to add them to the simulation, uncheck to remove.", Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
+            container.Rows.Add(new DynamicRow(new Label { Text = "Check compounds to add them to the simulation, uncheck to remove.", Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
             if (Application.Instance.Platform.IsWpf)
             {
-                container.Rows.Add(new TableRow(new Label { Text = "To commit the changes, select another table cell or press ENTER after checking/unchecking the compound. You may have to double-click on the checkbox in order to change its state (checked/unchecked).", Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
+                container.Rows.Add(new DynamicRow(new Label { Text = "To commit the changes, select another table cell or press ENTER after checking/unchecking the compound. You may have to double-click on the checkbox in order to change its state (checked/unchecked).", Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
             }
-            container.Rows.Add(new TableRow(new Label { Text = "Number of compounds available: " + complist.Count().ToString(), Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
+            container.Rows.Add(new DynamicRow(new Label { Text = "Number of compounds available: " + complist.Count().ToString(), Font = SystemFonts.Label(DWSIM.UI.Shared.Common.GetEditorFontSize() - 2.0f) }));
 
             var searchcontainer = new DynamicLayout();
 
@@ -77,7 +77,7 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             };
 
-            container.Rows.Add(new TableRow(searchcontainer));
+            container.Rows.Add(new DynamicRow(searchcontainer));
 
             var txt = new Label { Text = "Click to view properties of the selected compound", VerticalAlignment = VerticalAlignment.Center };
             txt.Font = new Font(SystemFont.Default, DWSIM.UI.Shared.Common.GetEditorFontSize());
@@ -172,10 +172,10 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             }
 
-            listcontainer = new GridView { DataStore = obslist, RowHeight = 20 };
+            listcontainer = new GridView { DataStore = obslist, RowHeight = 20, Width = 880 };
             listcontainer.Style = "fastgrid";
 
-            if (Application.Instance.Platform.IsWinForms) listcontainer.Height = 300;
+            listcontainer.Height = 360;
 
             var col2 = new GridColumn
             {
@@ -242,7 +242,7 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             };
 
-            container.Rows.Add(new TableRow(listcontainer));
+            container.Rows.Add(new DynamicRow(listcontainer));
 
         }
 

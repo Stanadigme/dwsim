@@ -380,14 +380,14 @@ namespace DWSIM.UI.Forms
 
             ActComps = () =>
             {
-                var cont = new TableLayout();
-                var editor = new DWSIM.UI.Desktop.Editors.Compounds(FlowsheetObject, cont);
+                var cont = new DynamicLayout();
+                var editor = new Compounds(FlowsheetObject, cont);
                 cont.Tag = "Simulation Compounds";
 
-                var cont2 = new Desktop.Editors.CompoundTools(FlowsheetObject);
+                var cont2 = new CompoundTools(FlowsheetObject);
                 cont2.Tag = "Compound Tools";
 
-                var form = UI.Shared.Common.GetDefaultTabbedForm("Compounds", (int)(sf * 920), (int)(sf * 500), new Control[] { cont, cont2 });
+                var form = UI.Shared.Common.GetDefaultTabbedForm("Compounds", (int)(sf * 920), (int)(sf * 700), new Control[] { cont, cont2 });
 
                 editor.listcontainer.CellEdited += (sender, e) => UpdateEditorPanels();
 
