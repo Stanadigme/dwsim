@@ -52,6 +52,8 @@ Public Class ChemeoParser
 
         comp.Comments = url
 
+        comp.Name = data.compound
+
         comp.OriginalDB = "Cheméo"
 
         comp.CurrentDB = "Cheméo"

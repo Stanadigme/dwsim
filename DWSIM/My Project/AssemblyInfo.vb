@@ -14,7 +14,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("DWSIM Simulator (Windows Forms GUI)")> 
 <Assembly: AssemblyCompany("DWSIM Project")> 
 <Assembly: AssemblyProduct("DWSIM")>
-<Assembly: AssemblyCopyright("Copyright © 2007-2024 Daniel Wagner and contributors")>
+<Assembly: AssemblyCopyright("Copyright © 2007-2025 Daniel Wagner and contributors")>
 <Assembly: AssemblyTrademark("DWSIM")> 
 
 <Assembly: ComVisible(True)> 
@@ -33,7 +33,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("8.8.3.0")>
+<Assembly: AssemblyVersion("8.9.0.0")>
 '<Assembly: AssemblyFileVersion("1.6")> 
 
 <Assembly: NeutralResourcesLanguageAttribute("pt-BR")> 
