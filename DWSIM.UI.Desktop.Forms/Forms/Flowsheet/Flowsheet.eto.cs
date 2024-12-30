@@ -989,6 +989,8 @@ namespace DWSIM.UI.Forms
             Split2.Panel2 = PanelObjects;
             Split2.Panel2.Height = 120 * (int)sf;
 
+            if (Application.Instance.Platform.IsWpf || Application.Instance.Platform.IsGtk) FlowsheetControl.AllowDrop = true;
+
             foreach (var obj in ObjectList.Values.OrderBy(x => x.GetDisplayName()))
             {
                 if ((Boolean)(obj.GetType().GetProperty("Visible").GetValue(obj)))
@@ -1002,22 +1004,12 @@ namespace DWSIM.UI.Forms
                     pitem.txtName.Text = obj.GetDisplayName();
                     pitem.MouseDown += (sender, e) =>
                     {
-                        if (Application.Instance.Platform.IsGtk)
-                        {
-                            var dobj = new DataObject();
-                            dobj.SetString(obj.GetDisplayName(), "ObjectName");
-                            using (var img = new Bitmap(pitem.imgIcon.Image, 40, 40, ImageInterpolation.High))
-                                pitem.DoDragDrop(dobj, DragEffects.Copy, img, new PointF(20, 20));
-                            e.Handled = true;
-                        }
-                        else
-                        {
-                            var dobj = new DataObject();
-                            dobj.Image = pitem.imgIcon.Image;
-                            dobj.SetString(obj.GetDisplayName(), "ObjectName");
-                            pitem.DoDragDrop(dobj, DragEffects.Copy);
-                            e.Handled = true;
-                        }
+                        var dobj = new DataObject();
+                        dobj.SetString(obj.GetDisplayName(), "ObjectName");
+                        dobj.Text = obj.GetDisplayName();
+                        using (var img = new Bitmap(pitem.imgIcon.Image, 40, 40, ImageInterpolation.High))
+                            pitem.DoDragDrop(dobj, DragEffects.Copy, img, new PointF(20, 20));
+                        e.Handled = true;
                     };
                     switch (obj.ObjectClass)
                     {
@@ -1072,11 +1064,14 @@ namespace DWSIM.UI.Forms
                 }
             }
 
-            if (Application.Instance.Platform.IsWpf) FlowsheetControl.AllowDrop = true;
-            if (Application.Instance.Platform.IsGtk)
+            if (Application.Instance.Platform.IsWpf)
             {
-                FlowsheetControl.AllowDrop = true;
+                FlowsheetControl.DragEnter += (s, e) =>
+                {
+                    e.Effects = DragEffects.Copy;
+                };
             }
+
             FlowsheetControl.DragDrop += (sender, e) =>
             {
                 if (e.Data.GetString("ObjectName") != null)
@@ -1833,7 +1828,7 @@ namespace DWSIM.UI.Forms
             }
         }
 
-        private bool called1 = false; 
+        private bool called1 = false;
 
         void Flowsheet_Shown(object sender, EventArgs e)
         {
@@ -1851,7 +1846,8 @@ namespace DWSIM.UI.Forms
                 surface.Zoom *= 0.8f;
                 surface.Center((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
 
-                Task.Delay(2000).ContinueWith((t) => {
+                Task.Delay(2000).ContinueWith((t) =>
+                {
                     if (!called1) Application.Instance.Invoke(() => { FlowsheetObject.SetGTKDragDest.Invoke(); called1 = true; });
                 });
             }
@@ -2267,8 +2263,9 @@ namespace DWSIM.UI.Forms
                 obj.GraphicObject.DrawLabel = !obj.GraphicObject.DrawLabel;
             };
 
+
             var item3 = new ButtonMenuItem { Text = "Calculate", Image = new Bitmap(bitmapprefix + "icons8-play.png") };
-            item3.Click += (sender, e) => FlowsheetObject.RequestCalculation(obj, false);
+            item3.Click += (sender, e) => FlowsheetObject.RequestCalculation3(obj, false);
 
             var item4 = new ButtonMenuItem { Text = "Debug", Image = new Bitmap(bitmapprefix + "Console_96px.png") };
             item4.Click += (sender, e) =>
