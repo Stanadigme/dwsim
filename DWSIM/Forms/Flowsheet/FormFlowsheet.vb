@@ -748,8 +748,11 @@ Public Class FormFlowsheet
         Catch ex As Exception
         End Try
 
-        PropertyPackages?.Clear()
-        SelectedCompounds?.Clear()
+        Try
+            PropertyPackages?.Clear()
+            SelectedCompounds?.Clear()
+        Catch ex As Exception
+        End Try
 
         If GlobalSettings.Settings.OldUI Then
 
