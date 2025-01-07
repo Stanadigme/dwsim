@@ -24,7 +24,6 @@
 🌟 José Marques
 🌟 Justin Parrot
 🌟 Leonard Seed
-🌟 Magnus Carlsen
 🌟 Marcos Guimarães
 🌟 Martin Heiser
 🌟 Michael Papantoniou
@@ -54,6 +53,7 @@ Carlos Pantoja
 Christian Jordan
 Christian Pedersen
 CollectiveObjective
+Daniel Dornellas Athayde
 David Miller
 David Whitlock
 Denislav Zdravkov
