@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="SplitContainer1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="Label8.Location" type="System.Drawing.Point, System.Drawing">
     <value>7, 10</value>
@@ -145,7 +149,6 @@
   <data name="Label6.Text" xml:space="preserve">
     <value>Molar Flow</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="cbForcePhase.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
@@ -354,13 +357,19 @@
     <value>Specific Enthalpy</value>
   </data>
   <data name="PanelConditions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>393, 522</value>
+    <value>393, 545</value>
   </data>
   <data name="TabPageInputConditions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>399, 528</value>
+    <value>399, 551</value>
   </data>
   <data name="TabPageInputConditions.Text" xml:space="preserve">
     <value>Stream Conditions</value>
+  </data>
+  <data name="lblInputAmount.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="lblInputAmount.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 526</value>
   </data>
   <data name="Label16.Location" type="System.Drawing.Point, System.Drawing">
     <value>9, 11</value>
@@ -390,7 +399,7 @@
     <value>200, 132</value>
   </data>
   <data name="gridInputComposition.Size" type="System.Drawing.Size, System.Drawing">
-    <value>272, 441</value>
+    <value>272, 453</value>
   </data>
   <data name="btnCompAcceptChanges.Location" type="System.Drawing.Point, System.Drawing">
     <value>287, 186</value>
@@ -446,12 +455,6 @@
   <data name="btnNormalizeInput.Text" xml:space="preserve">
     <value>Normalize</value>
   </data>
-  <data name="lblInputAmount.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="lblInputAmount.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 599</value>
-  </data>
   <data name="btnEqualizeInput.Location" type="System.Drawing.Point, System.Drawing">
     <value>286, 96</value>
   </data>
@@ -459,25 +462,25 @@
     <value>Equalize</value>
   </data>
   <data name="PanelComposition.Size" type="System.Drawing.Size, System.Drawing">
-    <value>393, 522</value>
+    <value>393, 545</value>
   </data>
   <data name="TabPageInputComposition.Size" type="System.Drawing.Size, System.Drawing">
-    <value>399, 528</value>
+    <value>399, 551</value>
   </data>
   <data name="TabPageInputComposition.Text" xml:space="preserve">
     <value>Compound Amounts</value>
   </data>
   <data name="TabControl2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>407, 554</value>
+    <value>407, 577</value>
   </data>
   <data name="TabPageInputPane.Size" type="System.Drawing.Size, System.Drawing">
-    <value>413, 560</value>
+    <value>413, 583</value>
   </data>
   <data name="TabPageInputPane.Text" xml:space="preserve">
     <value>Input Data</value>
   </data>
   <data name="gridPhaseTotal.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 467</value>
+    <value>3, 490</value>
   </data>
   <data name="gridPhaseTotal.Size" type="System.Drawing.Size, System.Drawing">
     <value>379, 26</value>
@@ -501,10 +504,10 @@
     <value>Amount</value>
   </data>
   <data name="gridCompMixture.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompMix.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompMix.Text" xml:space="preserve">
     <value>Mixture</value>
@@ -516,10 +519,10 @@
     <value>Amount</value>
   </data>
   <data name="gridCompVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompVapor.Text" xml:space="preserve">
     <value>Vapor</value>
@@ -531,10 +534,10 @@
     <value>Amount</value>
   </data>
   <data name="gridCompLiqMix.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompLiqMix.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompLiqMix.Text" xml:space="preserve">
     <value>Overall Liquid</value>
@@ -546,10 +549,10 @@
     <value>Amount</value>
   </data>
   <data name="gridCompLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>375, 370</value>
+    <value>375, 393</value>
   </data>
   <data name="tabCompLiq1.Text" xml:space="preserve">
     <value>Liquid 1</value>
@@ -585,7 +588,7 @@
     <value>Solid</value>
   </data>
   <data name="TabPhaseComps.Size" type="System.Drawing.Size, System.Drawing">
-    <value>383, 396</value>
+    <value>383, 419</value>
   </data>
   <data name="cbCalculatedAmountsBasis.Items" xml:space="preserve">
     <value>Mole Fractions</value>
@@ -615,7 +618,7 @@
     <value>309, 15</value>
   </data>
   <data name="TabPage1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>385, 496</value>
+    <value>385, 519</value>
   </data>
   <data name="TabPage1.Text" xml:space="preserve">
     <value>Amounts</value>
@@ -642,10 +645,10 @@
     <value>Property</value>
   </data>
   <data name="gridCompPropVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>365, 428</value>
+    <value>365, 451</value>
   </data>
   <data name="TabCompPropVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>365, 428</value>
+    <value>365, 451</value>
   </data>
   <data name="TabCompPropVapor.Text" xml:space="preserve">
     <value>Vapor</value>
@@ -657,10 +660,10 @@
     <value>Property</value>
   </data>
   <data name="gridCompPropLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropLiq1.Text" xml:space="preserve">
     <value>Liquid 1</value>
@@ -672,10 +675,10 @@
     <value>Property</value>
   </data>
   <data name="gridCompPropLiq2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropLiq2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropLiq2.Text" xml:space="preserve">
     <value>Liquid 2</value>
@@ -687,10 +690,10 @@
     <value>Property</value>
   </data>
   <data name="gridCompPropSolid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropSolid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>313, 428</value>
+    <value>365, 428</value>
   </data>
   <data name="TabCompPropSolid.Text" xml:space="preserve">
     <value>Solid</value>
@@ -699,7 +702,7 @@
     <value>6, 39</value>
   </data>
   <data name="TabCompoundPhaseProps.Size" type="System.Drawing.Size, System.Drawing">
-    <value>373, 454</value>
+    <value>373, 477</value>
   </data>
   <data name="cbCompoundPhaseProperties.Items" xml:space="preserve">
     <value>Fugacity Coefficients</value>
@@ -723,16 +726,16 @@
     <value>206, 21</value>
   </data>
   <data name="TabPage2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>385, 496</value>
+    <value>385, 519</value>
   </data>
   <data name="TabPage2.Text" xml:space="preserve">
     <value>Properties</value>
   </data>
   <data name="TabControlCompound.Size" type="System.Drawing.Size, System.Drawing">
-    <value>393, 522</value>
+    <value>393, 545</value>
   </data>
   <data name="TabPageResultsComp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>399, 528</value>
+    <value>399, 551</value>
   </data>
   <data name="TabPageResultsComp.Text" xml:space="preserve">
     <value>Compounds</value>
@@ -765,10 +768,10 @@
     <value>Units</value>
   </data>
   <data name="gridPropertiesVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsVapor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsVapor.Text" xml:space="preserve">
     <value>Vapor</value>
@@ -783,10 +786,10 @@
     <value>Units</value>
   </data>
   <data name="gridPropertiesLiqMix.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiqMix.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiqMix.Text" xml:space="preserve">
     <value>Overall Liquid</value>
@@ -801,10 +804,10 @@
     <value>Units</value>
   </data>
   <data name="gridPropertiesLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiq1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiq1.Text" xml:space="preserve">
     <value>Liquid 1</value>
@@ -819,10 +822,10 @@
     <value>Units</value>
   </data>
   <data name="gridPropertiesLiq2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiq2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsLiq2.Text" xml:space="preserve">
     <value>Liquid 2</value>
@@ -837,10 +840,10 @@
     <value>Units</value>
   </data>
   <data name="gridPropertiesSolid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsSolid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>339, 502</value>
+    <value>391, 502</value>
   </data>
   <data name="tabPropsSolid.Text" xml:space="preserve">
     <value>Solid</value>
@@ -855,19 +858,19 @@
     <value>Phase Properties</value>
   </data>
   <data name="TabControlMain.Size" type="System.Drawing.Size, System.Drawing">
-    <value>407, 554</value>
+    <value>407, 577</value>
   </data>
   <data name="TabPageResultsPane.Size" type="System.Drawing.Size, System.Drawing">
-    <value>413, 560</value>
+    <value>413, 583</value>
   </data>
   <data name="TabPageResultsPane.Text" xml:space="preserve">
     <value>Results</value>
   </data>
   <data name="rtbAnnotations.Size" type="System.Drawing.Size, System.Drawing">
-    <value>407, 554</value>
+    <value>407, 351</value>
   </data>
   <data name="TabPageAnnotations.Size" type="System.Drawing.Size, System.Drawing">
-    <value>413, 560</value>
+    <value>413, 357</value>
   </data>
   <data name="TabPageAnnotations.Text" xml:space="preserve">
     <value>Annotations</value>
@@ -885,7 +888,7 @@
     <value>248, 21</value>
   </data>
   <data name="TabPageDynamics.Size" type="System.Drawing.Size, System.Drawing">
-    <value>413, 560</value>
+    <value>413, 357</value>
   </data>
   <data name="TabPageDynamics.Text" xml:space="preserve">
     <value>Dynamics</value>
@@ -927,16 +930,16 @@
     <value>Compound Amounts</value>
   </data>
   <data name="TabPageFloatingTables.Size" type="System.Drawing.Size, System.Drawing">
-    <value>413, 560</value>
+    <value>413, 357</value>
   </data>
   <data name="TabPageFloatingTables.Text" xml:space="preserve">
     <value>Floating Tables</value>
   </data>
   <data name="TabControlMain0.Size" type="System.Drawing.Size, System.Drawing">
-    <value>421, 586</value>
+    <value>421, 609</value>
   </data>
   <data name="SplitContainer1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>421, 586</value>
+    <value>421, 609</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="SplitContainer1.SplitterDistance" type="System.Int32, mscorlib">
@@ -978,19 +981,19 @@
   <data name="btnDisconnectO.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         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
-        dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALISURBVDhPfZJbTFJxHMfZcm6++tQTb61aLVfpkoaX
-        lrVpxbIyzSHaxWs2xZg51C6SgoqdEkkw5EzFW+TRTMQEEYehzWu1JpIt07w1W72kRQ/fzjkbPRj18Plv
-        Zzuf//f8vr/DAfBfHju/+Rkc61z9wBpPbVoSVFIfJHdaZz35+jfmzJpxf5+Sl9bhrwENtnVnvWUFtb2f
-        UN09D4JyQ2Oag5ScQnyZw+xT9EKn5hvsq+gaXUO7YwmNAx+h7Z1DhfEtSgzTiMo3eXyKDHV9y/7E04XN
-        tqEVkP3zqHziQknza9yon8TdllcQltkQltkh8Sl7oWctVRhnUdPtRnWXC3naMWTcH0aBbhQxed04lNgo
-        +EtqsNOF6fU6rVZLMs+pxEgRPetmTu1LFJFjuFBqxdVqB8Ivt2D/KQ3vj9js+BJA2j531nVO/jCbzbBa
-        rVAqlewl9Kz8yGvUhlBmQTphR0qFBQdPa7HnKMH1pvrpLCvuJrqwpsElVNSbflEUBZlMRkql0m1isTiQ
-        l9zKD44nN07mdSAiuRG7j9xz74xQ+LEXaPqWuaqeRXQ4V9FiXwTR9Q7iqp6fSYqhcFom09PTXSKRaHtQ
-        jJpPp37fdaSyc0d4WQDjshcoqXmeknoPg20B5UYXap7NsntOKGjyqFQqtLe3Iy4uziUQCALpVC7jeGGP
-        W80zgpKWGXbHxQ3TuF43Ru95ChLtCBKyyyGXy0HLbB9bYY9czaSkiBYJagZM22mEA0LFAK4o7biosIIf
-        K/OEnihmP3krnCz1hH+K0umR0T9HITmOQv0Ym5xNryq1yoZjmW3YF12T70tm4CQqhj0Z1U7cbpxA7sMX
-        OFvYi+NZRoSJmhByRoe9UQ+cdOM+0xk4MUX9ZqF8EOdvPsfhS62ekHhSciD2kSAoWs1j9kw37udL9MKJ
-        zOkK4KcZzaFJBk/wOb2/r5f+DTi/AcFGp9AV5agvAAAAAElFTkSuQmCC
+        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
 </value>
   </data>
   <data name="btnDisconnectO.Location" type="System.Drawing.Point, System.Drawing">
@@ -999,19 +1002,19 @@
   <data name="btnDisconnectI.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         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
-        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
+        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
 </value>
   </data>
   <data name="btnDisconnectI.Location" type="System.Drawing.Point, System.Drawing">
@@ -1099,13 +1102,13 @@
     <value>True Critical Point</value>
   </data>
   <data name="AddUtilityTSMI.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>143, 22</value>
   </data>
   <data name="AddUtilityTSMI.Text" xml:space="preserve">
     <value>Attach Utility</value>
   </data>
   <data name="UtilitiesCtxMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 48</value>
+    <value>144, 26</value>
   </data>
   <data name="TabPage3.Size" type="System.Drawing.Size, System.Drawing">
     <value>417, 106</value>
@@ -1123,6 +1126,6 @@
     <value>425, 132</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>436, 822</value>
+    <value>436, 836</value>
   </data>
 </root>
