@@ -9,9 +9,14 @@ namespace DWSIM.AI.ConvergenceHelper
 {
     public class ConvergenceHelper : IConvergenceHelper
     {
-        public IConvergenceHelperResponse GetEstimates(ConvergenceHelperRequestType RequestType, string ModelName, double? MixtureMolarFlows, double? Temperature, double? Pressure, double? VaporMolarFraction, double? MassEnthalpy, double? MassEntropy)
+        public IConvergenceHelperResponse GetEstimates(ConvergenceHelperRequestType RequestType, string ModelName, double[] MixtureMolarFlows, double? Temperature, double? Pressure, double? VaporMolarFraction, double? MassEnthalpy, double? MassEntropy)
         {
             return new ConvergenceHelperResponse();
+        }
+
+        public object StoreResults(ConvergenceHelperRequestType RequestType, string ModelName, double[] MixtureMolarFlows, double? Temperature, double? Pressure, double? VaporMolarFraction, double? MassEnthalpy, double? MassEntropy, double[] VaporMolarFlows, double[] Liquid1MolarFlows, double[] Liquid2MolarFlows, double[] SolidMolarFlows, double[] KValuesVL1, double[] KValuesVL2)
+        {
+            throw new NotImplementedException();
         }
     }
 
