@@ -8,5 +8,8 @@ namespace DWSIM.AI.ConvergenceHelper
 {
     public class Manager
     {
+
+        public static ConvergenceHelper Instance = new ConvergenceHelper();
+
     }
 }
