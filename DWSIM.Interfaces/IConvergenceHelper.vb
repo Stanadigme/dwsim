@@ -1,7 +1,7 @@
-﻿Public Interface IFlashConvergenceHelper
+﻿Public Interface IConvergenceHelper
 
-
-
+    Function GetEstimates(RequestType As ConvergenceHelperRequestType, ModelName As String, MixtureMolarFlows As Double?, Temperature As Double?, Pressure As Double?, VaporMolarFraction As Double?,
+                          MassEnthalpy As Double?, MassEntropy As Double?) As IConvergenceHelperResponse
 
 
 
