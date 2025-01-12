@@ -18,6 +18,11 @@ namespace DWSIM.AI.ConvergenceHelper
 
         public static string HomeDirectory = Path.Combine(GlobalSettings.Settings.GetConfigFileDir(), "ConvergenceHelper");
 
+        public static void Initialize()
+        { 
+        
+        }
+
         public static void SetupDirectories()
         { 
         
