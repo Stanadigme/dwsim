@@ -69,7 +69,7 @@ namespace DWSIM.UI.Desktop.Editors
             if (HeaderTitle != "") topcontainer.Rows.Add(new TableRow(new Label { Text = HeaderTitle, Font = SystemFonts.Bold() }));
             if (HeaderDescription != "") topcontainer.Rows.Add(new TableRow(new Label { Text = HeaderDescription }));
 
-            var middlecontainer = new DynamicLayout();
+            var middlecontainer = new DynamicLayout {Width = 800, Height = 400 };
 
             var footercontainer = new TableLayout();
 
@@ -143,7 +143,7 @@ namespace DWSIM.UI.Desktop.Editors
             if (Application.Instance.Platform.IsWinForms) container.Rows.Add(null);
             container.Rows.Add(new TableRow(footercontainer));
 
-            if (Application.Instance.Platform.IsGtk) container.Rows.Add(null);
+            //if (Application.Instance.Platform.IsGtk) container.Rows.Add(null);
 
             container.Padding = new Padding(0);
 
@@ -151,11 +151,8 @@ namespace DWSIM.UI.Desktop.Editors
 
             ContentContainer = middlecontainer;
 
-            var center = Screen.PrimaryScreen.WorkingArea.Center;
-            center.X -= (int)(s.UIScalingFactor * width) / 2;
-            center.Y -= ((int)(s.UIScalingFactor * height) + (int)(s.UIScalingFactor * 150)) / 2;
-
-            Location = new Point(center);
+            container.Rows[1].ScaleHeight = true;
+            container.Rows[2].ScaleHeight = false;
 
             if (!s.OldUI) Topmost = true;
 

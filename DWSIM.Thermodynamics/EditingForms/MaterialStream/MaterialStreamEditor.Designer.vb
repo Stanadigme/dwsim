@@ -622,6 +622,7 @@ Partial Class MaterialStreamEditor
         'PanelComposition
         '
         resources.ApplyResources(Me.PanelComposition, "PanelComposition")
+        Me.PanelComposition.Controls.Add(Me.lblInputAmount)
         Me.PanelComposition.Controls.Add(Me.Label16)
         Me.PanelComposition.Controls.Add(Me.Button1)
         Me.PanelComposition.Controls.Add(Me.gridInputComposition)
@@ -631,7 +632,6 @@ Partial Class MaterialStreamEditor
         Me.PanelComposition.Controls.Add(Me.lblSolvent)
         Me.PanelComposition.Controls.Add(Me.btnEraseInput)
         Me.PanelComposition.Controls.Add(Me.btnNormalizeInput)
-        Me.PanelComposition.Controls.Add(Me.lblInputAmount)
         Me.PanelComposition.Controls.Add(Me.btnEqualizeInput)
         Me.PanelComposition.Name = "PanelComposition"
         Me.ToolTipChangeTag.SetToolTip(Me.PanelComposition, resources.GetString("PanelComposition.ToolTip"))
@@ -1554,7 +1554,7 @@ Partial Class MaterialStreamEditor
         resources.ApplyResources(Me.rtbAnnotations, "rtbAnnotations")
         Me.rtbAnnotations.Name = "rtbAnnotations"
         Me.rtbAnnotations.Rtf = "{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1046{\fonttbl{\f0\fnil Microsoft " &
-    "Sans Serif;}}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "{\*\generator Riched20 10.0.22621}\viewkind4\uc1 " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "\pard\f0\fs17\" &
+    "Sans Serif;}}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "{\*\generator Riched20 10.0.26100}\viewkind4\uc1 " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "\pard\f0\fs17\" &
     "par" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "}" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         Me.rtbAnnotations.ShowOpen = False
         Me.rtbAnnotations.ShowSave = False

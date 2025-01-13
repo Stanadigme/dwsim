@@ -191,7 +191,6 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -1815,6 +1814,84 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\box_important_48px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\col_abs_32.png" />
+    <EmbeddedResource Include="Icons\col_dc_32.png" />
+    <EmbeddedResource Include="Icons\col_sc_32.png" />
+    <EmbeddedResource Include="Icons\component_separator.png" />
+    <EmbeddedResource Include="Icons\compressor.png" />
+    <EmbeddedResource Include="Icons\cooler.png" />
+    <EmbeddedResource Include="Icons\cstr.png" />
+    <EmbeddedResource Include="Icons\electrolysis.png" />
+    <EmbeddedResource Include="Icons\energy_stream.png" />
+    <EmbeddedResource Include="Icons\erecycle.png" />
+    <EmbeddedResource Include="Icons\expander.png" />
+    <EmbeddedResource Include="Icons\filter.png" />
+    <EmbeddedResource Include="Icons\flowsheet_block.png" />
+    <EmbeddedResource Include="Icons\fuel_cell.png" />
+    <EmbeddedResource Include="Icons\heater2.png" />
+    <EmbeddedResource Include="Icons\heat_exchanger.png" />
+    <EmbeddedResource Include="Icons\icons8_fan.png" />
+    <EmbeddedResource Include="Icons\icons8_hydroelectric.png" />
+    <EmbeddedResource Include="Icons\icons8_solar_panel.png" />
+    <EmbeddedResource Include="Icons\icons8_wind_turbine.png" />
+    <EmbeddedResource Include="Icons\input.png" />
+    <EmbeddedResource Include="Icons\lo_adjust_32.png" />
+    <EmbeddedResource Include="Icons\lo_enrecy_32.png" />
+    <EmbeddedResource Include="Icons\lo_recy_32.png" />
+    <EmbeddedResource Include="Icons\lo_spec_32.png" />
+    <EmbeddedResource Include="Icons\mixer.png" />
+    <EmbeddedResource Include="Icons\pfr.png" />
+    <EmbeddedResource Include="Icons\pipe_segment.png" />
+    <EmbeddedResource Include="Icons\pump.png" />
+    <EmbeddedResource Include="Icons\python_script.png" />
+    <EmbeddedResource Include="Icons\reactor_conversion.png" />
+    <EmbeddedResource Include="Icons\reactor_equilibrium.png" />
+    <EmbeddedResource Include="Icons\reactor_gibbs.png" />
+    <EmbeddedResource Include="Icons\reactor_reaktoro.png" />
+    <EmbeddedResource Include="Icons\recycle.png" />
+    <EmbeddedResource Include="Icons\re_conv_32.png" />
+    <EmbeddedResource Include="Icons\re_cstr_32.png" />
+    <EmbeddedResource Include="Icons\re_gibbs_32.png" />
+    <EmbeddedResource Include="Icons\re_pfr_32.png" />
+    <EmbeddedResource Include="Icons\separator.png" />
+    <EmbeddedResource Include="Icons\solids_separator.png" />
+    <EmbeddedResource Include="Icons\spec.png" />
+    <EmbeddedResource Include="Icons\splitter.png" />
+    <EmbeddedResource Include="Icons\square_240px.png" />
+    <EmbeddedResource Include="Icons\switch_on.png" />
+    <EmbeddedResource Include="Icons\tank.png" />
+    <EmbeddedResource Include="Icons\typewriter.png" />
+    <EmbeddedResource Include="Icons\uo_pipe_32.png" />
+    <EmbeddedResource Include="Icons\valve.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\adjust.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\analog_gauge.png" />
+    <EmbeddedResource Include="Icons\control_panel.png" />
+    <EmbeddedResource Include="Icons\digital_display.png" />
+    <EmbeddedResource Include="Icons\level_gauge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\uo_co_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\uo_orifice_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\linked_table.png" />
+    <EmbeddedResource Include="Icons\master_table.png" />
+    <EmbeddedResource Include="Icons\property_table.png" />
+    <EmbeddedResource Include="Icons\table.png" />
+    <EmbeddedResource Include="Icons\table_80px.png" />
+    <Content Include="linked_table.png" />
+    <Content Include="master_table.png" />
+    <Content Include="property_table.png" />
+    <Content Include="table.png" />
+    <Content Include="table_80px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

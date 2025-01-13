@@ -35,10 +35,9 @@ Partial Class EditingForm_Column_InitialEstimates
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.chkAutoUpdate = New System.Windows.Forms.CheckBox()
         Me.Button4 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.FaTabStrip1 = New FarsiLibrary.Win.FATabStrip()
@@ -59,7 +58,6 @@ Partial Class EditingForm_Column_InitialEstimates
         Me.ToolStripButton27 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton26 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripButton29 = New System.Windows.Forms.ToolStripButton()
         Me.FaTabStripItem2 = New FarsiLibrary.Win.FATabStripItem()
         Me.dgvcl = New System.Windows.Forms.DataGridView()
         Me.Column5 = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -126,14 +124,21 @@ Partial Class EditingForm_Column_InitialEstimates
         'GroupBox1
         '
         resources.ApplyResources(Me.GroupBox1, "GroupBox1")
+        Me.GroupBox1.Controls.Add(Me.chkAutoUpdate)
         Me.GroupBox1.Controls.Add(Me.Button4)
         Me.GroupBox1.Controls.Add(Me.Button3)
-        Me.GroupBox1.Controls.Add(Me.Button2)
-        Me.GroupBox1.Controls.Add(Me.TextBox1)
         Me.GroupBox1.Controls.Add(Me.Button1)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.TabStop = False
         Me.ToolTip1.SetToolTip(Me.GroupBox1, resources.GetString("GroupBox1.ToolTip"))
+        '
+        'chkAutoUpdate
+        '
+        resources.ApplyResources(Me.chkAutoUpdate, "chkAutoUpdate")
+        Me.chkAutoUpdate.Image = Global.DWSIM.UnitOperations.My.Resources.Resources.lightning
+        Me.chkAutoUpdate.Name = "chkAutoUpdate"
+        Me.ToolTip1.SetToolTip(Me.chkAutoUpdate, resources.GetString("chkAutoUpdate.ToolTip"))
+        Me.chkAutoUpdate.UseVisualStyleBackColor = True
         '
         'Button4
         '
@@ -150,21 +155,6 @@ Partial Class EditingForm_Column_InitialEstimates
         Me.Button3.Name = "Button3"
         Me.ToolTip1.SetToolTip(Me.Button3, resources.GetString("Button3.ToolTip"))
         Me.Button3.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        resources.ApplyResources(Me.Button2, "Button2")
-        Me.Button2.Image = Global.DWSIM.UnitOperations.My.Resources.Resources.tick
-        Me.Button2.Name = "Button2"
-        Me.ToolTip1.SetToolTip(Me.Button2, resources.GetString("Button2.ToolTip"))
-        Me.Button2.UseVisualStyleBackColor = True
-        '
-        'TextBox1
-        '
-        resources.ApplyResources(Me.TextBox1, "TextBox1")
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.ReadOnly = True
-        Me.ToolTip1.SetToolTip(Me.TextBox1, resources.GetString("TextBox1.ToolTip"))
         '
         'Button1
         '
@@ -256,7 +246,7 @@ Partial Class EditingForm_Column_InitialEstimates
         'ToolStrip1
         '
         resources.ApplyResources(Me.ToolStrip1, "ToolStrip1")
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripButton5, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripSeparator1, Me.ToolStripButton28, Me.ToolStripButton27, Me.ToolStripButton26, Me.ToolStripSeparator2, Me.ToolStripButton29})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripButton5, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripSeparator1, Me.ToolStripButton28, Me.ToolStripButton27, Me.ToolStripButton26, Me.ToolStripSeparator2})
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolTip1.SetToolTip(Me.ToolStrip1, resources.GetString("ToolStrip1.ToolTip"))
         '
@@ -325,14 +315,6 @@ Partial Class EditingForm_Column_InitialEstimates
         '
         resources.ApplyResources(Me.ToolStripSeparator2, "ToolStripSeparator2")
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        '
-        'ToolStripButton29
-        '
-        resources.ApplyResources(Me.ToolStripButton29, "ToolStripButton29")
-        Me.ToolStripButton29.CheckOnClick = True
-        Me.ToolStripButton29.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton29.Image = Global.DWSIM.UnitOperations.My.Resources.Resources.lightning
-        Me.ToolStripButton29.Name = "ToolStripButton29"
         '
         'FaTabStripItem2
         '
@@ -709,7 +691,6 @@ Partial Class EditingForm_Column_InitialEstimates
         Me.Name = "EditingForm_Column_InitialEstimates"
         Me.ToolTip1.SetToolTip(Me, resources.GetString("$this.ToolTip"))
         Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         CType(Me.FaTabStrip1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.FaTabStrip1.ResumeLayout(False)
@@ -741,8 +722,6 @@ Partial Class EditingForm_Column_InitialEstimates
     End Sub
     Public WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Public WithEvents Button3 As System.Windows.Forms.Button
-    Public WithEvents Button2 As System.Windows.Forms.Button
-    Public WithEvents TextBox1 As System.Windows.Forms.TextBox
     Public WithEvents Button1 As System.Windows.Forms.Button
     Public WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Public WithEvents Button4 As System.Windows.Forms.Button
@@ -805,5 +784,5 @@ Partial Class EditingForm_Column_InitialEstimates
     Public WithEvents ToolStripButton26 As System.Windows.Forms.ToolStripButton
     Public WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-    Friend WithEvents ToolStripButton29 As ToolStripButton
+    Friend WithEvents chkAutoUpdate As CheckBox
 End Class

@@ -140,6 +140,12 @@ Namespace UnitOperations
             Return My.Resources.switch_on
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.switch_on.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("SW_Desc")
         End Function

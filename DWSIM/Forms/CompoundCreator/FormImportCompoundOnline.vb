@@ -1,7 +1,5 @@
 ﻿Imports System.Threading.Tasks
-Imports DWSIM.Thermodynamics.Databases.KDBLink
 Imports DWSIM.Thermodynamics.Databases.ChemeoLink
-Imports DWSIM.Thermodynamics.Databases.DDBStructureLink
 Imports DWSIM.Interfaces
 Imports DWSIM.SharedClassesCSharp.FilePicker
 Imports System.IO
@@ -11,7 +9,6 @@ Public Class FormImportCompoundOnline
     Private CurrentPanel As String = ""
     Private compounds As New List(Of String())
     Private structuredata As Dictionary(Of String, List(Of String()))
-    Private compoundk As Global.DWSIM.Thermodynamics.BaseClasses.ConstantProperties
     Private compoundc As Global.DWSIM.Thermodynamics.BaseClasses.ConstantProperties
 
     Public BaseCompound As Global.DWSIM.Thermodynamics.BaseClasses.ConstantProperties
@@ -141,30 +138,18 @@ Public Class FormImportCompoundOnline
                                                   End Try
                                               End Function, tcs.Token)
 
-                Dim t1 As New Task(Of Global.DWSIM.Thermodynamics.BaseClasses.ConstantProperties)(Function()
-                                                                                                      Dim res1 = KDBParser.GetCompoundIDs(casid, True)
-                                                                                                      If res1.Count = 0 Then
-                                                                                                          Return Nothing
-                                                                                                      Else
-                                                                                                          Return KDBParser.GetCompoundData(Integer.Parse(res1(0)(0)))
-                                                                                                      End If
-                                                                                                  End Function, tcs.Token)
                 Dim t2 As New Task(Of Global.DWSIM.Thermodynamics.BaseClasses.ConstantProperties)(Function()
                                                                                                       Return ChemeoParser.GetCompoundData(cstring)
                                                                                                   End Function, tcs.Token)
-                'Dim t3 As New Task(Of Dictionary(Of String, List(Of String())))(Function()
-                '                                                                    Return DDBStructureParser.GetData(DDBStructureParser.GetID(casid))
-                '                                                                End Function, tcs.Token)
 
 
                 Task.Factory.StartNew(Sub()
                                           t0.Start()
                                           t0.Wait()
                                           casid = t0.Result
-                                          t1.Start()
                                           t2.Start()
                                           't3.Start()
-                                          Task.WaitAll(t1, t2)
+                                          Task.WaitAll(t2)
                                       End Sub).ContinueWith(Sub(tsk)
                                                                 If tsk.Exception IsNot Nothing Then
                                                                     UIThread(Sub()
@@ -191,34 +176,21 @@ Public Class FormImportCompoundOnline
                                                                                  End If
                                                                                  Me.Enabled = True
                                                                                  Focus()
-                                                                                 If Not t1.Status = TaskStatus.WaitingToRun AndAlso t1.Exception Is Nothing Then
-                                                                                     compoundk = t1.Result
-                                                                                 End If
                                                                                  If Not t2.Status = TaskStatus.WaitingToRun AndAlso t2.Exception Is Nothing Then
                                                                                      compoundc = t2.Result
                                                                                  End If
-                                                                                 'If Not t3.Status = TaskStatus.WaitingToRun AndAlso t3.Exception Is Nothing Then
-                                                                                 '    structuredata = t3.Result
-                                                                                 'End If
                                                                                  AddPropertiesToGrid()
-                                                                                 btnNext.Enabled = compoundk IsNot Nothing
+                                                                                 btnNext.Enabled = compoundc IsNot Nothing
                                                                                  If dgResults.Rows.Count = 0 Then btnNext.Enabled = False
-                                                                                 If Not compoundk Is Nothing Then
-                                                                                     If compoundk.Molar_Weight > 0.0# And
-                                                                                         compoundk.Critical_Temperature > 0.0# And
-                                                                                         compoundk.Critical_Pressure > 0.0# And
-                                                                                         compoundk.Acentric_Factor > 0.0# And
-                                                                                         compoundk.IdealgasCpEquation <> "" Then
+                                                                                 If Not compoundc Is Nothing Then
+                                                                                     If compoundc.Molar_Weight > 0.0# And
+                                                                                         compoundc.Critical_Temperature > 0.0# And
+                                                                                         compoundc.Critical_Pressure > 0.0# And
+                                                                                         compoundc.Acentric_Factor > 0.0# And
+                                                                                         compoundc.IdealgasCpEquation <> "" Then
                                                                                          btnNext.Enabled = True
                                                                                          btnExportJSON.Enabled = True
-                                                                                     Else
-                                                                                         btnNext.Enabled = False
-                                                                                         btnExportJSON.Enabled = False
-                                                                                         MessageBox.Show("Could not find data for this compound in KDB Korean Thermo Database.", DWSIM.App.GetLocalString("Erro"))
                                                                                      End If
-                                                                                 Else
-                                                                                     btnExportJSON.Enabled = False
-                                                                                     MessageBox.Show("Could not find data for this compound in KDB Korean Thermo Database.", DWSIM.App.GetLocalString("Erro"))
                                                                                  End If
                                                                              End Sub)
                                                                 End If
@@ -233,37 +205,7 @@ Public Class FormImportCompoundOnline
 
             Case "Panel3"
 
-                BaseCompound = compoundk.Clone
-
-                If Not compoundc Is Nothing Then
-                    BaseCompound.InChI = compoundc.InChI
-                    BaseCompound.SMILES = compoundc.SMILES
-                    BaseCompound.Comments += vbCrLf + compoundc.Comments
-                End If
-
-                If Not structuredata Is Nothing Then
-                    With BaseCompound
-                        If structuredata.ContainsKey("Original") Then
-                            If .UNIFACGroups Is Nothing Then .UNIFACGroups = New SortedList
-                            .UNIFACGroups.Clear()
-                            For Each item In structuredata("Original")
-                                .UNIFACGroups.Add(item(1), item(2))
-                            Next
-                        End If
-                        If structuredata.ContainsKey("Modified") Then
-                            If .MODFACGroups Is Nothing Then .UNIFACGroups = New SortedList
-                            .MODFACGroups.Clear()
-                            For Each item In structuredata("Modified")
-                                .MODFACGroups.Add(item(1), item(2))
-                            Next
-                            If .NISTMODFACGroups Is Nothing Then .NISTMODFACGroups = New SortedList
-                            .NISTMODFACGroups.Clear()
-                            For Each sg As String In .MODFACGroups.Keys
-                                .NISTMODFACGroups.Add(sg, .MODFACGroups(sg))
-                            Next
-                        End If
-                    End With
-                End If
+                BaseCompound = compoundc.Clone
 
                 Me.DialogResult = System.Windows.Forms.DialogResult.OK
 
@@ -281,13 +223,15 @@ Public Class FormImportCompoundOnline
         Dim okimg = My.Resources.accept
         Dim noimg = My.Resources.cross
 
-        If Not compoundk Is Nothing Then
+        If Not compoundc Is Nothing Then
 
-            With compoundk
+            With compoundc
 
                 Me.dgResults.Rows.Add(New Object() {If(.Name <> "", okimg, noimg), "Name"})
                 Me.dgResults.Rows.Add(New Object() {If(.CAS_Number <> "", okimg, noimg), "CAS Number"})
                 Me.dgResults.Rows.Add(New Object() {If(.Formula <> "", okimg, noimg), "Formula"})
+                Me.dgResults.Rows.Add(New Object() {If(.InChI <> "", okimg, noimg), "InChI String"})
+                Me.dgResults.Rows.Add(New Object() {If(.SMILES <> "", okimg, noimg), "SMILES String"})
 
             End With
 
@@ -296,24 +240,6 @@ Public Class FormImportCompoundOnline
         If Not compoundc Is Nothing Then
 
             With compoundc
-
-                Me.dgResults.Rows.Add(New Object() {If(.InChI <> "", okimg, noimg), "InChI String"})
-                Me.dgResults.Rows.Add(New Object() {If(.SMILES <> "", okimg, noimg), "SMILES String"})
-
-            End With
-
-        End If
-
-        If Not structuredata Is Nothing Then
-
-            Me.dgResults.Rows.Add(New Object() {If(structuredata.ContainsKey("Original"), okimg, noimg), "Original UNIFAC Structure Data"})
-            Me.dgResults.Rows.Add(New Object() {If(structuredata.ContainsKey("Modified"), okimg, noimg), "Modified UNIFAC (Dortmund) Structure Data"})
-
-        End If
-
-        If Not compoundk Is Nothing Then
-
-            With compoundk
 
                 Me.dgResults.Rows.Add(New Object() {If(.Molar_Weight <> 0.0#, okimg, noimg), "Molecular Weight"})
                 Me.dgResults.Rows.Add(New Object() {If(.Normal_Boiling_Point <> 0.0#, okimg, noimg), "Normal Boiling Point"})
@@ -364,7 +290,7 @@ Public Class FormImportCompoundOnline
 
     End Sub
 
-    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
+    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         Process.Start("http://www.cheric.org/research/kdb/")
     End Sub
 
@@ -372,7 +298,7 @@ Public Class FormImportCompoundOnline
         Process.Start("https://www.chemeo.com/")
     End Sub
 
-    Private Sub LinkLabel3_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel3.LinkClicked
+    Private Sub LinkLabel3_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         Process.Start("http://www.ddbst.com/unifacga.html")
     End Sub
 
@@ -380,7 +306,7 @@ Public Class FormImportCompoundOnline
 
         FormMain.AnalyticsProvider?.RegisterEvent("Exporting Compound to JSON", "", Nothing)
 
-        BaseCompound = compoundk.Clone
+        BaseCompound = compoundc.Clone
 
         If Not compoundc Is Nothing Then
             BaseCompound.InChI = compoundc.InChI

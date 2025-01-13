@@ -65,7 +65,7 @@ Public Class FlashAlgorithmConfig
 
         chkIdealPVFlash.Checked = Settings(Interfaces.Enums.FlashSetting.PVFlash_TryIdealCalcOnFailure)
 
-        chkDisplayCompWarning.Checked = PropPack.DisplayMissingCompoundPropertiesWarning
+        chkDisplayCompWarning.Checked = PropPack?.DisplayMissingCompoundPropertiesWarning
 
         Select Case Settings(Interfaces.Enums.FlashSetting.ForceEquilibriumCalculationType)
             Case "Default"
@@ -84,11 +84,11 @@ Public Class FlashAlgorithmConfig
 
         cbFSMethod.SelectedIndex = Settings(Interfaces.Enums.FlashSetting.FailSafeCalculationMode)
 
-        cbFlashApproach.SelectedIndex = PropPack.FlashCalculationApproach
+        cbFlashApproach.SelectedIndex = PropPack?.FlashCalculationApproach
 
         'external solvers
 
-        If PropPack.Flowsheet IsNot Nothing Then
+        If PropPack IsNot Nothing AndAlso PropPack.Flowsheet IsNot Nothing Then
 
             cbExternalSolver.Items.Clear()
             cbExternalSolver.Items.Add("")
@@ -190,18 +190,22 @@ Public Class FlashAlgorithmConfig
 
             Settings(Interfaces.Enums.FlashSetting.PVFlash_TryIdealCalcOnFailure) = chkIdealPVFlash.Checked
 
-            PropPack.FlashCalculationApproach = cbFlashApproach.SelectedIndex
+            If PropPack IsNot Nothing Then
 
-            PropPack.DisplayMissingCompoundPropertiesWarning = chkDisplayCompWarning.Checked
+                PropPack.FlashCalculationApproach = cbFlashApproach.SelectedIndex
 
-            If cbExternalSolver.Enabled And PropPack.Flowsheet IsNot Nothing Then
-                Dim selectedsolver = PropPack.Flowsheet.ExternalSolvers.Values.Where(
+                PropPack.DisplayMissingCompoundPropertiesWarning = chkDisplayCompWarning.Checked
+
+                If cbExternalSolver.Enabled And PropPack.Flowsheet IsNot Nothing Then
+                    Dim selectedsolver = PropPack.Flowsheet.ExternalSolvers.Values.Where(
               Function(s) s.DisplayText = cbExternalSolver.SelectedItem.ToString()).FirstOrDefault()
-                If selectedsolver IsNot Nothing Then
-                    Settings(Interfaces.Enums.FlashSetting.GibbsMinimizationExternalSolver) = selectedsolver.ID
-                Else
-                    Settings(Interfaces.Enums.FlashSetting.GibbsMinimizationExternalSolver) = ""
+                    If selectedsolver IsNot Nothing Then
+                        Settings(Interfaces.Enums.FlashSetting.GibbsMinimizationExternalSolver) = selectedsolver.ID
+                    Else
+                        Settings(Interfaces.Enums.FlashSetting.GibbsMinimizationExternalSolver) = ""
+                    End If
                 End If
+
             End If
 
         Catch ex As Exception

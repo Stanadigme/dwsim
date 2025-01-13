@@ -1885,6 +1885,12 @@ Namespace Reactors
             Return My.Resources.pfr
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.pfr.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("PFR_Desc")
         End Function

@@ -163,7 +163,7 @@ Public Class EditingForm_Column_InitialEstimates
             i += 1
         Next
 
-        ToolStripButton29.Checked = dc.AutoUpdateInitialEstimates
+        chkAutoUpdate.Checked = dc.AutoUpdateInitialEstimates
 
         loaded = True
 
@@ -248,7 +248,14 @@ Public Class EditingForm_Column_InitialEstimates
             Try
                 Dim jsondata = handler.ReadAllText()
                 _ies = Newtonsoft.Json.JsonConvert.DeserializeObject(Of InitialEstimates)(jsondata)
-                Me.TextBox1.Text = handler.FullPath
+
+                loaded = False
+
+                dc.InitialEstimates = _ies
+                dc.UpdateEditForm()
+
+                loaded = True
+
             Catch ex As Exception
                 MessageBox.Show(ex.Message)
             End Try
@@ -272,7 +279,6 @@ Public Class EditingForm_Column_InitialEstimates
                         handler.Write(stream)
                     End Using
                 End Using
-                Me.TextBox1.Text = handler.FullPath
             Catch ex As Exception
                 MessageBox.Show(ex.Message)
             End Try
@@ -376,17 +382,6 @@ Public Class EditingForm_Column_InitialEstimates
         Next
     End Sub
 
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
-
-        loaded = False
-
-        dc.InitialEstimates = _ies
-        dc.UpdateEditForm()
-
-        loaded = True
-
-    End Sub
-
     Private Sub ToolStripButton28_Click(sender As Object, e As EventArgs) Handles ToolStripButton28.Click
 
         Dim i, n As Integer, px, py As New List(Of Double)
@@ -429,16 +424,22 @@ Public Class EditingForm_Column_InitialEstimates
 
     End Sub
 
-    Private Sub ToolStripButton29_CheckedChanged(sender As Object, e As EventArgs) Handles ToolStripButton29.CheckedChanged
-        If loaded Then
-            dc.AutoUpdateInitialEstimates = ToolStripButton29.Checked
-        End If
+    Private Sub ToolStripButton29_CheckedChanged(sender As Object, e As EventArgs)
+
     End Sub
 
     Private Sub dgvv_KeyDown(sender As Object, e As KeyEventArgs) Handles dgvv.KeyDown, dgvcl.KeyDown, dgvcv.KeyDown
         If e.KeyCode = Keys.V And e.Modifiers = Keys.Control Then
             PasteData(sender)
         End If
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles chkAutoUpdate.CheckedChanged
+
+        If loaded Then
+            dc.AutoUpdateInitialEstimates = chkAutoUpdate.Checked
+        End If
+
     End Sub
 
     Private Sub ToolStripButton26_Click(sender As Object, e As EventArgs) Handles ToolStripButton26.Click

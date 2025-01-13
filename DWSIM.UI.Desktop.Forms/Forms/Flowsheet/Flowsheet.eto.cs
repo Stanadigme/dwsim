@@ -13,7 +13,6 @@ using DWSIM.UI.Desktop.Editors;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables;
 using System.Timers;
-using System.Diagnostics;
 using DWSIM.Drawing.SkiaSharp.GraphicObjects.Charts;
 using System.Reflection;
 using s = DWSIM.GlobalSettings.Settings;
@@ -172,14 +171,7 @@ namespace DWSIM.UI.Forms
 
             Title = "New Flowsheet";
 
-            if (s.FlowsheetRenderer == s.SkiaCanvasRenderer.CPU)
-            {
-                FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
-            }
-            else
-            {
-                FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl_OpenGL() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
-            }
+            FlowsheetControl = new DWSIM.UI.Controls.FlowsheetSurfaceControl() { FlowsheetObject = FlowsheetObject, FlowsheetSurface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface() };
 
             FlowsheetObject.FlowsheetControl = FlowsheetControl;
 
@@ -388,14 +380,14 @@ namespace DWSIM.UI.Forms
 
             ActComps = () =>
             {
-                var cont = new TableLayout();
-                var editor = new DWSIM.UI.Desktop.Editors.Compounds(FlowsheetObject, cont);
+                var cont = new DynamicLayout();
+                var editor = new Compounds(FlowsheetObject, cont);
                 cont.Tag = "Simulation Compounds";
 
-                var cont2 = new Desktop.Editors.CompoundTools(FlowsheetObject);
+                var cont2 = new CompoundTools(FlowsheetObject);
                 cont2.Tag = "Compound Tools";
 
-                var form = UI.Shared.Common.GetDefaultTabbedForm("Compounds", (int)(sf * 920), (int)(sf * 500), new Control[] { cont, cont2 });
+                var form = UI.Shared.Common.GetDefaultTabbedForm("Compounds", (int)(sf * 920), (int)(sf * 700), new Control[] { cont, cont2 });
 
                 editor.listcontainer.CellEdited += (sender, e) => UpdateEditorPanels();
 
@@ -562,17 +554,20 @@ namespace DWSIM.UI.Forms
 
             // button click events
 
-            btnmUndo.Click += (sender, e) => {
+            btnmUndo.Click += (sender, e) =>
+            {
                 if (!FlowsheetObject.FlowsheetOptions.EnabledUndoRedo)
                 {
                     FlowsheetObject.ShowMessage("Undo/Redo feature is disabled (Edit > Flowsheet Settings > General > Enable Undo/Redo)", Interfaces.IFlowsheet.MessageType.Tip);
                 }
-                else {
+                else
+                {
                     FlowsheetObject.ProcessUndo();
                 }
             };
 
-            btnmRedo.Click += (sender, e) => {
+            btnmRedo.Click += (sender, e) =>
+            {
                 if (!FlowsheetObject.FlowsheetOptions.EnabledUndoRedo)
                 {
                     FlowsheetObject.ShowMessage("Undo/Redo feature is disabled (Edit > Flowsheet Settings > General > Enable Undo/Redo)", Interfaces.IFlowsheet.MessageType.Tip);
@@ -932,9 +927,9 @@ namespace DWSIM.UI.Forms
             var Split2 = new Eto.Forms.Splitter { Orientation = Orientation.Vertical, FixedPanel = SplitterFixedPanel.Panel2 };
             var Split3 = new Eto.Forms.Splitter { Orientation = Orientation.Vertical, FixedPanel = SplitterFixedPanel.Panel2 };
 
-            EditorHolder = new DocumentControl() { AllowReordering = true, DisplayArrows = false };
+            EditorHolder = new DocumentControl() { AllowReordering = true };
 
-            var PanelEditors = new DocumentControl() { TabBarBackgroundColor = SystemColors.Highlight };
+            var PanelEditors = new DocumentControl();
             PanelEditors.Pages.Add(new DocumentPage(EditorHolder) { Text = "Object Editors", Closable = false });
 
             Split1.Panel1 = PanelEditors;
@@ -988,11 +983,13 @@ namespace DWSIM.UI.Forms
             objcontainer.Pages.Add(new DocumentPage(panelindicators) { Closable = false, Text = "Indicators" });
             objcontainer.Pages.Add(new DocumentPage(panelother) { Closable = false, Text = "Other" });
 
-            var PanelObjects = new DocumentControl() { DisplayArrows = false, TabBarBackgroundColor = SystemColors.Highlight };
+            var PanelObjects = new DocumentControl();
             PanelObjects.Pages.Add(new DocumentPage(objcontainer) { Text = "Object Palette", Closable = false });
 
             Split2.Panel2 = PanelObjects;
             Split2.Panel2.Height = 120 * (int)sf;
+
+            if (Application.Instance.Platform.IsWpf || Application.Instance.Platform.IsGtk) FlowsheetControl.AllowDrop = true;
 
             foreach (var obj in ObjectList.Values.OrderBy(x => x.GetDisplayName()))
             {
@@ -1001,16 +998,17 @@ namespace DWSIM.UI.Forms
                     var pitem = new FlowsheetObjectPanelItem();
                     if (!(Application.Instance.Platform.IsGtk && s.RunningPlatform() == s.Platform.Mac))
                     {
-                        var bmp = (System.Drawing.Bitmap)obj.GetIconBitmap();
-                        pitem.imgIcon.Image = new Bitmap(DWSIM.UI.Shared.Common.ImageToByte(bmp));
+                        var bmp = new Bitmap(obj.GetIconBitmapBytes());
+                        pitem.imgIcon.Image = bmp;
                     }
                     pitem.txtName.Text = obj.GetDisplayName();
                     pitem.MouseDown += (sender, e) =>
                     {
                         var dobj = new DataObject();
-                        dobj.Image = pitem.imgIcon.Image;
                         dobj.SetString(obj.GetDisplayName(), "ObjectName");
-                        pitem.DoDragDrop(dobj, DragEffects.All);
+                        dobj.Text = obj.GetDisplayName();
+                        using (var img = new Bitmap(pitem.imgIcon.Image, 40, 40, ImageInterpolation.High))
+                            pitem.DoDragDrop(dobj, DragEffects.Copy, img, new PointF(20, 20));
                         e.Handled = true;
                     };
                     switch (obj.ObjectClass)
@@ -1066,7 +1064,14 @@ namespace DWSIM.UI.Forms
                 }
             }
 
-            if (Application.Instance.Platform.IsWpf) FlowsheetControl.AllowDrop = true;
+            if (Application.Instance.Platform.IsWpf)
+            {
+                FlowsheetControl.DragEnter += (s, e) =>
+                {
+                    e.Effects = DragEffects.Copy;
+                };
+            }
+
             FlowsheetControl.DragDrop += (sender, e) =>
             {
                 if (e.Data.GetString("ObjectName") != null)
@@ -1444,15 +1449,20 @@ namespace DWSIM.UI.Forms
                     imghum, tbhum, lblhum, imgsun, tbirr, lblirr },
                 VerticalContentAlignment = VerticalAlignment.Center,
                 Spacing = 4,
-                Visible = false
+                Visible = false,
+                Height = 0
             };
 
             btnToggleWeatherPanel.Click += (s, e) =>
             {
                 weatherpanel.Visible = !weatherpanel.Visible;
+                if (weatherpanel.Visible)
+                    weatherpanel.Height = 40;
+                else
+                    weatherpanel.Height = 0;
             };
 
-            flowsheetcontrolcontainer.Rows.Add(new TableRow(new Scrollable { Border = BorderType.None, Content = weatherpanel }));
+            flowsheetcontrolcontainer.Rows.Add(new TableRow(weatherpanel));
 
             Split2.Panel1 = flowsheetcontrolcontainer;
 
@@ -1539,16 +1549,17 @@ namespace DWSIM.UI.Forms
                 documentcontainer.SelectedIndex = 1;
             };
 
-            Split1.Panel2 = Split3;
-
             btnShowHideObjectPalette.Click += (sender, e) =>
             {
                 Split2.Panel2.Visible = !Split2.Panel2.Visible;
             };
 
-            DocumentPageSpreadsheet = new DocumentPage { Content = SpreadsheetControl, Text = "Spreadsheet", Closable = false };
+            if (Application.Instance.Platform.IsGtk)
+                DocumentPageSpreadsheet = new DocumentPage { Content = new Scrollable { Content = SpreadsheetControl }, Text = "Spreadsheet", Closable = false };
+            else
+                DocumentPageSpreadsheet = new DocumentPage { Content = SpreadsheetControl, Text = "Spreadsheet", Closable = false };
 
-            DocumentContainer = new DocumentControl() { AllowReordering = false, DisplayArrows = false };
+            DocumentContainer = new DocumentControl() { AllowReordering = false };
             DocumentContainer.Pages.Add(new DocumentPage { Content = Split2, Text = "Flowsheet", Closable = false });
             DocumentContainer.Pages.Add(new DocumentPage { Content = MaterialStreamListControl, Text = "Material Streams", Closable = false });
             DocumentContainer.Pages.Add(DocumentPageSpreadsheet);
@@ -1630,6 +1641,8 @@ namespace DWSIM.UI.Forms
                 Spacing = 4,
                 Visible = true
             };
+
+            Split1.Panel2 = Split3;
 
             var Split0 = new Eto.Forms.Splitter { Orientation = Orientation.Vertical, FixedPanel = SplitterFixedPanel.Panel2 };
             Split0.Panel1 = Split1;
@@ -1815,6 +1828,8 @@ namespace DWSIM.UI.Forms
             }
         }
 
+        private bool called1 = false;
+
         void Flowsheet_Shown(object sender, EventArgs e)
         {
 
@@ -1823,10 +1838,27 @@ namespace DWSIM.UI.Forms
             btnmMultiSelect.Checked = FlowsheetObject.Options.FlowsheetMultiSelectMode;
 
             var surface = (DWSIM.Drawing.SkiaSharp.GraphicsSurface)FlowsheetObject.GetSurface();
-            surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
-            surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
-            surface.Zoom *= 0.7f;
-            surface.Center((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+
+            if (Application.Instance.Platform.IsGtk)
+            {
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+                surface.Zoom *= 0.8f;
+                surface.Center((int)(FlowsheetControl.Width * s.DpiScale* s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale* s.DpiScale));
+
+                Task.Delay(2000).ContinueWith((t) =>
+                {
+                    if (!called1) Application.Instance.Invoke(() => { FlowsheetObject.SetGTKDragDest.Invoke(); called1 = true; });
+                });
+            }
+            else
+            {
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+                surface.ZoomAll((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+                surface.Zoom *= 0.8f;
+                surface.Center((int)(FlowsheetControl.Width * s.DpiScale), (int)(FlowsheetControl.Height * s.DpiScale));
+            }
+
 
             ddstates.Items.Clear();
             ddstates.Items.Add("");
@@ -2013,8 +2045,8 @@ namespace DWSIM.UI.Forms
             var fsolverassembly = System.Reflection.Assembly.LoadFile(Path.Combine(dir, "DWSIM.FlowsheetSolver.dll"));
             List<Type> availableTypes = new List<Type>();
 
-            availableTypes.AddRange(calculatorassembly.GetTypes().Where(x => x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null ? true : false));
-            availableTypes.AddRange(unitopassembly.GetTypes().Where(x => x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null && !x.IsAbstract ? true : false));
+            availableTypes.AddRange(calculatorassembly.GetExportedTypes().Where(x => x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null ? true : false));
+            availableTypes.AddRange(unitopassembly.GetExportedTypes().Where(x => x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null && !x.IsAbstract ? true : false));
 
             List<ListItem> litems = new List<ListItem>();
 
@@ -2117,7 +2149,7 @@ namespace DWSIM.UI.Forms
                 });
             };
 
-            var container = new DocumentControl() { DisplayArrows = false };
+            var container = new DocumentControl();
 
             container.Pages.Add(new DocumentPage(outtxt) { Text = "Log Panel", Closable = false });
 
@@ -2231,8 +2263,9 @@ namespace DWSIM.UI.Forms
                 obj.GraphicObject.DrawLabel = !obj.GraphicObject.DrawLabel;
             };
 
+
             var item3 = new ButtonMenuItem { Text = "Calculate", Image = new Bitmap(bitmapprefix + "icons8-play.png") };
-            item3.Click += (sender, e) => FlowsheetObject.RequestCalculation(obj, false);
+            item3.Click += (sender, e) => FlowsheetObject.RequestCalculation3(obj, false);
 
             var item4 = new ButtonMenuItem { Text = "Debug", Image = new Bitmap(bitmapprefix + "Console_96px.png") };
             item4.Click += (sender, e) =>

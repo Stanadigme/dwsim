@@ -180,11 +180,10 @@ namespace DWSIM.UI.Desktop.Editors
                 }
             });
 
-            page1.SuspendLayout();
-            page1.ContentContainer.Add(dl);
-            page1.ResumeLayout();
+            page1.ContentContainer.Content = dl;
             page1.SetFontAndPadding();
             page1.Show();
+            c.Center(page1);
 
         }
 
@@ -274,9 +273,10 @@ namespace DWSIM.UI.Desktop.Editors
                 dl.CreateAndAddLabelRow2("This will search selected online thermodynamic databases (KDB, Cheméo and DDB) for compound data according to its name and/or CAS ID.");
             }
 
-            page2.ContentContainer.Add(new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width });
+            page2.ContentContainer.Content = new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width };
             page2.SetFontAndPadding();
             page2.Show();
+            c.Center(page2);
 
         }
 
@@ -453,9 +453,10 @@ namespace DWSIM.UI.Desktop.Editors
                     break;
             }
 
-            page2.ContentContainer.Add(new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width });
+            page2.ContentContainer.Content =new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width };
             page2.SetFontAndPadding();
             page2.Show();
+            c.Center(page2);
 
         }
 
@@ -514,9 +515,10 @@ namespace DWSIM.UI.Desktop.Editors
                 });
             }
 
-            page.ContentContainer.Add(new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width });
+            page.ContentContainer.Content = new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width };
             page.SetFontAndPadding();
             page.Show();
+            c.Center(page);
 
         }
 
@@ -644,9 +646,10 @@ namespace DWSIM.UI.Desktop.Editors
                 if (c.IsValidDouble(arg1.Text)) comp.EnthalpyOfFusionAtTf = arg1.Text.ToDoubleFromCurrent();
             });
 
-            page.ContentContainer.Add(new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width });
+            page.ContentContainer.Content = new Scrollable { Content = dl, Border = BorderType.None, Height = Height, Width = Width };
             page.SetFontAndPadding();
             page.Show();
+            c.Center(page);
 
         }
 
@@ -844,9 +847,10 @@ namespace DWSIM.UI.Desktop.Editors
             escp.Visible = false;
             escp.PlaceholderText = "T in K, Cp in kJ/[kg.K]";
 
-            page.ContentContainer.Add(dl);
+            page.ContentContainer.Content = dl;
             page.SetFontAndPadding();
             page.Show();
+            c.Center(page);
 
         }
 
@@ -1003,9 +1007,10 @@ namespace DWSIM.UI.Desktop.Editors
                 dl.CreateAndAddLabelRow2("Adds the compound to the current simulation.");
             }
 
-            page.ContentContainer.Add(dl);
+            page.ContentContainer.Content = dl;
             page.SetFontAndPadding();
             page.Show();
+            c.Center(page);
 
 
         }

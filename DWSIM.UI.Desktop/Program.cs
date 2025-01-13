@@ -50,37 +50,8 @@ namespace DWSIM.UI.Desktop
                 loadsetex = ex;
             }
 
-            if (GlobalSettings.Settings.EnableGPUProcessing)
-            {
-                // initialize gpu if enabled
-                try
-                {
-                    //set CUDA params
-                    CudafyModes.Compiler = eGPUCompiler.All;
-                    CudafyModes.Target = (eGPUType)Settings.CudafyTarget;
-                    Cudafy.Translator.CudafyTranslator.GenerateDebug = false;
-                    DWSIM.Thermodynamics.Calculator.InitComputeDevice();
-                    Console.WriteLine("GPU initialized successfully: " + Settings.SelectedGPU + "(" + CudafyModes.Target.ToString() + ")");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("GPU initialization failed: " + ex.ToString());
-                    var ex1 = ex;
-                    while (ex1.InnerException != null)
-                    {
-                        Console.WriteLine("GPU initialization failed (IEX): " + ex1.InnerException.ToString());
-                        if (ex1.InnerException is ReflectionTypeLoadException)
-                        {
-                            foreach (var tlex in ((ReflectionTypeLoadException)(ex1.InnerException)).LoaderExceptions)
-                            { Console.WriteLine("GPU initialization failed (TLEX): " + tlex.Message); }
-                        }
-                        ex1 = ex1.InnerException;
-                    }
-                }
-            }
-
             Eto.Platform platform = null;
-
+            
             try
             {
                 if (Settings.RunningPlatform() == Settings.Platform.Windows)
@@ -91,7 +62,6 @@ namespace DWSIM.UI.Desktop
                             DWSIM.UI.Desktop.WinForms.StyleSetter.SetStyles();
                             platform = new Eto.WinForms.Platform();
                             platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new WinForms.FlowsheetSurfaceControlHandler());
-                            platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new WinForms.FlowsheetSurfaceControlHandler_OpenGL());
                             platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.WinForms.PlotHandler());
                             platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.WinForms.ScintillaControlHandler());
                             break;
@@ -100,17 +70,17 @@ namespace DWSIM.UI.Desktop
                             DWSIM.UI.Desktop.WPF.StyleSetter.SetStyles();
                             platform = new Eto.Wpf.Platform();
                             platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new WPF.FlowsheetSurfaceControlHandler());
-                            platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new WPF.FlowsheetSurfaceControlHandler_OpenGL());
                             platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.WPF2.PlotHandler());
                             platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.WPF.ScintillaControlHandler());
                             break;
                         case Settings.WindowsPlatformRenderer.Gtk2:
-                            DWSIM.UI.Desktop.GTK.StyleSetter.SetStyles();
+                        case Settings.WindowsPlatformRenderer.Gtk3:
+                            GlobalSettings.Settings.IsGTKRenderer = true;
+                            DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
-                            platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK.FlowsheetSurfaceControlHandler());
-                            platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new GTK.FlowsheetSurfaceControlHandler_OpenGL());
-                            platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk.PlotHandler());
-                            platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK.ScintillaControlHandler());
+                            platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
+                            platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk3.PlotHandler());
+                            //platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
                             break;
                     }
                     if (!GlobalSettings.Settings.AutomationMode)
@@ -129,18 +99,18 @@ namespace DWSIM.UI.Desktop
                     switch (renderer)
                     {
                         case Settings.LinuxPlatformRenderer.Gtk2:
-                            DWSIM.UI.Desktop.GTK.StyleSetter.SetStyles();
+                        case Settings.LinuxPlatformRenderer.Gtk3:
+                            GlobalSettings.Settings.IsGTKRenderer = true;
+                            DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                             platform = new Eto.GtkSharp.Platform();
-                            platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK.FlowsheetSurfaceControlHandler());
-                            platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new GTK.FlowsheetSurfaceControlHandler_OpenGL());
-                            platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk.PlotHandler());
-                            platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK.ScintillaControlHandler());
+                            platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
+                            platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk3.PlotHandler());
+                            platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
                             break;
                         case Settings.LinuxPlatformRenderer.WinForms:
                             DWSIM.UI.Desktop.WinForms.StyleSetter.SetStyles();
                             platform = new Eto.WinForms.Platform();
                             platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new WinForms.FlowsheetSurfaceControlHandler());
-                            platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new WinForms.FlowsheetSurfaceControlHandler_OpenGL());
                             platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.WinForms.PlotHandler());
                             platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.WinForms.ScintillaControlHandler());
                             break;
@@ -158,12 +128,11 @@ namespace DWSIM.UI.Desktop
                 {
                     if (GlobalSettings.Settings.AutomationMode)
                     {
-                        DWSIM.UI.Desktop.GTK.StyleSetter.SetStyles();
+                        DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                         platform = new Eto.GtkSharp.Platform();
-                        platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK.FlowsheetSurfaceControlHandler());
-                        platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new GTK.FlowsheetSurfaceControlHandler_OpenGL());
-                        platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk.PlotHandler());
-                        platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK.ScintillaControlHandler());
+                        platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
+                        platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk3.PlotHandler());
+                        platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
                     }
                     else
                     {
@@ -174,23 +143,22 @@ namespace DWSIM.UI.Desktop
                                 platform = new Eto.Mac.Platform();
                                 DWSIM.UI.Desktop.Mac.StyleSetter.BeginLaunching();
                                 platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new Mac.FlowsheetSurfaceControlHandler());
-                                platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new Mac.FlowsheetSurfaceControlHandler_OpenGL());
                                 platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Mac.PlotHandler());
                                 platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.Mac.ScintillaControlHandler());
                                 break;
                             case Settings.MacOSPlatformRenderer.Gtk2:
-                                DWSIM.UI.Desktop.GTK.StyleSetter.SetStyles();
+                            case Settings.MacOSPlatformRenderer.Gtk3:
+                                GlobalSettings.Settings.IsGTKRenderer = true;
+                                DWSIM.UI.Desktop.GTK3.StyleSetter.SetStyles();
                                 platform = new Eto.GtkSharp.Platform();
-                                platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK.FlowsheetSurfaceControlHandler());
-                                platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new GTK.FlowsheetSurfaceControlHandler_OpenGL());
-                                platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk.PlotHandler());
-                                platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK.ScintillaControlHandler());
+                                platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new GTK3.FlowsheetSurfaceControlHandler());
+                                platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.Gtk3.PlotHandler());
+                                platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.GTK3.ScintillaControlHandler());
                                 break;
                             case Settings.MacOSPlatformRenderer.WinForms:
                                 DWSIM.UI.Desktop.WinForms.StyleSetter.SetStyles();
                                 platform = new Eto.WinForms.Platform();
                                 platform.Add<FlowsheetSurfaceControl.IFlowsheetSurface>(() => new WinForms.FlowsheetSurfaceControlHandler());
-                                platform.Add<FlowsheetSurfaceControl_OpenGL.IFlowsheetSurface_OpenGL>(() => new WinForms.FlowsheetSurfaceControlHandler_OpenGL());
                                 platform.Add<Eto.OxyPlot.Plot.IHandler>(() => new Eto.OxyPlot.WinForms.PlotHandler());
                                 platform.Add<Eto.Forms.Controls.Scintilla.Shared.ScintillaControl.IScintillaControl>(() => new Eto.Forms.Controls.Scintilla.WinForms.ScintillaControlHandler());
                                 break;

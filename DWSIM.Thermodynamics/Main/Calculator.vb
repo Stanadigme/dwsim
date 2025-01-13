@@ -8,6 +8,7 @@ Imports DWSIM.GlobalSettings
 Public Class Calculator
 
     Public Shared _ResourceManager As System.Resources.ResourceManager
+    Public Shared Culture As Globalization.CultureInfo
 
     Public Shared ExcelLogForm As LogForm
 
@@ -17,11 +18,9 @@ Public Class Calculator
 
     Public Shared Function GetLocalString(ByVal text As String) As String
 
+        If Culture Is Nothing Then Culture = New Globalization.CultureInfo("en-US")
+
         If _ResourceManager Is Nothing Then
-
-            Dim cultureinfo As String = If(Settings.ExcelMode, "en", GlobalSettings.Settings.CultureInfo)
-
-            My.Application.ChangeUICulture(cultureinfo)
 
             'loads the resource manager
             _ResourceManager = New System.Resources.ResourceManager("DWSIM.Thermodynamics.Strings", System.Reflection.Assembly.GetExecutingAssembly())
@@ -30,12 +29,7 @@ Public Class Calculator
 
         If text <> "" Then
 
-            Dim cultureinfo As String = If(Settings.ExcelMode, "en", GlobalSettings.Settings.CultureInfo)
-            If My.Application.UICulture.Name <> cultureinfo Then
-                My.Application.ChangeUICulture(cultureinfo)
-            End If
-
-            Dim retstr As String = _ResourceManager.GetString(text, My.Application.UICulture)
+            Dim retstr As String = _ResourceManager.GetString(text, Culture)
             If retstr Is Nothing Then Return text Else Return retstr
 
         Else

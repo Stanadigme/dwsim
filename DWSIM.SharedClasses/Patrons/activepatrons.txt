@@ -1,5 +1,7 @@
-﻿🥇 Yoshihide Watabe
+﻿💎 AI4Tech
+🥇 Yoshihide Watabe
 🥇 Lauterbach Verfahrenstechnik GmbH
+🥇 Nils Tellier, PE
 🥈 Alexander Semenyak
 🥈 Pedro Sabóia
 🥈 Sukin Oh
@@ -23,7 +25,6 @@
 🌟 José Marques
 🌟 Justin Parrot
 🌟 Leonard Seed
-🌟 Magnus Carlsen
 🌟 Marcos Guimarães
 🌟 Martin Heiser
 🌟 Michael Papantoniou
@@ -53,9 +54,11 @@ Carlos Pantoja
 Christian Jordan
 Christian Pedersen
 CollectiveObjective
+Daniel Dornellas Athayde
 David Miller
 David Whitlock
 Denislav Zdravkov
+Elinéia Costa
 Eugenio León
 Fabiano Scheufele
 Fernando Almeida
@@ -67,22 +70,20 @@ Guenther Holzer
 Harry Levinson
 Hep Ingham
 Hurudza
-Jay Hunter
 John Eamon
 John Kossik
 Kenneth Troldal
 Leandro Favaretto
 Les Waymont
 Lewis Estall
+Luís Gustavo Carneiro
 Maša Novaković
 Marcos Silva
 Mario Farley
-Mohan Vaze
 Nathan Schuh
 Peter Nordquist
 Petroconsulting LLC
 Rainer Scheuring
-Rashad Ahmadov
 Renato Arrieche
 Robert Gerard
 Robert Gulotty

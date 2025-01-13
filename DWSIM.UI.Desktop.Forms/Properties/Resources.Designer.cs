@@ -59,25 +59,5 @@ namespace DWSIM.UI.Forms.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon DWSIM_ico {
-            get {
-                object obj = ResourceManager.GetObject("DWSIM_ico", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon DWSIM_ico_16 {
-            get {
-                object obj = ResourceManager.GetObject("DWSIM_ico_16", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
     }
 }

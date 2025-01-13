@@ -25,10 +25,7 @@ Partial Class FormImportCompoundOnline
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FormImportCompoundOnline))
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.LinkLabel3 = New System.Windows.Forms.LinkLabel()
         Me.LinkLabel2 = New System.Windows.Forms.LinkLabel()
-        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
-        Me.Label9 = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.tbSearchString = New System.Windows.Forms.TextBox()
@@ -65,38 +62,18 @@ Partial Class FormImportCompoundOnline
         'Panel1
         '
         resources.ApplyResources(Me.Panel1, "Panel1")
-        Me.Panel1.Controls.Add(Me.LinkLabel3)
         Me.Panel1.Controls.Add(Me.LinkLabel2)
-        Me.Panel1.Controls.Add(Me.LinkLabel1)
-        Me.Panel1.Controls.Add(Me.Label9)
         Me.Panel1.Controls.Add(Me.Label8)
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.tbSearchString)
         Me.Panel1.Controls.Add(Me.Label1)
         Me.Panel1.Name = "Panel1"
         '
-        'LinkLabel3
-        '
-        resources.ApplyResources(Me.LinkLabel3, "LinkLabel3")
-        Me.LinkLabel3.Name = "LinkLabel3"
-        Me.LinkLabel3.TabStop = True
-        '
         'LinkLabel2
         '
         resources.ApplyResources(Me.LinkLabel2, "LinkLabel2")
         Me.LinkLabel2.Name = "LinkLabel2"
         Me.LinkLabel2.TabStop = True
-        '
-        'LinkLabel1
-        '
-        resources.ApplyResources(Me.LinkLabel1, "LinkLabel1")
-        Me.LinkLabel1.Name = "LinkLabel1"
-        Me.LinkLabel1.TabStop = True
-        '
-        'Label9
-        '
-        resources.ApplyResources(Me.Label9, "Label9")
-        Me.Label9.Name = "Label9"
         '
         'Label8
         '
@@ -264,10 +241,7 @@ Partial Class FormImportCompoundOnline
     Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents Column2 As System.Windows.Forms.DataGridViewImageColumn
     Friend WithEvents Column1 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents LinkLabel3 As System.Windows.Forms.LinkLabel
     Friend WithEvents LinkLabel2 As System.Windows.Forms.LinkLabel
-    Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
-    Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents btnExportJSON As Button
 End Class

@@ -1,14 +1,9 @@
-Version 8.8.3
+Version 8.9.0
 
-- Added spreadsheet object to Automation3 API
-- Added MJ/h to heat flow units (#675)
-- Updated IronPython version to v3.4.1
-- Fixed issue with Sensitivity Analysis utility (Classic UI) (#684)
-- Fixed issue with Optimization utility (Classic UI) (#688)
-- Fixed Cantera Interop sample
-- Fixed Biodiesel Combustion (Cantera) sample
-- Fixed enthalpy and entropy calculation for Seawater Property Package (#682)
-- Fixed Pipe Segment external diameter calculation
-- Fixed issue with loading reaction sets for internal flowsheets in Flowsheet UO
-- Fixed issue with CAPE-OPEN Property Package equilibrium calculations
-- Missing compound parameter warnings are now optional
+- Cross-Platform UI overhaul + added GTK 3 and .NET 8 support for Linux
+- Fixed a bug in Nested Loops flash
+- Recycle Op now defaults to legacy mode solving
+- Fixed solver busy message
+- Reworked Rigorous Column initial estimates editor controls (Classic UI)
+- Fixed zedgraph file saving
+- Fixed rigorous column stage naming

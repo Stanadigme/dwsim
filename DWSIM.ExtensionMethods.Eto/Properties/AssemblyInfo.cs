@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DWSIM.ExtensionMethods.Eto")]
-[assembly: AssemblyCopyright("Copyright © 2017-2024 Daniel Wagner")]
+[assembly: AssemblyCopyright("Copyright © 2017-2025 Daniel Wagner")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("8.8.3.0")]
+[assembly: AssemblyVersion("8.9.0.0")]

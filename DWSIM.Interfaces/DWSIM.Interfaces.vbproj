@@ -103,6 +103,7 @@
     <Compile Include="IBidirectionalSolver.vb" />
     <Compile Include="IChart.vb" />
     <Compile Include="IConnectionPortInfo.vb" />
+    <Compile Include="IConvergenceHelper.vb" />
     <Compile Include="IDimension.vb" />
     <Compile Include="IEnergyStream.vb" />
     <Compile Include="IFlowsheetResults.vb" />

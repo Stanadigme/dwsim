@@ -2285,7 +2285,7 @@ Imports DWSIM.ExtensionMethods
                             Dim propname = xel.Element("Name").Value
                             Dim proptype = xel.Element("PropertyType").Value
                             Dim assembly1 As Assembly = Nothing
-                            For Each assembly In My.Application.Info.LoadedAssemblies
+                            For Each assembly In AppDomain.CurrentDomain.GetAssemblies()
                                 If proptype.Contains(assembly.GetName().Name) Then
                                     assembly1 = assembly
                                     Exit For
@@ -2648,12 +2648,13 @@ Imports DWSIM.ExtensionMethods
         xel = xdoc.Element("DWSIM_Simulation_Data").Element("GeneralInfo")
 
         If Not DWSIM.GlobalSettings.Settings.AutomationMode Then
-            xel.Add(New XElement("BuildVersion", My.Application.Info.Version.ToString))
-            xel.Add(New XElement("BuildDate", CType("01/01/2000", DateTime).AddDays(My.Application.Info.Version.Build).AddSeconds(My.Application.Info.Version.Revision * 2)))
+            Dim appver = Assembly.GetEntryAssembly().GetName().Version
+            xel.Add(New XElement("BuildVersion", appver.ToString))
+            xel.Add(New XElement("BuildDate", CType("01/01/2000", DateTime).AddDays(appver.Build).AddSeconds(appver.Revision * 2)))
             If GlobalSettings.Settings.RunningPlatform() = GlobalSettings.Settings.Platform.Mac Then
                 xel.Add(New XElement("OSInfo", "macOS " + Environment.OSVersion.ToString()))
             Else
-                xel.Add(New XElement("OSInfo", My.Computer.Info.OSFullName & ", Version " & My.Computer.Info.OSVersion & ", " & My.Computer.Info.OSPlatform & " Platform"))
+                xel.Add(New XElement("OSInfo", Environment.OSVersion.Platform.ToString() & ", Version " & Environment.OSVersion.Version.ToString()))
             End If
         End If
         xel.Add(New XElement("SavedOn", Date.Now))
@@ -3112,7 +3113,7 @@ Imports DWSIM.ExtensionMethods
 
         AddExternalUOs()
         AddSystemsOfUnits()
-        AddDefaultProperties()
+        'AddDefaultProperties()
 
         If Not SupressDataLoading Then
 
@@ -3263,7 +3264,7 @@ Imports DWSIM.ExtensionMethods
 
     Public Function LoadZippedXML(pathtofile As String) As XDocument
 
-        Dim pathtosave As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, Guid.NewGuid().ToString())
+        Dim pathtosave As String = Path.Combine(IO.Path.GetTempPath(), Guid.NewGuid().ToString())
 
         Directory.CreateDirectory(pathtosave)
 
@@ -3325,7 +3326,7 @@ Label_00CC:
 
     Public Shared Function LoadZippedXMLDoc(pathtofile As String) As XDocument
 
-        Dim pathtosave As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, Guid.NewGuid().ToString())
+        Dim pathtosave As String = Path.Combine(IO.Path.GetTempPath(), Guid.NewGuid().ToString())
 
         Directory.CreateDirectory(pathtosave)
 
@@ -3573,11 +3574,7 @@ Label_00CC:
 
         Dim otheruos = SharedClasses.Utility.LoadAdditionalUnitOperations()
 
-        Dim unitopassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.UnitOperations")).FirstOrDefault
-
-        If unitopassembly Is Nothing Then
-            unitopassembly = Assembly.Load("DWSIM.UnitOperations")
-        End If
+        Dim unitopassembly = Assembly.Load("DWSIM.UnitOperations")
 
         Dim euolist As List(Of Interfaces.IExternalUnitOperation) = SharedClasses.Utility.GetUnitOperations(unitopassembly)
 
@@ -3642,21 +3639,20 @@ Label_00CC:
 
     Sub AddDefaultProperties()
 
+        If (GlobalSettings.Settings.RunningPlatform() = Settings.Platform.Linux) Then
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+
+        End If
+
         If Me.FlowsheetOptions.VisibleProperties.Count = 0 Then
 
-            Dim calculatorassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.Thermodynamics,")).FirstOrDefault
-            Dim unitopassembly = My.Application.Info.LoadedAssemblies.Where(Function(x) x.FullName.Contains("DWSIM.UnitOperations")).FirstOrDefault
-
-            If calculatorassembly Is Nothing Then
-                calculatorassembly = AppDomain.CurrentDomain.Load("DWSIM.Thermodynamics")
-            End If
-            If unitopassembly Is Nothing Then
-                unitopassembly = AppDomain.CurrentDomain.Load("DWSIM.UnitOperations")
-            End If
+            Dim calculatorassembly = System.Reflection.Assembly.Load("DWSIM.Thermodynamics")
+            Dim unitopassembly = System.Reflection.Assembly.Load("DWSIM.UnitOperations")
 
             Dim aTypeList As New List(Of Type)
-            aTypeList.AddRange(calculatorassembly.GetTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing, True, False)))
-            aTypeList.AddRange(unitopassembly.GetTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing And
+            aTypeList.AddRange(calculatorassembly.GetExportedTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing, True, False)))
+            aTypeList.AddRange(unitopassembly.GetExportedTypes().Where(Function(x) If(x.GetInterface("DWSIM.Interfaces.ISimulationObject") IsNot Nothing And
                                                                    Not x.IsAbstract And x.GetInterface("DWSIM.Interfaces.IExternalUnitOperation") Is Nothing, True, False)))
 
             For Each item In aTypeList.OrderBy(Function(x) x.Name)
@@ -4005,14 +4001,23 @@ Label_00CC:
 
         If Not File.Exists(assemblyPath1) Then
             If Not File.Exists(assemblyPath2) Then
+                'Console.WriteLine("Could not find assembly " + assemblyPath1)
                 Return Nothing
             Else
-                Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath2)
-                Return assembly
+                Try
+                    Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath2)
+                    Return assembly
+                Catch ex As System.IO.FileLoadException
+                    'Console.WriteLine("Could not find assembly " + ex.FileName)
+                End Try
             End If
         Else
-            Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath1)
-            Return assembly
+            Try
+                Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath1)
+                Return assembly
+            Catch ex As System.IO.FileLoadException
+                'Console.WriteLine("Could not find assembly " + ex.FileName)
+            End Try
         End If
 
     End Function
@@ -4916,7 +4921,7 @@ Label_00CC:
                                     Dim propname = xel.Element("Name").Value
                                     Dim proptype = xel.Element("PropertyType").Value
                                     Dim assembly1 As Assembly = Nothing
-                                    For Each assembly In My.Application.Info.LoadedAssemblies
+                                    For Each assembly In AppDomain.CurrentDomain.GetAssemblies()
                                         If proptype.Contains(assembly.GetName().Name) Then
                                             assembly1 = assembly
                                             Exit For

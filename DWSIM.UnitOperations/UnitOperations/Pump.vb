@@ -1270,6 +1270,12 @@ Namespace UnitOperations
             Return My.Resources.pump
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.pump.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("PUMP_Desc")
         End Function

@@ -436,6 +436,12 @@ Namespace Reactors
 
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.reactor_reaktoro.png")
+
+        End Function
+
         Public Sub Draw(g As Object) Implements IExternalUnitOperation.Draw
 
             Dim canvas As SKCanvas = DirectCast(g, SKCanvas)

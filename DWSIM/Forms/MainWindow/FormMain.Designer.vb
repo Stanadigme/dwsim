@@ -84,6 +84,8 @@ Partial Class FormMain
         Me.NewToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.OpenToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.OpenFileS365 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+        Me.tsbAutoSave = New System.Windows.Forms.ToolStripButton()
         Me.SaveToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.SaveFileS365 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
@@ -450,7 +452,7 @@ Partial Class FormMain
         resources.ApplyResources(Me.ToolStrip1, "ToolStrip1")
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripButton, Me.OpenToolStripButton, Me.OpenFileS365, Me.SaveToolStripButton, Me.SaveFileS365, Me.ToolStripButton1, Me.ToolStripSeparator3, Me.ToolStripButton2, Me.tsbInspector, Me.ToolStripSeparator4, Me.ToolStripButton3, Me.ToolStripButton5, Me.ToolStripButton4, Me.ToolStripSeparator6, Me.tsbRegCO, Me.ToolStripSeparator8, Me.LoginButton, Me.LogoutDropdown, Me.CheckingCredentialsLabel})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripButton, Me.OpenToolStripButton, Me.OpenFileS365, Me.ToolStripSeparator5, Me.tsbAutoSave, Me.SaveToolStripButton, Me.SaveFileS365, Me.ToolStripButton1, Me.ToolStripSeparator3, Me.ToolStripButton2, Me.tsbInspector, Me.ToolStripSeparator4, Me.ToolStripButton3, Me.ToolStripButton5, Me.ToolStripButton4, Me.ToolStripSeparator6, Me.tsbRegCO, Me.ToolStripSeparator8, Me.LoginButton, Me.LogoutDropdown, Me.CheckingCredentialsLabel})
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
         '
@@ -474,6 +476,18 @@ Partial Class FormMain
         Me.OpenFileS365.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.OpenFileS365.Image = Global.DWSIM.My.Resources.Resources.open_file_s365
         Me.OpenFileS365.Name = "OpenFileS365"
+        '
+        'ToolStripSeparator5
+        '
+        resources.ApplyResources(Me.ToolStripSeparator5, "ToolStripSeparator5")
+        Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+        '
+        'tsbAutoSave
+        '
+        resources.ApplyResources(Me.tsbAutoSave, "tsbAutoSave")
+        Me.tsbAutoSave.CheckOnClick = True
+        Me.tsbAutoSave.Image = Global.DWSIM.My.Resources.Resources.cancel_30px
+        Me.tsbAutoSave.Name = "tsbAutoSave"
         '
         'SaveToolStripButton
         '
@@ -991,4 +1005,6 @@ Partial Class FormMain
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
     Public WithEvents tsmiNewCompoundWizard As ToolStripMenuItem
     Public WithEvents tsmiNewCompoundCreatorStudy As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
+    Public WithEvents tsbAutoSave As ToolStripButton
 End Class

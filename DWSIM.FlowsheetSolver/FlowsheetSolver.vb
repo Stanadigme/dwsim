@@ -1740,9 +1740,9 @@ Public Delegate Sub CustomEvent2(ByVal objinfo As CalculationArgs)
 
             fgui.UpdateInterface()
 
-            fgui.ProcessScripts(Scripts.EventType.SolverFinished, Scripts.ObjectType.Solver, "")
-
             GlobalSettings.Settings.CalculatorBusy = False
+
+            fgui.ProcessScripts(Scripts.EventType.SolverFinished, Scripts.ObjectType.Solver, "")
 
             IObj?.Close()
 

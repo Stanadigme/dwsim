@@ -214,6 +214,12 @@ Namespace UnitOperations
             Return My.Resources.level_gauge1
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.level_gauge.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("LG_Desc")
         End Function

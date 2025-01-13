@@ -76,7 +76,7 @@ namespace DWSIM.UI.Desktop.Editors
             dl.CreateAndAddLabelRow2("You can close this wizard at your will. Many other (advanced) settings can be configured by using the appropriate editors, which can be found in the 'Setup' menu item.");
             dl.CreateAndAddLabelRow2("Click 'Next' to continue.");
 
-            page1.ContentContainer.Add(dl);
+            page1.ContentContainer.Content = dl;
             page1.Show();
             page1.Center();
 
@@ -103,11 +103,11 @@ namespace DWSIM.UI.Desktop.Editors
 
             page1.Init(Width, Height);
 
-            var tl = new TableLayout() { Width = Width, Height = Height };
+            var tl = new DynamicLayout() { Width = Width, Height = Height };
 
             new Compounds(flowsheet, tl);
 
-            page1.ContentContainer.Add(tl);
+            page1.ContentContainer.Content = tl;
             page1.Show();
             page1.Center();
 
@@ -256,7 +256,7 @@ namespace DWSIM.UI.Desktop.Editors
             {
                 dl.Height = Height;
                 dl.Width = Width;
-                page.ContentContainer.Add(dl);
+                page.ContentContainer.Content = dl;
             }
             page.Show();
             page.Center();
@@ -323,7 +323,7 @@ namespace DWSIM.UI.Desktop.Editors
 
             c.CreateAndAddDescriptionRow(dl, "Select the formatting scheme for compound amounts in Material Stream reports.");
 
-            page.ContentContainer.Add(dl);
+            page.ContentContainer.Content = dl;
             page.Show();
             page.Center();
 

@@ -36,13 +36,13 @@ namespace DWSIM.UI.Desktop.Editors
 
             Padding = new Padding(10);
 
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            var calculatorassembly = System.Reflection.Assembly.LoadFile(Path.Combine(dir, "DWSIM.Thermodynamics.dll"));
-            var unitopassembly = System.Reflection.Assembly.LoadFile(Path.Combine(dir, "DWSIM.UnitOperations.dll"));
+            var calculatorassembly = Assembly.LoadFile(Path.Combine(dir, "DWSIM.Thermodynamics.dll"));
+            var unitopassembly = Assembly.LoadFile(Path.Combine(dir, "DWSIM.UnitOperations.dll"));
 
             aTypeList.Clear();
-            aTypeList.AddRange(calculatorassembly.GetTypes().Where(x =>
+            aTypeList.AddRange(calculatorassembly.GetExportedTypes().Where(x =>
             {
                 if (x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null)
                 {
@@ -53,7 +53,7 @@ namespace DWSIM.UI.Desktop.Editors
                     return false;
                 }
             }));
-            aTypeList.AddRange(unitopassembly.GetTypes().Where(x =>
+            aTypeList.AddRange(unitopassembly.GetExportedTypes().Where(x =>
             {
                 if (x.GetInterface("DWSIM.Interfaces.ISimulationObject") != null)
                 {

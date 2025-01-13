@@ -592,6 +592,12 @@ Namespace SpecialOps
             Return My.Resources.control_panel1
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.control_panel.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("PID_Desc")
         End Function

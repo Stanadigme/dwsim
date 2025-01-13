@@ -1222,6 +1222,12 @@ Namespace Reactors
             Return My.Resources.reactor_conversion
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.reactor_conversion.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("CONV_Desc")
         End Function

@@ -1,7 +1,7 @@
 ﻿==================================================
 DWSIM - Open Source Process Simulator
-Version 8.8.3
-Copyright (c) 2017-2024 Daniel Wagner and contributors
+Version 8.9.0
+Copyright (c) 2017-2025 Daniel Wagner and contributors
 Copyright (c) 2008-2016 Daniel Wagner, Gregor Reichert, Gustavo Leon
 ==================================================
 
@@ -62,6 +62,16 @@ VERSION HISTORY / CHANGELOG
 
 The full changelog including souce code changes can be viewed at https://github.com/DanWBR/dwsim/commits/windows
 
+Version 8.9.0
+
+- Cross-Platform UI overhaul + added GTK 3 and .NET 8 support for Linux
+- Fixed a bug in Nested Loops flash
+- Recycle Op now defaults to legacy mode solving
+- Fixed solver busy message
+- Reworked Rigorous Column initial estimates editor controls (Classic UI)
+- Fixed zedgraph file saving
+- Fixed rigorous column stage naming
+
 Version 8.8.3
 
 - Added spreadsheet object to Automation3 API
@@ -77,7 +87,7 @@ Version 8.8.3
 - Fixed issue with CAPE-OPEN Property Package equilibrium calculations
 - Missing compound parameter warnings are now optional
 
-Version 8.8.3
+Version 8.8.2
 
 - Optimized memory consumption and CPU usage
 - Added mass balance residual and total energy balance to flowsheet results

@@ -622,10 +622,10 @@ Public Class Utility
 
     Shared Function GetPropertyPackages(ByVal assmbly As Assembly) As List(Of Interfaces.IPropertyPackage)
 
-        Dim availableTypes As New List(Of TypeInfo)()
+        Dim availableTypes As New List(Of Type)()
 
         Try
-            availableTypes.AddRange(assmbly.DefinedTypes())
+            availableTypes.AddRange(assmbly.ExportedTypes)
         Catch ex As ReflectionTypeLoadException
             Console.WriteLine("Error loading types from assembly'" + assmbly.FullName + "':" + ex.ToString())
             Logging.Logger.LogError("Error loading types from assembly '" + assmbly.FullName, ex)
@@ -637,7 +637,7 @@ Public Class Utility
             Logging.Logger.LogError("Error loading types from assembly '" + assmbly.FullName, ex)
         End Try
 
-        Dim ppList As List(Of TypeInfo) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IPropertyPackage)) And Not t.IsAbstract)
+        Dim ppList As List(Of Type) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IPropertyPackage)) And Not t.IsAbstract)
 
         Dim instances As New List(Of Interfaces.IPropertyPackage)
         For Each item In ppList
@@ -655,15 +655,15 @@ Public Class Utility
 
     Shared Function GetUnitOperations(ByVal assmbly As Assembly) As List(Of Interfaces.IExternalUnitOperation)
 
-        Dim availableTypes As New List(Of TypeInfo)()
+        Dim availableTypes As New List(Of Type)()
 
         Try
-            availableTypes.AddRange(assmbly.DefinedTypes())
+            availableTypes.AddRange(assmbly.ExportedTypes())
         Catch ex As Exception
             Console.WriteLine("Error loading types from assembly '" + assmbly.FullName + "': " + ex.ToString)
         End Try
 
-        Dim ppList As List(Of TypeInfo) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IExternalUnitOperation)) And Not t.IsAbstract And Not Attribute.IsDefined(t, Type.GetType("System.ObsoleteAttribute")))
+        Dim ppList As List(Of Type) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IExternalUnitOperation)) And Not t.IsAbstract And Not Attribute.IsDefined(t, Type.GetType("System.ObsoleteAttribute")))
 
         Dim list As New List(Of IExternalUnitOperation)
 
@@ -680,27 +680,7 @@ Public Class Utility
 
     Shared Function GetRuntimeVersion() As String
 
-        If GlobalSettings.Settings.IsRunningOnMono Then
-
-            If GlobalSettings.Settings.RunningPlatform = GlobalSettings.Settings.Platform.Mac Then
-
-                Return "Xamarin.Mac (v5.14.0.110)"
-
-            Else
-
-                Dim t As Type = Type.GetType("Mono.Runtime")
-                Dim displayName As MethodInfo = t.GetMethod("GetDisplayName", BindingFlags.NonPublic + BindingFlags.Static)
-                Dim verstr As String = "Mono Framework v" & displayName.Invoke(Nothing, Nothing)
-                If verstr.Contains("(") Then verstr = verstr.Substring(0, verstr.IndexOf("(") - 1)
-                If displayName IsNot Nothing Then Return verstr Else Return ""
-
-            End If
-
-        Else
-
-            Return ".NET Framework (CLR v" & Environment.Version.ToString() & ")"
-
-        End If
+        Return ".NET (CLR v" & Environment.Version.ToString() & ")"
 
     End Function
 

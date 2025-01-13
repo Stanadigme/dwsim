@@ -29,17 +29,6 @@ namespace DWSIM.UI.Forms.Forms
         public void Init()
         {
 
-            int w = (int)(sf * 640);
-            int h = (int)(sf * 480);
-
-            var center = Screen.PrimaryScreen.WorkingArea.Center;
-            center.X -= w / 2;
-            center.Y -= h / 2;
-
-            Location = new Point(center);
-
-            ClientSize = new Size(w, h);
-            
             Maximizable = false;
 
             Minimizable = false;
@@ -235,6 +224,13 @@ namespace DWSIM.UI.Forms.Forms
             tablecontainer.Rows.Add(new TableRow(tabc));
 
             Content = tablecontainer;
+
+            int w = (int)(sf * 640);
+            int h = (int)(sf * 480);
+
+            Size = new Size(w, h);
+
+            DWSIM.UI.Shared.Common.Center(this);
 
         }
 

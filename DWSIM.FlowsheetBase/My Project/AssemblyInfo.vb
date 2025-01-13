@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("DWSIM Flowsheet Base Class")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("DWSIM.FlowsheetBase")>
-<Assembly: AssemblyCopyright("Copyright © 2017-2024 Daniel Wagner")>
+<Assembly: AssemblyCopyright("Copyright © 2017-2025 Daniel Wagner")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,4 +31,4 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("8.8.3.0")>
+<Assembly: AssemblyVersion("8.9.0.0")>

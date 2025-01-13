@@ -748,8 +748,11 @@ Public Class FormFlowsheet
         Catch ex As Exception
         End Try
 
-        PropertyPackages?.Clear()
-        SelectedCompounds?.Clear()
+        Try
+            PropertyPackages?.Clear()
+            SelectedCompounds?.Clear()
+        Catch ex As Exception
+        End Try
 
         If GlobalSettings.Settings.OldUI Then
 
@@ -1497,62 +1500,69 @@ Public Class FormFlowsheet
 
     Private Sub RequestFlowsheetCalculation(obj As ISimulationObject, wait As Boolean)
 
-        If Settings.CalculatorBusy Then
-            UIThreadInvoke(Sub() ShowMessage(DWSIM.App.GetLocalString("The calculator is busy, please wait..."), IFlowsheet.MessageType.Warning))
-        End If
+        If Not DynamicMode Then
 
-        If Not DynamicMode And Not Settings.CalculatorBusy Then
+            If Not Settings.CalculatorBusy Then
 
-            UIThreadInvoke(Sub()
-                               Me.FormLog.Grid1.Rows.Clear()
-                               pbSolver.Visible = True
-                           End Sub)
+                UIThreadInvoke(Sub()
+                                   Me.FormLog.Grid1.Rows.Clear()
+                                   pbSolver.Visible = True
+                               End Sub)
 
-            Dim data As New Dictionary(Of String, String)
-            data.Add("Compounds", Me.SelectedCompounds.Count)
-            data.Add("Objects", Me.SimulationObjects.Count)
-            data.Add("Reactions", Me.Reactions.Count)
-            data.Add("Property Packages", Me.PropertyPackages.Count)
+                Dim data As New Dictionary(Of String, String)
+                data.Add("Compounds", Me.SelectedCompounds.Count)
+                data.Add("Objects", Me.SimulationObjects.Count)
+                data.Add("Reactions", Me.Reactions.Count)
+                data.Add("Property Packages", Me.PropertyPackages.Count)
 
-            If Not FormMain.IsPro AndAlso My.Application.MainWindowForm IsNot Nothing Then
-                My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Requested Flowsheet Solving", "", data)
+                If Not FormMain.IsPro AndAlso My.Application.MainWindowForm IsNot Nothing Then
+                    My.Application.MainWindowForm.AnalyticsProvider?.RegisterEvent("Requested Flowsheet Solving", "", data)
+                End If
+
+                UIThread(Sub() RaiseEvent ToolOpened("Solve Flowsheet", New EventArgs()))
+                Settings.TaskCancellationTokenSource = Nothing
+                My.Application.ActiveSimulation = Me
+                If My.Computer.Keyboard.ShiftKeyDown Then GlobalSettings.Settings.CalculatorBusy = False
+                Dim t As New Task(Of List(Of Exception))(Function()
+                                                             UIThread(Sub() RaiseEvent StartedSolving(Me, New EventArgs()))
+                                                             If ExternalFlowsheetSolver IsNot Nothing Then
+                                                                 Return ExternalFlowsheetSolver.SolveFlowsheet(Me)
+                                                             Else
+                                                                 If obj IsNot Nothing Then
+                                                                     Return FlowsheetSolver.FlowsheetSolver.CalculateObject(Me, obj.Name)
+                                                                 Else
+                                                                     Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, Settings.TaskCancellationTokenSource, False, False, Nothing, Nothing,
+                                                                    Sub()
+                                                                        If My.Settings.ObjectEditor = 1 Then
+                                                                            Me.UIThread(Sub()
+                                                                                            Me.FormSurface.Flowsheet = Me
+                                                                                            Me.FormSurface.UpdateSelectedObject()
+                                                                                        End Sub)
+                                                                        End If
+                                                                    End Sub, My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown)
+                                                                 End If
+                                                             End If
+                                                         End Function)
+                t.ContinueWith(Sub(tres)
+                                   UIThread(Sub() RaiseEvent FinishedSolving(Me, New EventArgs()))
+                                   Me.UIThread(Sub()
+                                                   pbSolver.Visible = False
+                                                   UpdateOpenEditForms()
+                                               End Sub)
+                               End Sub)
+                t.Start()
+                If wait Then t.Wait()
+
+            Else
+
+                UIThreadInvoke(Sub() ShowMessage(DWSIM.App.GetLocalString("Flowsheet Solver is busy, please be patient..."), IFlowsheet.MessageType.Warning))
+
             End If
 
-            UIThread(Sub() RaiseEvent ToolOpened("Solve Flowsheet", New EventArgs()))
-            Settings.TaskCancellationTokenSource = Nothing
-            My.Application.ActiveSimulation = Me
-            If My.Computer.Keyboard.ShiftKeyDown Then GlobalSettings.Settings.CalculatorBusy = False
-            Dim t As New Task(Of List(Of Exception))(Function()
-                                                         UIThread(Sub() RaiseEvent StartedSolving(Me, New EventArgs()))
-                                                         If ExternalFlowsheetSolver IsNot Nothing Then
-                                                             Return ExternalFlowsheetSolver.SolveFlowsheet(Me)
-                                                         Else
-                                                             If obj IsNot Nothing Then
-                                                                 Return FlowsheetSolver.FlowsheetSolver.CalculateObject(Me, obj.Name)
-                                                             Else
-                                                                 Return FlowsheetSolver.FlowsheetSolver.SolveFlowsheet(Me, My.Settings.SolverMode, Settings.TaskCancellationTokenSource, False, False, Nothing, Nothing,
-                                                                Sub()
-                                                                    If My.Settings.ObjectEditor = 1 Then
-                                                                        Me.UIThread(Sub()
-                                                                                        Me.FormSurface.Flowsheet = Me
-                                                                                        Me.FormSurface.UpdateSelectedObject()
-                                                                                    End Sub)
-                                                                    End If
-                                                                End Sub, My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown)
-                                                             End If
-                                                         End If
-                                                     End Function)
-            t.ContinueWith(Sub(tres)
-                               UIThread(Sub() RaiseEvent FinishedSolving(Me, New EventArgs()))
-                               Me.UIThread(Sub()
-                                               pbSolver.Visible = False
-                                               UpdateOpenEditForms()
-                                           End Sub)
-                           End Sub)
-            t.Start()
-            If wait Then t.Wait()
         Else
-            ShowMessage(DWSIM.App.GetLocalString("DynEnabled"), IFlowsheet.MessageType.Warning)
+
+            UIThreadInvoke(Sub() ShowMessage(DWSIM.App.GetLocalString("DynEnabled"), IFlowsheet.MessageType.Warning))
+
         End If
 
     End Sub

@@ -291,6 +291,12 @@ Namespace UnitOperations
 
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.icons8_wind_turbine.png")
+
+        End Function
+
         Public Overrides Function CloneXML() As Object
 
             Dim obj As ICustomXMLSerialization = New WindTurbine()

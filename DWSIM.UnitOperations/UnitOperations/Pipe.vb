@@ -2361,6 +2361,12 @@ Final3:     T = bbb
             Return My.Resources.pipe_segment
         End Function
 
+        Public Overrides Function GetIconBitmapBytes() As Byte()
+
+            Return GetBytesFromResource("DWSIM.UnitOperations.pipe_segment.png")
+
+        End Function
+
         Public Overrides Function GetDisplayDescription() As String
             Return ResMan.GetLocalString("PIPE_Desc")
         End Function

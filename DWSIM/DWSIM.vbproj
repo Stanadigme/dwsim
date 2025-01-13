@@ -111,29 +111,6 @@
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'x86|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\</OutputPath>
-    <DocumentationFile>DWSIM.xml</DocumentationFile>
-    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <WarningsAsErrors>
-    </WarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'x86|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\x86\</OutputPath>
-    <DocumentationFile>DWSIM.xml</DocumentationFile>
-    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
-    <DebugType>Full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <WarningsAsErrors>
-    </WarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
   </PropertyGroup>
@@ -170,17 +147,7 @@
     <DefineConstants>
     </DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x86|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x64\x86\</OutputPath>
-    <DocumentationFile>DWSIM.xml</DocumentationFile>
-    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Linux|x64'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseLinux|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x64\Release Linux\</OutputPath>
@@ -194,7 +161,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <DefineConstants>LINUX</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Linux|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseLinux|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Release Linux\</OutputPath>
@@ -206,7 +173,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Linux|x86'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseLinux|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Release Linux\</OutputPath>
     <RemoveIntegerChecks>true</RemoveIntegerChecks>
@@ -250,6 +217,45 @@
   <PropertyGroup>
     <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'wine64|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\wine64\</OutputPath>
+    <DocumentationFile>DWSIM.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'wine64|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\wine64\</OutputPath>
+    <DefineConstants>WINE32</DefineConstants>
+    <DocumentationFile>DWSIM.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'wine64|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\wine64\</OutputPath>
+    <DocumentationFile>DWSIM.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <DefineConstants>WINE32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'wine64|Win32'">
+    <OutputPath>bin\Win32\wine64\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AeroWizard, Version=2.0.2.27955, Culture=neutral, PublicKeyToken=915e74f5d64b8f37, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -282,22 +288,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>References\Cureos.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="CustomMarshalers" />
     <Reference Include="DWSIM.CrossPlatform.UI.Controls.ReoGrid">
       <HintPath>References\ReoGrid.Eto\DWSIM.CrossPlatform.UI.Controls.ReoGrid.dll</HintPath>
     </Reference>
     <Reference Include="EPPlus, Version=4.5.3.2, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.4.5.3.2\lib\net40\EPPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Eto, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\Eto.Forms\Release\net45\Eto.dll</HintPath>
+    <Reference Include="Eto, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Eto.Forms.2.8.3\lib\netstandard2.0\Eto.dll</HintPath>
     </Reference>
     <Reference Include="Eto.OxyPlot, Version=1.0.5911.41864, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Eto.OxyPlot.1.2.0-beta\lib\net45\Eto.OxyPlot.dll</HintPath>
     </Reference>
-    <Reference Include="Eto.WinForms, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\Eto.Forms\Release\net45\Eto.WinForms.dll</HintPath>
+    <Reference Include="Eto.WinForms, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Eto.Platform.Windows.2.8.3\lib\net461\Eto.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="ExcelApi, Version=1.9.1.0, Culture=neutral, PublicKeyToken=297f57b43ae7c1de, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOfficeFw.Excel.1.9.1\lib\net462\ExcelApi.dll</HintPath>
@@ -377,6 +382,12 @@
     <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.1587.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.1587.40\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.4.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.4\lib\net462\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.4.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.4\lib\net462\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="NeoDataType.MyNeoReport, Version=1.4.0.0, Culture=neutral, PublicKeyToken=cc45d3430ba4f561, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>References\NeoDataType.MyNeoReport.dll</HintPath>
@@ -454,6 +465,10 @@
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -476,6 +491,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Resources.Extensions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Resources.Extensions.7.0.0\lib\net462\System.Resources.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
@@ -3172,6 +3190,7 @@
     <Content Include="lib\lib2to3\PatternGrammar.txt" />
     <Content Include="lib\pydoc_data\_pydoc.css" />
     <Content Include="lib\venv\scripts\posix\activate.csh" />
+    <None Include="Resources\cancel_30px.png" />
     <Content Include="Resources\ch.png" />
     <None Include="Resources\clock_red.png" />
     <None Include="Resources\comp_separator.png" />
@@ -3196,6 +3215,7 @@
     <None Include="Resources\collaboration_female_male_48px.png" />
     <None Include="Resources\checkmark_48px.png" />
     <None Include="Resources\collapse_arrow_48px.png" />
+    <None Include="Resources\Checkmark_40px.png" />
     <Content Include="Resources\control_equalizer_blue.png" />
     <None Include="Resources\cut.png" />
     <None Include="Resources\ddbsearch.jpg" />
@@ -3860,6 +3880,7 @@ erase /S  /Q "$(SolutionDir)DistPackages\Windows_32\*.dylib" 2&gt;nul 1&gt;nul 4
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -3882,4 +3903,5 @@ erase /S  /Q "$(SolutionDir)DistPackages\Windows_32\*.dylib" 2&gt;nul 1&gt;nul 4
   </Target>
   <Import Project="..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.68.2.1\build\net45\SkiaSharp.targets')" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\Microsoft.Web.WebView2.targets')" />
+  <Import Project="..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets" Condition="Exists('..\packages\Eto.Forms.2.8.3\build\Eto.Forms.targets')" />
 </Project>
