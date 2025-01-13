@@ -504,12 +504,6 @@ Public Class FormMain
             Catch ex As Exception
             End Try
 
-            'release yeppp! resources
-            Try
-                If My.Settings.UseSIMDExtensions Then Yeppp.Library.Release()
-            Catch ex As Exception
-            End Try
-
         End If
 
     End Sub

@@ -49,7 +49,6 @@ Public Class AboutBox
                                                       For Each qinfo In scrh.Get()
                                                           text1 += " / " & qinfo.Properties("Name").Value.ToString
                                                       Next
-                                                      text1 += " (" & Yeppp.Library.GetProcessABI().Description & ")"
                                                       Return text1
                                                   End Function).ContinueWith(Sub(t)
                                                                                  Lblcpuinfo.Text = t.Result
@@ -76,22 +75,11 @@ Public Class AboutBox
                                                       Return lbltext
                                                   End Function).ContinueWith(Sub(t)
                                                                                  Lblcpuinfo.Text = t.Result
-                                                                                 Lblcpuinfo.Text += " (" & Yeppp.Library.GetProcessABI().Description & ")"
                                                                              End Sub, Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext)
 
         End If
 
         Lblcpusimd.Text = "Querying CPU SIMD capabilities..."
-
-        Threading.Tasks.Task.Factory.StartNew(Function()
-                                                  Dim text1 As String = ""
-                                                  For Each item In Library.GetCpuArchitecture.CpuSimdFeatures
-                                                      text1 += item.ToString & " "
-                                                  Next
-                                                  Return text1
-                                              End Function).ContinueWith(Sub(t)
-                                                                             Lblcpusimd.Text = t.Result
-                                                                         End Sub, Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext)
 
         With Me.DataGridView1.Rows
             .Clear()
