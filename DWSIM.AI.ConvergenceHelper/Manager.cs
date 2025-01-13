@@ -20,16 +20,19 @@ namespace DWSIM.AI.ConvergenceHelper
 
         public static void Initialize()
         { 
-        
+            if (!Directory.Exists(HomeDirectory)) { Directory.CreateDirectory(HomeDirectory); }
+            var modelsdir = Path.Combine(HomeDirectory, "models");
+            if (!Directory.Exists(modelsdir)) { Directory.CreateDirectory(modelsdir); }
+            var configdir = Path.Combine(HomeDirectory, "config");
+            if (!Directory.Exists(configdir)) { Directory.CreateDirectory(configdir); }
+            LoadSettings();
         }
 
-        public static void SetupDirectories()
-        { 
-        
-        }
-
-        public static void LoadSettings() { 
-        
+        public static void LoadSettings() {
+            var configfile = Path.Combine(HomeDirectory, "config", "settings.json");
+            if (File.Exists(configfile)) { 
+            
+            }
         }
 
         public static void SaveSettings() { 
