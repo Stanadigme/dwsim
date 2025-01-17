@@ -205,6 +205,25 @@ namespace DWSIM.UI.Desktop.Editors
 
             s.CreateAndAddLabelRow(container, "Calculated HTC Parameters");
 
+            s.CreateAndAddCheckBoxRow(container, "Include Solar Irradiation", profile.IncludeSolarRadiation, (sender, e) =>
+            {
+                profile.IncludeSolarRadiation = sender.Checked.GetValueOrDefault();
+            });
+
+            s.CreateAndAddCheckBoxRow(container, "Use Global Solar Irradiation", profile.UseGlobalSolarRadiation, (sender, e) =>
+            {
+                profile.UseGlobalSolarRadiation = sender.Checked.GetValueOrDefault();
+            });
+
+            s.CreateAndAddTextBoxRow(container, nf, "User-Defined Solar Irradiation (kWh/m2)", profile.SolarRadiationValue_kWh_m2,
+                                    (sender, e) =>
+                                    {
+                                        if (s.IsValidDouble(sender.Text))
+                                        {
+                                            profile.SolarRadiationValue_kWh_m2 =double.Parse(sender.Text);
+                                        }
+                                    });
+
             s.CreateAndAddTextBoxRow(container, nf, "Ambient Temperature (" + su.temperature + ")", cv.ConvertFromSI(su.temperature, profile.Temp_amb_estimar),
                                      (sender, e) =>
                                      {
