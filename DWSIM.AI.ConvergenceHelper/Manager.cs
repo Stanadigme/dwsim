@@ -16,10 +16,6 @@ namespace DWSIM.AI.ConvergenceHelper
 
         public static FileDatabaseProvider Database = new FileDatabaseProvider();
 
-        public static bool Enabled = false;
-
-        public static bool ProvideSolutionOnError = false;
-
         public static string HomeDirectory = Path.Combine(GlobalSettings.Settings.GetConfigFileDir(), "ConvergenceHelper");
 
         public static void Initialize()
