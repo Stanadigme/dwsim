@@ -112,6 +112,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DWSIM.FileStorage\DWSIM.FileStorage.csproj">
+      <Project>{13823753-2284-4d3e-aeb4-ca72118ef094}</Project>
+      <Name>DWSIM.FileStorage</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\DWSIM.GlobalSettings\DWSIM.GlobalSettings.vbproj">
       <Project>{725c8134-9fe3-43aa-9b33-d9046657fb2a}</Project>
       <Name>DWSIM.GlobalSettings</Name>

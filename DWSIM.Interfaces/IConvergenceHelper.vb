@@ -3,9 +3,45 @@
     Function GetEstimates(RequestType As ConvergenceHelperRequestType, ModelName As String, MixtureMolarFlows As Double(), Temperature As Double?, Pressure As Double?,
                           VaporMolarFraction As Double?, MassEnthalpy As Double?, MassEntropy As Double?) As IConvergenceHelperResponse
 
-    Function StoreResults(RequestType As ConvergenceHelperRequestType, ModelName As String, MixtureMolarFlows As Double(), Temperature As Double?, Pressure As Double?,
+    Sub StoreResults(RequestType As ConvergenceHelperRequestType, ModelName As String, MixtureMolarFlows As Double(), Temperature As Double?, Pressure As Double?,
                           VaporMolarFraction As Double?, MassEnthalpy As Double?, MassEntropy As Double?, VaporMolarFlows As Double(), Liquid1MolarFlows As Double(),
                           Liquid2MolarFlows As Double(), SolidMolarFlows As Double(), KValuesVL1 As Double(), KValuesVL2 As Double())
+
+End Interface
+
+Public Interface IConvergenceHelperTrainingData
+
+    Property RequestType As ConvergenceHelperRequestType
+
+    Property ModelName As String
+
+    Property NumberOfCompounds As Integer
+
+    Property CompoundNames As String()
+
+    Property Temperature As Double?
+
+    Property Pressure As Double?
+
+    Property MassEnthalpy As Double?
+
+    Property MassEntropy As Double?
+
+    Property VaporMolarFraction As Double?
+
+    Property MixtureMolarFlows As Double()
+
+    Property VaporMolarFlows As Double()
+
+    Property Liquid1MolarFlows As Double()
+
+    Property Liquid2MolarFlows As Double()
+
+    Property SolidMolarFlows As Double()
+
+    Property KValuesVL1 As Double()
+
+    Property KValuesVL2 As Double()
 
 End Interface
 

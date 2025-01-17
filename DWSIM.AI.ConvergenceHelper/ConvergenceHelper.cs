@@ -14,10 +14,30 @@ namespace DWSIM.AI.ConvergenceHelper
             return new ConvergenceHelperResponse();
         }
 
-        public object StoreResults(ConvergenceHelperRequestType RequestType, string ModelName, double[] MixtureMolarFlows, double? Temperature, double? Pressure, double? VaporMolarFraction, double? MassEnthalpy, double? MassEntropy, double[] VaporMolarFlows, double[] Liquid1MolarFlows, double[] Liquid2MolarFlows, double[] SolidMolarFlows, double[] KValuesVL1, double[] KValuesVL2)
+        public void StoreResults(ConvergenceHelperRequestType RequestType, string ModelName, double[] MixtureMolarFlows, double? Temperature, double? Pressure, double? VaporMolarFraction, double? MassEnthalpy, double? MassEntropy, double[] VaporMolarFlows, double[] Liquid1MolarFlows, double[] Liquid2MolarFlows, double[] SolidMolarFlows, double[] KValuesVL1, double[] KValuesVL2)
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class ConvergenceHelperTrainingData : IConvergenceHelperTrainingData
+    {
+        public ConvergenceHelperRequestType RequestType { get; set; }
+        public string ModelName { get; set; }
+        public int NumberOfCompounds { get; set; }
+        public string[] CompoundNames { get; set; }
+        public double? Temperature { get; set; }
+        public double? Pressure { get; set; }
+        public double? MassEnthalpy { get; set; }
+        public double? MassEntropy { get; set; }
+        public double? VaporMolarFraction { get; set; }
+        public double[] MixtureMolarFlows { get; set; }
+        public double[] VaporMolarFlows { get; set; }
+        public double[] Liquid1MolarFlows { get; set; }
+        public double[] Liquid2MolarFlows { get; set; }
+        public double[] SolidMolarFlows { get; set; }
+        public double[] KValuesVL1 { get; set; }
+        public double[] KValuesVL2 { get; set; }
     }
 
     public class ConvergenceHelperRequest : IConvergenceHelperRequest
