@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using DWSIM.FileStorage;
@@ -40,6 +41,17 @@ namespace DWSIM.AI.ConvergenceHelper
             }
             else
                 Database.LoadDatabase(dbfile);
+        }
+
+        public static void StoreData(ConvergenceHelperTrainingData data)
+        {
+            lock (Database)
+            {
+                Database.GetDatabaseObject().GetCollection<ConvergenceHelperTrainingData>("TrainingData").Insert(data);
+                var datadir = Path.Combine(HomeDirectory, "data");
+                var dbfile = Path.Combine(datadir, "data.db");
+                Database.ExportDatabase(dbfile);
+            }
         }
 
         public static void LoadSettings() {
