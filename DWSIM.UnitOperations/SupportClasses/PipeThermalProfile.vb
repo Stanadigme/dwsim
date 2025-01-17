@@ -15,6 +15,9 @@
         Public Property UserDefinedU_Length As New List(Of Double)
         Public Property UserDefinedU_Temp As New List(Of Double)
         Public Property UserDefinedU_U As New List(Of Double)
+        Public Property IncludeSolarRadiation As Boolean = False
+        Public Property UseGlobalSolarRadiation As Boolean = False
+        Public Property SolarRadiationValue_kWh_m2 As Double = 0.0
 
         Public Sub New()
             With Me

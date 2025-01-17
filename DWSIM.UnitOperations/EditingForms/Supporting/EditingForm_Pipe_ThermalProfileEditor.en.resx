@@ -131,6 +131,61 @@
   <data name="RadioButton7.Text" xml:space="preserve">
     <value>Estimate Overall Heat Transfer Coefficient</value>
   </data>
+  <data name="Label2.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="Label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>49, 13</value>
+  </data>
+  <data name="Label2.Text" xml:space="preserve">
+    <value>kWh/m2</value>
+  </data>
+  <data name="tbSolarIrradiation.Location" type="System.Drawing.Point, System.Drawing">
+    <value>26, 49</value>
+  </data>
+  <data name="tbSolarIrradiation.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 20</value>
+  </data>
+  <data name="tbSolarIrradiation.TabIndex" type="System.Int32, mscorlib">
+    <value>37</value>
+  </data>
+  <data name="tbSolarIrradiation.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tbSolarIrradiation.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
+    <value>Right</value>
+  </data>
+  <data name="chkSolarIrradiationGlobal.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkSolarIrradiationGlobal.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkSolarIrradiationGlobal.Size" type="System.Drawing.Size, System.Drawing">
+    <value>56, 17</value>
+  </data>
+  <data name="chkSolarIrradiationGlobal.Text" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="chkIncludeSolarIrradiation.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkIncludeSolarIrradiation.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkIncludeSolarIrradiation.Size" type="System.Drawing.Size, System.Drawing">
+    <value>137, 17</value>
+  </data>
+  <data name="chkIncludeSolarIrradiation.Text" xml:space="preserve">
+    <value>Include Solar Irradiation</value>
+  </data>
+  <data name="Label1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 235</value>
+  </data>
   <data name="Label1.Size" type="System.Drawing.Size, System.Drawing">
     <value>104, 13</value>
   </data>
@@ -138,16 +193,19 @@
     <value>Insulation Thickness</value>
   </data>
   <data name="lblTAGUnits2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>295, 16</value>
+    <value>295, 86</value>
   </data>
   <data name="TextBoxTAG2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>243, 13</value>
+    <value>243, 83</value>
   </data>
   <data name="Label25.Location" type="System.Drawing.Point, System.Drawing">
-    <value>222, 16</value>
+    <value>222, 86</value>
   </data>
   <data name="TextBoxTA2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 13</value>
+    <value>170, 83</value>
+  </data>
+  <data name="Label26.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 86</value>
   </data>
   <data name="Label26.Size" type="System.Drawing.Size, System.Drawing">
     <value>159, 13</value>
@@ -156,7 +214,7 @@
     <value>External Temperature / Gradient</value>
   </data>
   <data name="Label28.Location" type="System.Drawing.Point, System.Drawing">
-    <value>240, 251</value>
+    <value>240, 321</value>
   </data>
   <data name="Label28.Size" type="System.Drawing.Size, System.Drawing">
     <value>48, 13</value>
@@ -165,7 +223,10 @@
     <value>m/s or m</value>
   </data>
   <data name="TextBoxVEL.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 249</value>
+    <value>170, 319</value>
+  </data>
+  <data name="Label29.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 322</value>
   </data>
   <data name="Label29.Size" type="System.Drawing.Size, System.Drawing">
     <value>115, 13</value>
@@ -192,10 +253,13 @@
     <value>Moist soil</value>
   </data>
   <data name="ComboBoxMAMB.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 220</value>
+    <value>170, 290</value>
   </data>
   <data name="ComboBoxMAMB.Size" type="System.Drawing.Size, System.Drawing">
     <value>151, 21</value>
+  </data>
+  <data name="Label30.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 295</value>
   </data>
   <data name="Label30.Size" type="System.Drawing.Size, System.Drawing">
     <value>66, 13</value>
@@ -204,13 +268,13 @@
     <value>Environment</value>
   </data>
   <data name="Label31.Location" type="System.Drawing.Point, System.Drawing">
-    <value>240, 165</value>
+    <value>240, 235</value>
   </data>
   <data name="TextBoxESP.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 162</value>
+    <value>170, 232</value>
   </data>
   <data name="Label33.Location" type="System.Drawing.Point, System.Drawing">
-    <value>240, 139</value>
+    <value>240, 209</value>
   </data>
   <data name="Label33.Size" type="System.Drawing.Size, System.Drawing">
     <value>44, 13</value>
@@ -219,7 +283,10 @@
     <value>W / mK</value>
   </data>
   <data name="TextBoxCTERM.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 136</value>
+    <value>170, 206</value>
+  </data>
+  <data name="Label34.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 209</value>
   </data>
   <data name="Label34.Size" type="System.Drawing.Size, System.Drawing">
     <value>106, 13</value>
@@ -252,10 +319,13 @@
     <value>User Defined</value>
   </data>
   <data name="ComboBoxMAT.Location" type="System.Drawing.Point, System.Drawing">
-    <value>170, 109</value>
+    <value>170, 179</value>
   </data>
   <data name="ComboBoxMAT.Size" type="System.Drawing.Size, System.Drawing">
     <value>151, 21</value>
+  </data>
+  <data name="Label35.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 185</value>
   </data>
   <data name="Label35.Size" type="System.Drawing.Size, System.Drawing">
     <value>92, 13</value>
@@ -263,11 +333,17 @@
   <data name="Label35.Text" xml:space="preserve">
     <value>Insulation Material</value>
   </data>
+  <data name="CheckBoxICTE.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 264</value>
+  </data>
   <data name="CheckBoxICTE.Size" type="System.Drawing.Size, System.Drawing">
     <value>127, 17</value>
   </data>
   <data name="CheckBoxICTE.Text" xml:space="preserve">
     <value>Include External HTC</value>
+  </data>
+  <data name="CheckBoxICTI.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 134</value>
   </data>
   <data name="CheckBoxICTI.Size" type="System.Drawing.Size, System.Drawing">
     <value>124, 17</value>
@@ -275,11 +351,17 @@
   <data name="CheckBoxICTI.Text" xml:space="preserve">
     <value>Include Internal HTC</value>
   </data>
+  <data name="CheckBoxII.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 160</value>
+  </data>
   <data name="CheckBoxII.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 17</value>
   </data>
   <data name="CheckBoxII.Text" xml:space="preserve">
     <value>Include Insulation</value>
+  </data>
+  <data name="CheckBoxIPT.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 109</value>
   </data>
   <data name="CheckBoxIPT.Size" type="System.Drawing.Size, System.Drawing">
     <value>114, 17</value>
@@ -291,7 +373,7 @@
     <value>5, 221</value>
   </data>
   <data name="GroupBox7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>336, 287</value>
+    <value>336, 358</value>
   </data>
   <data name="RadioButton8.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -305,6 +387,12 @@
   <data name="RadioButton8.Text" xml:space="preserve">
     <value>Define the Heat Exchanged</value>
   </data>
+  <data name="GroupBox8.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 158</value>
+  </data>
+  <data name="GroupBox8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>335, 39</value>
+  </data>
   <data name="Label37.Location" type="System.Drawing.Point, System.Drawing">
     <value>221, 16</value>
   </data>
@@ -317,12 +405,6 @@
   <data name="Label38.Text" xml:space="preserve">
     <value>Heat Exchanged</value>
   </data>
-  <data name="GroupBox8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 158</value>
-  </data>
-  <data name="GroupBox8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>335, 39</value>
-  </data>
   <data name="RadioButton9.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -331,6 +413,9 @@
   </data>
   <data name="RadioButton9.Text" xml:space="preserve">
     <value>Define Overall Heat Transfer Coefficient</value>
+  </data>
+  <data name="GroupBox9.Size" type="System.Drawing.Size, System.Drawing">
+    <value>335, 109</value>
   </data>
   <data name="Button1.Location" type="System.Drawing.Point, System.Drawing">
     <value>169, 77</value>
@@ -344,7 +429,6 @@
   <data name="chkUserDefU.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chkUserDefU.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -387,10 +471,7 @@
   <data name="Label53.Text" xml:space="preserve">
     <value>Overall HTC</value>
   </data>
-  <data name="GroupBox9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>335, 109</value>
-  </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>347, 518</value>
+    <value>347, 582</value>
   </data>
 </root>

@@ -752,11 +752,19 @@ Namespace UnitOperations
                                         If U <> 0.0# Then
                                             DQ = (Tout - Tin) / Math.Log((results.External_Temperature - Tin) / (results.External_Temperature - Tout)) * U / 1000 * A
                                             DQmax = (results.External_Temperature - Tin) * Cp_m * Win
+                                            Dim SR As Double
+                                            If ThermalProfile.IncludeSolarRadiation Then
+                                                If ThermalProfile.UseGlobalSolarRadiation Then
+                                                    SR = FlowSheet.FlowsheetOptions.CurrentWeather.SolarIrradiation_kWh_m2
+                                                Else
+                                                    SR = ThermalProfile.SolarRadiationValue_kWh_m2
+                                                End If
+                                                DQ += SR / 12 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
+                                                DQmax += SR / 12 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
+                                            End If
                                             If Double.IsNaN(DQ) Then DQ = 0.0#
                                             If Math.Abs(DQ) > Math.Abs(DQmax) Then DQ = DQmax
-                                            'Tout = DQ / (Win * Cp_m) + Tin
                                         Else
-                                            'Tout = Tin
                                             DQ = 0.0#
                                             DQmax = 0.0#
                                         End If
@@ -1018,9 +1026,9 @@ Namespace UnitOperations
             End With
             segmento.Results.Add(results)
 
-            Me.DeltaP = (PinP - Pout)
-            Me.DeltaT = (TinP - Tout)
-            Me.DeltaQ = -(HinP - Hout) * Win
+            Me.DeltaP = (Pout - PinP)
+            Me.DeltaT = (Tout - TinP)
+            Me.DeltaQ = (Hout - HinP) * Win
 
             'Atribuir valores a corrente de materia conectada a jusante
             Dim msout As MaterialStream

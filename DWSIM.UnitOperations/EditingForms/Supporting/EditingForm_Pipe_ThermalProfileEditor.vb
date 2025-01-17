@@ -178,6 +178,9 @@ Public Class PipeThermalProfileEditor
                 Me.TextBoxTAG.Text = (cv.ConvertFromSI(su.deltaT, .AmbientTemperatureGradient) / cv.ConvertFromSI(su.distance, 1)).ToString(form.FlowsheetOptions.NumberFormat)
                 Me.TextBoxTAG2.Text = (cv.ConvertFromSI(su.deltaT, .AmbientTemperatureGradient_EstimateHTC) / cv.ConvertFromSI(su.distance, 1)).ToString(form.FlowsheetOptions.NumberFormat)
                 chkUserDefU.Checked = .UseUserDefinedU
+                chkSolarIrradiationGlobal.Checked = .UseGlobalSolarRadiation
+                chkIncludeSolarIrradiation.Checked = .IncludeSolarRadiation
+                tbSolarIrradiation.Text = .SolarRadiationValue_kWh_m2.ToString()
             End With
         End If
         loaded = True
@@ -344,6 +347,25 @@ Public Class PipeThermalProfileEditor
         fu.Profile = Profile
         fu.Flowsheet = form
         fu.ShowDialog()
+    End Sub
+
+    Private Sub chkIncludeSolarIrradiation_CheckedChanged(sender As Object, e As EventArgs) Handles chkIncludeSolarIrradiation.CheckedChanged
+        Profile.IncludeSolarRadiation = chkIncludeSolarIrradiation.Checked
+    End Sub
+
+    Private Sub chkGlobalIrradiationValue_CheckedChanged(sender As Object, e As EventArgs) Handles chkSolarIrradiationGlobal.CheckedChanged
+        tbSolarIrradiation.Enabled = Not chkSolarIrradiationGlobal.Checked
+    End Sub
+
+    Private Sub tbSolarIrradiation_TextChanged(sender As Object, e As EventArgs) Handles tbSolarIrradiation.TextChanged
+        If loaded Then
+            Try
+                Profile.SolarRadiationValue_kWh_m2 = Double.Parse(Me.tbSolarIrradiation.Text)
+                Me.tbSolarIrradiation.ForeColor = Color.Blue
+            Catch ex As Exception
+                Me.tbSolarIrradiation.ForeColor = Color.Red
+            End Try
+        End If
     End Sub
 End Class
 
