@@ -16,6 +16,15 @@ namespace DWSIM.FileStorage
         private MemoryStream DBMem;
         private LiteDatabase DB;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public LiteDatabase GetDatabaseObject()
+        {
+            return DB;
+        }
+
         private static MemoryStream ReadStream(string path)
         {
             using (var temp = new MemoryStream(File.ReadAllBytes(path)))
