@@ -4,6 +4,8 @@
 [![wiki](https://img.shields.io/badge/visit-website-blackblue.svg)](http://dwsim.inforside.com.br)
 [![donate](https://img.shields.io/badge/make%20a-donation-greenblue.svg)](https://sourceforge.net/p/dwsim/donate/)
 
+[<img src="https://api.gitsponsors.com/api/badge/img?id=246047362" height="30">](https://api.gitsponsors.com/api/badge/link?p=eOM4go05lgdp+FYMTgc3Mwosam2Br9GOY6Hz0SQyQVuMqLE6xLl9l7ba/syq3q/yYBv2eeFiodRLxfJ4hFnxyQ==)
+
 ## DWSIM - Open Source Process Simulator
 Copyright 2008-2025 Daniel Wagner and contributors
 
