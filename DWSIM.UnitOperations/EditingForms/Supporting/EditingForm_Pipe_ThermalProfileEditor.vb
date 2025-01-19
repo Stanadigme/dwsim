@@ -181,6 +181,7 @@ Public Class PipeThermalProfileEditor
                 chkSolarIrradiationGlobal.Checked = .UseGlobalSolarRadiation
                 chkIncludeSolarIrradiation.Checked = .IncludeSolarRadiation
                 tbSolarIrradiation.Text = .SolarRadiationValue_kWh_m2.ToString()
+                tbSolarEff.Text = .SolarRadiationAbsorptionEfficiency.ToString()
             End With
         End If
         loaded = True
@@ -364,6 +365,17 @@ Public Class PipeThermalProfileEditor
                 Me.tbSolarIrradiation.ForeColor = Color.Blue
             Catch ex As Exception
                 Me.tbSolarIrradiation.ForeColor = Color.Red
+            End Try
+        End If
+    End Sub
+
+    Private Sub tbSolarEff_TextChanged(sender As Object, e As EventArgs) Handles tbSolarEff.TextChanged
+        If loaded Then
+            Try
+                Profile.SolarRadiationAbsorptionEfficiency = Double.Parse(Me.tbSolarEff.Text)
+                Me.tbSolarEff.ForeColor = Color.Blue
+            Catch ex As Exception
+                Me.tbSolarEff.ForeColor = Color.Red
             End Try
         End If
     End Sub

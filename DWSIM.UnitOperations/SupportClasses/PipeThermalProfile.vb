@@ -18,6 +18,7 @@
         Public Property IncludeSolarRadiation As Boolean = False
         Public Property UseGlobalSolarRadiation As Boolean = False
         Public Property SolarRadiationValue_kWh_m2 As Double = 0.0
+        Public Property SolarRadiationAbsorptionEfficiency As Double = 0.1
 
         Public Sub New()
             With Me

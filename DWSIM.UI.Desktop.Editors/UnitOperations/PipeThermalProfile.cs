@@ -224,6 +224,15 @@ namespace DWSIM.UI.Desktop.Editors
                                         }
                                     });
 
+            s.CreateAndAddTextBoxRow(container, nf, "Solar Irradiation Absorption Efficiency (0.0 - 1.0)", profile.SolarRadiationAbsorptionEfficiency,
+                                    (sender, e) =>
+                                    {
+                                        if (s.IsValidDouble(sender.Text))
+                                        {
+                                            profile.SolarRadiationAbsorptionEfficiency =double.Parse(sender.Text);
+                                        }
+                                    });
+
             s.CreateAndAddTextBoxRow(container, nf, "Ambient Temperature (" + su.temperature + ")", cv.ConvertFromSI(su.temperature, profile.Temp_amb_estimar),
                                      (sender, e) =>
                                      {

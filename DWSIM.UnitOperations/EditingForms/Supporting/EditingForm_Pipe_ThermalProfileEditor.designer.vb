@@ -68,6 +68,8 @@ Partial Class PipeThermalProfileEditor
         Me.Label52 = New System.Windows.Forms.Label()
         Me.TextBoxCGTC = New System.Windows.Forms.TextBox()
         Me.Label53 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.tbSolarEff = New System.Windows.Forms.TextBox()
         Me.GroupBox7.SuspendLayout()
         Me.GroupBox8.SuspendLayout()
         Me.GroupBox9.SuspendLayout()
@@ -81,6 +83,8 @@ Partial Class PipeThermalProfileEditor
         'GroupBox7
         '
         resources.ApplyResources(Me.GroupBox7, "GroupBox7")
+        Me.GroupBox7.Controls.Add(Me.Label3)
+        Me.GroupBox7.Controls.Add(Me.tbSolarEff)
         Me.GroupBox7.Controls.Add(Me.Label2)
         Me.GroupBox7.Controls.Add(Me.tbSolarIrradiation)
         Me.GroupBox7.Controls.Add(Me.chkSolarIrradiationGlobal)
@@ -352,6 +356,16 @@ Partial Class PipeThermalProfileEditor
         resources.ApplyResources(Me.Label53, "Label53")
         Me.Label53.Name = "Label53"
         '
+        'Label3
+        '
+        resources.ApplyResources(Me.Label3, "Label3")
+        Me.Label3.Name = "Label3"
+        '
+        'tbSolarEff
+        '
+        resources.ApplyResources(Me.tbSolarEff, "tbSolarEff")
+        Me.tbSolarEff.Name = "tbSolarEff"
+        '
         'PipeThermalProfileEditor
         '
         resources.ApplyResources(Me, "$this")
@@ -418,4 +432,6 @@ Partial Class PipeThermalProfileEditor
     Public WithEvents chkIncludeSolarIrradiation As CheckBox
     Public WithEvents Label2 As Label
     Public WithEvents tbSolarIrradiation As TextBox
+    Public WithEvents Label3 As Label
+    Public WithEvents tbSolarEff As TextBox
 End Class

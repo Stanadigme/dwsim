@@ -755,12 +755,12 @@ Namespace UnitOperations
                                             Dim SR As Double
                                             If ThermalProfile.IncludeSolarRadiation Then
                                                 If ThermalProfile.UseGlobalSolarRadiation Then
-                                                    SR = FlowSheet.FlowsheetOptions.CurrentWeather.SolarIrradiation_kWh_m2
+                                                    SR = ThermalProfile.SolarRadiationAbsorptionEfficiency * FlowSheet.FlowsheetOptions.CurrentWeather.SolarIrradiation_kWh_m2
                                                 Else
-                                                    SR = ThermalProfile.SolarRadiationValue_kWh_m2
+                                                    SR = ThermalProfile.SolarRadiationAbsorptionEfficiency * ThermalProfile.SolarRadiationValue_kWh_m2
                                                 End If
-                                                DQ += SR / 12 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
-                                                DQmax += SR / 12 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
+                                                DQ += SR / 24.0 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
+                                                DQmax += SR / 24.0 * .Comprimento / .Incrementos * .DE * 0.0254 / 2
                                             End If
                                             If Double.IsNaN(DQ) Then DQ = 0.0#
                                             If Math.Abs(DQ) > Math.Abs(DQmax) Then DQ = DQmax
