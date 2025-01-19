@@ -39,26 +39,10 @@ Partial Class AboutBox
         Me.Label4 = New System.Windows.Forms.Label()
         Me.FaTabStrip1 = New FarsiLibrary.Win.FATabStrip()
         Me.FaTabStripItem1 = New FarsiLibrary.Win.FATabStripItem()
-        Me.Lblcpusimd = New System.Windows.Forms.Label()
         Me.Lblcpuinfo = New System.Windows.Forms.Label()
-        Me.Label13 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
         Me.Lblmem = New System.Windows.Forms.Label()
         Me.Label11 = New System.Windows.Forms.Label()
-        Me.FaTabStripItem2 = New FarsiLibrary.Win.FATabStripItem()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
-        Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column5 = New System.Windows.Forms.DataGridViewLinkColumn()
-        Me.Column6 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column7 = New System.Windows.Forms.DataGridViewLinkColumn()
-        Me.FaTabStripItem6 = New FarsiLibrary.Win.FATabStripItem()
-        Me.DataGridView2 = New System.Windows.Forms.DataGridView()
-        Me.DataGridViewTextBoxColumn3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.DataGridViewTextBoxColumn4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.DataGridViewLinkColumn3 = New System.Windows.Forms.DataGridViewLinkColumn()
         Me.FaTabStripItem3 = New FarsiLibrary.Win.FATabStripItem()
         Me.AssemblyInfoListView = New System.Windows.Forms.ListView()
         Me.colAssemblyName = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -71,10 +55,6 @@ Partial Class AboutBox
         CType(Me.FaTabStrip1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.FaTabStrip1.SuspendLayout()
         Me.FaTabStripItem1.SuspendLayout()
-        Me.FaTabStripItem2.SuspendLayout()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.FaTabStripItem6.SuspendLayout()
-        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.FaTabStripItem3.SuspendLayout()
         Me.FaTabStripItem7.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -167,17 +147,15 @@ Partial Class AboutBox
         Me.FaTabStrip1.AlwaysShowClose = False
         Me.FaTabStrip1.AlwaysShowMenuGlyph = False
         resources.ApplyResources(Me.FaTabStrip1, "FaTabStrip1")
-        Me.FaTabStrip1.Items.AddRange(New FarsiLibrary.Win.FATabStripItem() {Me.FaTabStripItem1, Me.FaTabStripItem2, Me.FaTabStripItem6, Me.FaTabStripItem3, Me.FaTabStripItem7})
+        Me.FaTabStrip1.Items.AddRange(New FarsiLibrary.Win.FATabStripItem() {Me.FaTabStripItem1, Me.FaTabStripItem3, Me.FaTabStripItem7})
         Me.FaTabStrip1.Name = "FaTabStrip1"
-        Me.FaTabStrip1.SelectedItem = Me.FaTabStripItem7
+        Me.FaTabStrip1.SelectedItem = Me.FaTabStripItem1
         '
         'FaTabStripItem1
         '
         Me.FaTabStripItem1.CanClose = False
         Me.FaTabStripItem1.Controls.Add(Me.TextBox1)
-        Me.FaTabStripItem1.Controls.Add(Me.Lblcpusimd)
         Me.FaTabStripItem1.Controls.Add(Me.Lblcpuinfo)
-        Me.FaTabStripItem1.Controls.Add(Me.Label13)
         Me.FaTabStripItem1.Controls.Add(Me.Label12)
         Me.FaTabStripItem1.Controls.Add(Me.Lblmem)
         Me.FaTabStripItem1.Controls.Add(Me.Label11)
@@ -191,25 +169,14 @@ Partial Class AboutBox
         Me.FaTabStripItem1.Controls.Add(Me.Label7)
         Me.FaTabStripItem1.IsDrawn = True
         Me.FaTabStripItem1.Name = "FaTabStripItem1"
+        Me.FaTabStripItem1.Selected = True
         resources.ApplyResources(Me.FaTabStripItem1, "FaTabStripItem1")
-        '
-        'Lblcpusimd
-        '
-        Me.Lblcpusimd.BackColor = System.Drawing.Color.Transparent
-        resources.ApplyResources(Me.Lblcpusimd, "Lblcpusimd")
-        Me.Lblcpusimd.Name = "Lblcpusimd"
         '
         'Lblcpuinfo
         '
         resources.ApplyResources(Me.Lblcpuinfo, "Lblcpuinfo")
         Me.Lblcpuinfo.BackColor = System.Drawing.Color.Transparent
         Me.Lblcpuinfo.Name = "Lblcpuinfo"
-        '
-        'Label13
-        '
-        resources.ApplyResources(Me.Label13, "Label13")
-        Me.Label13.BackColor = System.Drawing.Color.Transparent
-        Me.Label13.Name = "Label13"
         '
         'Label12
         '
@@ -228,121 +195,6 @@ Partial Class AboutBox
         resources.ApplyResources(Me.Label11, "Label11")
         Me.Label11.BackColor = System.Drawing.Color.Transparent
         Me.Label11.Name = "Label11"
-        '
-        'FaTabStripItem2
-        '
-        Me.FaTabStripItem2.CanClose = False
-        Me.FaTabStripItem2.Controls.Add(Me.DataGridView1)
-        Me.FaTabStripItem2.IsDrawn = True
-        Me.FaTabStripItem2.Name = "FaTabStripItem2"
-        resources.ApplyResources(Me.FaTabStripItem2, "FaTabStripItem2")
-        '
-        'DataGridView1
-        '
-        Me.DataGridView1.AllowUserToAddRows = False
-        Me.DataGridView1.AllowUserToDeleteRows = False
-        Me.DataGridView1.AllowUserToResizeRows = False
-        Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
-        Me.DataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
-        Me.DataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None
-        Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Column1, Me.Column2, Me.Column3, Me.Column4, Me.Column5, Me.Column6, Me.Column7})
-        resources.ApplyResources(Me.DataGridView1, "DataGridView1")
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.ReadOnly = True
-        Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        '
-        'Column1
-        '
-        resources.ApplyResources(Me.Column1, "Column1")
-        Me.Column1.Name = "Column1"
-        Me.Column1.ReadOnly = True
-        '
-        'Column2
-        '
-        resources.ApplyResources(Me.Column2, "Column2")
-        Me.Column2.Name = "Column2"
-        Me.Column2.ReadOnly = True
-        '
-        'Column3
-        '
-        resources.ApplyResources(Me.Column3, "Column3")
-        Me.Column3.Name = "Column3"
-        Me.Column3.ReadOnly = True
-        '
-        'Column4
-        '
-        resources.ApplyResources(Me.Column4, "Column4")
-        Me.Column4.Name = "Column4"
-        Me.Column4.ReadOnly = True
-        '
-        'Column5
-        '
-        resources.ApplyResources(Me.Column5, "Column5")
-        Me.Column5.Name = "Column5"
-        Me.Column5.ReadOnly = True
-        Me.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
-        '
-        'Column6
-        '
-        resources.ApplyResources(Me.Column6, "Column6")
-        Me.Column6.Name = "Column6"
-        Me.Column6.ReadOnly = True
-        '
-        'Column7
-        '
-        resources.ApplyResources(Me.Column7, "Column7")
-        Me.Column7.Name = "Column7"
-        Me.Column7.ReadOnly = True
-        Me.Column7.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
-        '
-        'FaTabStripItem6
-        '
-        Me.FaTabStripItem6.Controls.Add(Me.DataGridView2)
-        Me.FaTabStripItem6.IsDrawn = True
-        Me.FaTabStripItem6.Name = "FaTabStripItem6"
-        resources.ApplyResources(Me.FaTabStripItem6, "FaTabStripItem6")
-        '
-        'DataGridView2
-        '
-        Me.DataGridView2.AllowUserToAddRows = False
-        Me.DataGridView2.AllowUserToDeleteRows = False
-        Me.DataGridView2.AllowUserToResizeRows = False
-        Me.DataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        Me.DataGridView2.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
-        Me.DataGridView2.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None
-        Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView2.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.DataGridViewTextBoxColumn3, Me.DataGridViewTextBoxColumn4, Me.DataGridViewLinkColumn3})
-        resources.ApplyResources(Me.DataGridView2, "DataGridView2")
-        Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.ReadOnly = True
-        Me.DataGridView2.RowHeadersVisible = False
-        Me.DataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        '
-        'DataGridViewTextBoxColumn3
-        '
-        Me.DataGridViewTextBoxColumn3.FillWeight = 150.0!
-        resources.ApplyResources(Me.DataGridViewTextBoxColumn3, "DataGridViewTextBoxColumn3")
-        Me.DataGridViewTextBoxColumn3.Name = "DataGridViewTextBoxColumn3"
-        Me.DataGridViewTextBoxColumn3.ReadOnly = True
-        '
-        'DataGridViewTextBoxColumn4
-        '
-        resources.ApplyResources(Me.DataGridViewTextBoxColumn4, "DataGridViewTextBoxColumn4")
-        Me.DataGridViewTextBoxColumn4.Name = "DataGridViewTextBoxColumn4"
-        Me.DataGridViewTextBoxColumn4.ReadOnly = True
-        '
-        'DataGridViewLinkColumn3
-        '
-        Me.DataGridViewLinkColumn3.FillWeight = 300.0!
-        resources.ApplyResources(Me.DataGridViewLinkColumn3, "DataGridViewLinkColumn3")
-        Me.DataGridViewLinkColumn3.Name = "DataGridViewLinkColumn3"
-        Me.DataGridViewLinkColumn3.ReadOnly = True
-        Me.DataGridViewLinkColumn3.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.DataGridViewLinkColumn3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic
         '
         'FaTabStripItem3
         '
@@ -386,7 +238,6 @@ Partial Class AboutBox
         Me.FaTabStripItem7.Controls.Add(Me.tbAcknowledgements)
         Me.FaTabStripItem7.IsDrawn = True
         Me.FaTabStripItem7.Name = "FaTabStripItem7"
-        Me.FaTabStripItem7.Selected = True
         resources.ApplyResources(Me.FaTabStripItem7, "FaTabStripItem7")
         '
         'tbAcknowledgements
@@ -424,10 +275,6 @@ Partial Class AboutBox
         Me.FaTabStrip1.ResumeLayout(False)
         Me.FaTabStripItem1.ResumeLayout(False)
         Me.FaTabStripItem1.PerformLayout()
-        Me.FaTabStripItem2.ResumeLayout(False)
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.FaTabStripItem6.ResumeLayout(False)
-        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.FaTabStripItem3.ResumeLayout(False)
         Me.FaTabStripItem7.ResumeLayout(False)
         Me.FaTabStripItem7.PerformLayout()
@@ -451,9 +298,7 @@ Partial Class AboutBox
     Public WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents FaTabStrip1 As FarsiLibrary.Win.FATabStrip
     Friend WithEvents FaTabStripItem1 As FarsiLibrary.Win.FATabStripItem
-    Friend WithEvents FaTabStripItem2 As FarsiLibrary.Win.FATabStripItem
     Friend WithEvents FaTabStripItem3 As FarsiLibrary.Win.FATabStripItem
-    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents AssemblyInfoListView As System.Windows.Forms.ListView
     Friend WithEvents colAssemblyName As System.Windows.Forms.ColumnHeader
     Friend WithEvents colAssemblyVersion As System.Windows.Forms.ColumnHeader
@@ -461,23 +306,9 @@ Partial Class AboutBox
     Friend WithEvents colAssemblyCodeBase As System.Windows.Forms.ColumnHeader
     Public WithEvents Lblmem As System.Windows.Forms.Label
     Public WithEvents Label11 As System.Windows.Forms.Label
-    Public WithEvents Lblcpusimd As System.Windows.Forms.Label
     Public WithEvents Lblcpuinfo As System.Windows.Forms.Label
-    Public WithEvents Label13 As System.Windows.Forms.Label
     Public WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents PictureBox1 As System.Windows.Forms.PictureBox
-    Friend WithEvents Column1 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Column2 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Column3 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Column4 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Column5 As System.Windows.Forms.DataGridViewLinkColumn
-    Friend WithEvents Column6 As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Column7 As System.Windows.Forms.DataGridViewLinkColumn
-    Friend WithEvents FaTabStripItem6 As FarsiLibrary.Win.FATabStripItem
-    Friend WithEvents DataGridView2 As DataGridView
-    Friend WithEvents DataGridViewTextBoxColumn3 As DataGridViewTextBoxColumn
-    Friend WithEvents DataGridViewTextBoxColumn4 As DataGridViewTextBoxColumn
-    Friend WithEvents DataGridViewLinkColumn3 As DataGridViewLinkColumn
     Friend WithEvents FaTabStripItem7 As FarsiLibrary.Win.FATabStripItem
     Public WithEvents tbAcknowledgements As TextBox
 End Class
