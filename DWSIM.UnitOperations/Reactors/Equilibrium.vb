@@ -1608,15 +1608,15 @@ Namespace Reactors
                     AI.ConvergenceHelper.Manager.StoreData(
                     New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
-                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
-                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray().ToSingle(),
+                        .MixtureMolarFlows2 = N.Values.ToArray().ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.EquilibriumReactorAdiabatic})
                 Else
                     AI.ConvergenceHelper.Manager.StoreData(
                       New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
-                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
-                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray().ToSingle(),
+                        .MixtureMolarFlows2 = N.Values.ToArray().ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.EquilibriumReactorIsothermic})
                 End If
             End If

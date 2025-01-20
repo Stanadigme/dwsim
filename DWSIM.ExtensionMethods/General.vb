@@ -608,7 +608,7 @@ Public Module General
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <System.Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As Array) As String
 
         Dim retstr As String = "{ "
@@ -619,6 +619,13 @@ Public Module General
         retstr += "}"
 
         Return retstr
+
+    End Function
+
+    <System.Runtime.CompilerServices.Extension()>
+    Public Function ToSingle(vector As Double()) As Single()
+
+        Return vector.Select(Function(d) Convert.ToSingle(d)).ToArray()
 
     End Function
 

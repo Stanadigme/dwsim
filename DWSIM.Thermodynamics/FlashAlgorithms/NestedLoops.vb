@@ -358,8 +358,8 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 AI.ConvergenceHelper.Manager.StoreData(
                 New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                     .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                    .Temperature = T, .Pressure = P, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx.MultiplyConstY(L),
-                    .VaporMolarFlows = Vy.MultiplyConstY(V), .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                    .Temperature = T, .Pressure = P, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx.MultiplyConstY(L).ToSingle(),
+                    .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(), .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                     .RequestType = Interfaces.ConvergenceHelperRequestType.PTFlash})
             End If
 
@@ -871,9 +871,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                     AI.ConvergenceHelper.Manager.StoreData(
                         New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                        .Temperature = T, .Pressure = P, .MassEnthalpy = H, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1),
-                        .VaporMolarFlows = Vy.MultiplyConstY(V),
-                        .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                        .Temperature = T, .Pressure = P, .MassEnthalpy = H, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1).ToSingle(),
+                        .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(),
+                        .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.PHFlash})
                 End If
 
@@ -1186,9 +1186,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 AI.ConvergenceHelper.Manager.StoreData(
                         New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                        .Temperature = T, .Pressure = P, .MassEnthalpy = H, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1),
-                        .VaporMolarFlows = Vy.MultiplyConstY(V),
-                        .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                        .Temperature = T, .Pressure = P, .MassEnthalpy = H, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1).ToSingle(),
+                        .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(),
+                        .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.PHFlash})
             End If
 
@@ -1419,9 +1419,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 AI.ConvergenceHelper.Manager.StoreData(
                         New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                        .Temperature = T, .Pressure = P, .MassEntropy = S, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1),
-                        .VaporMolarFlows = Vy.MultiplyConstY(V),
-                        .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                        .Temperature = T, .Pressure = P, .MassEntropy = S, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1).ToSingle(),
+                        .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(),
+                        .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.PSFlash})
             End If
 
@@ -1699,9 +1699,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 AI.ConvergenceHelper.Manager.StoreData(
                         New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                         .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                        .Temperature = T, .Pressure = P, .MassEntropy = S, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1),
-                        .VaporMolarFlows = Vy.MultiplyConstY(V),
-                        .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                        .Temperature = T, .Pressure = P, .MassEntropy = S, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx1.MultiplyConstY(L1).ToSingle(),
+                        .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(),
+                        .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.PSFlash})
             End If
 
@@ -2208,8 +2208,8 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                 AI.ConvergenceHelper.Manager.StoreData(
                 New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
                     .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Ki.Count,
-                    .Temperature = T, .Pressure = P, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx.MultiplyConstY(L),
-                    .VaporMolarFlows = Vy.MultiplyConstY(V), .KValuesVL1 = Ki, .MixtureMolarFlows = Vz,
+                    .Temperature = T, .Pressure = P, .VaporMolarFraction = V, .Liquid1MolarFlows = Vx.MultiplyConstY(L).ToSingle(),
+                    .VaporMolarFlows = Vy.MultiplyConstY(V).ToSingle(), .KValuesVL1 = Ki.ToSingle(), .MixtureMolarFlows = Vz.ToSingle(),
                     .RequestType = Interfaces.ConvergenceHelperRequestType.TVFlash})
             End If
 
@@ -2318,7 +2318,7 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                         .CompoundNames = PP.RET_VNAMES(), .ModelName = PP.ComponentName, .NumberOfCompounds = Vz.Count,
                         .Temperature = result(4), .Pressure = P, .VaporMolarFraction = result(1), .Liquid1MolarFlows = result(2).MultiplyConstY(result(0)),
                         .VaporMolarFlows = result(3).MultiplyConstY(result(1)),
-                        .KValuesVL1 = result(6), .MixtureMolarFlows = Vz,
+                        .KValuesVL1 = result(6), .MixtureMolarFlows = Vz.ToSingle(),
                         .RequestType = Interfaces.ConvergenceHelperRequestType.PVFlash})
                 End If
 
