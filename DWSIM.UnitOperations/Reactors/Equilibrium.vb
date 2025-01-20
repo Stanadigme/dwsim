@@ -1603,6 +1603,24 @@ Namespace Reactors
 
             OutletTemperature = T
 
+            If Settings.ConvergenceHelperEnabled Then
+                If ReactorOperationMode = OperationMode.Adiabatic Then
+                    AI.ConvergenceHelper.Manager.StoreData(
+                    New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.EquilibriumReactorAdiabatic})
+                Else
+                    AI.ConvergenceHelper.Manager.StoreData(
+                      New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.EquilibriumReactorIsothermic})
+                End If
+            End If
+
             Dim Hv As Double
 
             cp = Me.GraphicObject.OutputConnectors(0)

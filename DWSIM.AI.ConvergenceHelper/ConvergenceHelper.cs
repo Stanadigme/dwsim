@@ -27,11 +27,13 @@ namespace DWSIM.AI.ConvergenceHelper
         public int NumberOfCompounds { get; set; }
         public string[] CompoundNames { get; set; }
         public double? Temperature { get; set; }
+        public double? Temperature2 { get; set; }
         public double? Pressure { get; set; }
         public double? MassEnthalpy { get; set; }
         public double? MassEntropy { get; set; }
         public double? VaporMolarFraction { get; set; }
         public double[] MixtureMolarFlows { get; set; }
+        public double[] MixtureMolarFlows2 { get; set; }
         public double[] VaporMolarFlows { get; set; }
         public double[] Liquid1MolarFlows { get; set; }
         public double[] Liquid2MolarFlows { get; set; }

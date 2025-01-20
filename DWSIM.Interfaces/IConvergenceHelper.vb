@@ -21,6 +21,8 @@ Public Interface IConvergenceHelperTrainingData
 
     Property Temperature As Double?
 
+    Property Temperature2 As Double?
+
     Property Pressure As Double?
 
     Property MassEnthalpy As Double?
@@ -30,6 +32,8 @@ Public Interface IConvergenceHelperTrainingData
     Property VaporMolarFraction As Double?
 
     Property MixtureMolarFlows As Double()
+
+    Property MixtureMolarFlows2 As Double()
 
     Property VaporMolarFlows As Double()
 

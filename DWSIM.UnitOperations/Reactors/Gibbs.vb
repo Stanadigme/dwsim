@@ -1591,6 +1591,24 @@ Namespace Reactors
 
             OutletTemperature = T
 
+            If Settings.ConvergenceHelperEnabled Then
+                If ReactorOperationMode = OperationMode.Adiabatic Then
+                    AI.ConvergenceHelper.Manager.StoreData(
+                    New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = Ki.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.GibbsReactorAdiabatic})
+                Else
+                    AI.ConvergenceHelper.Manager.StoreData(
+                      New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = Ki.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.GibbsReactorIsothermic})
+                End If
+            End If
+
             Dim ms As MaterialStream
             Dim cp As IConnectionPoint
 
@@ -2431,6 +2449,24 @@ Namespace Reactors
             Next
 
             IObj?.SetCurrent
+
+            If Settings.ConvergenceHelperEnabled Then
+                If ReactorOperationMode = OperationMode.Adiabatic Then
+                    AI.ConvergenceHelper.Manager.StoreData(
+                    New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.GibbsReactorAdiabatic})
+                Else
+                    AI.ConvergenceHelper.Manager.StoreData(
+                      New AI.ConvergenceHelper.ConvergenceHelperTrainingData With {
+                        .CompoundNames = pp.RET_VNAMES(), .ModelName = pp.ComponentName, .NumberOfCompounds = N.Count,
+                        .Temperature = T0, .Temperature2 = T, .Pressure = P, .MixtureMolarFlows = N0.Values.ToArray(),
+                        .MixtureMolarFlows2 = N.Values.ToArray(),
+                        .RequestType = Interfaces.ConvergenceHelperRequestType.GibbsReactorIsothermic})
+                End If
+            End If
 
             Dim W As Double = ims.Phases(0).Properties.massflow.GetValueOrDefault
 
